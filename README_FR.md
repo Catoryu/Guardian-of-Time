@@ -22,7 +22,7 @@ Createur de LOBJ.
 Discord : F.Nax_OS#0002
 
 Leandro Saraiva Maia :  
-Aide aux dialogues et logique de l'histoire.  
+Aide aux dialogues, logique de l'histoire et code.  
 Email : leandro262009@gmail.com  
 Discord : Leandro4002#7992
 

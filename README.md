@@ -22,7 +22,7 @@ Creator of LOBJ.
 Discord : F.Nax_OS#0002
 
 Leandro Saraiva Maia :  
-Help for dialogues and story logic.  
+Help for dialogues, story logic and code.  
 Email : leandro262009@gmail.com  
 Discord : Leandro4002#7992
 
