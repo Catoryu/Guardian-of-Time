@@ -1,0 +1,15 @@
+Here are only types of blocks
+
+Type    :	Move	Destroy	Create	Ghost	Gravity
+----------------------------------------------------------------
+Normal  : 	N	N	N	N	N
+Ice	:	N	Y	Y	N	N
+Snow	:	Y	Y	Y	N	Y
+Sand	:	Y	Y	Y	N	Y
+Water	:	N	Y	N	Y	Y
+Liquid	:	N	Y	N	Y	Y
+Magma	:	N	Y	N	Y	Y
+Cloud	:	Y	Y	Y	N	N
+Steel	:	N	Y	Y	N	N
+
+Power	:	ADAPTS
