@@ -23,4 +23,7 @@ end
 
 function love.draw()
 
+    love.graphics.print(player.weapon[2].name, 10, 10, _, _, _, _, _, _, _)
+    player.hitbox:draw()
+    
 end

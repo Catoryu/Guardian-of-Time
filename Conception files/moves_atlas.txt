@@ -1,0 +1,18 @@
+-Stand
+-Crouch
+-Walk stand
+-Walk crouched
+-Jump
+-Dash
+-Special attack
+-Up attack
+-Down attack
+-Front attack
+-Back attack
+-Air attack
+-Dash attack
+
+One for each of those :
+-Specie
+-Clothes
+-Weapon
