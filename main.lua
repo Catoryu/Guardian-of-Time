@@ -1,6 +1,6 @@
 function love.load()
 
-    dofile("lobj.lua")
+    dofile("assets/lobj.lua")
     dofile("conf.lua")
     dofile("world.lua")
     dofile("entities.lua")
@@ -25,5 +25,5 @@ function love.draw()
 
     love.graphics.print(player.weapon[2].name, 10, 10, _, _, _, _, _, _, _)
     player.hitbox:draw()
-    
+
 end
