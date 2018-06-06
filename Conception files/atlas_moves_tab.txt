@@ -1,15 +1,28 @@
 Appearance :
+
 -Specie
+
 -Clothes
 
+
+
 Moves :
+
 -Weapon
+
 -Jump
+
 -Dash
 -Special attack
+
 -Up attack
+
 -Down attack
+
 -Front attack
+
 -Back attack
+
 -Air attack
+
 -Dash attack

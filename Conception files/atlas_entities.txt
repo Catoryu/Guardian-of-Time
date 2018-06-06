@@ -1,79 +1,154 @@
 Here are only entities that aren't enemies (magic or other things)(Some of they can be "blocks")
 
+
 Water :
+
 --Water Attacks
+
 --Water Boost (Using water blocks nearby as source)
+
 --Water Heal
+
 --Water Body
+
 -Liquid :
+
 --Liquid Attacks
+
 -Steam :
+
 --Steam Attacks
+
 --Steam Body
 Fire :
+
 --Fire Attacks
+
 --Fire Control (Grouping fire entities nearby)
+
 --Fire Body
 -Heat :
+
 --Heat Augmentation
+
 -Magma :
+
 --Magma Attacks
+
 --Magma Body
+
 Earth :
+
 --Earth Attacks
+
 --Earth Control (Grouping earth entities nearby)
+
 --Earth Creation
+
 -Steel :
+
 --Steel Attacks
+
 --Steel Control (Grouping steel entities nearby)
+
 --Steel Body
+
 --Steel Creation
+
 -Sand :
+
 --Sand Attacks
+
 --Sand Control (Grouping sand entities nearby)
+
 --Sand Body
+
 --Sand Creation
+
 Air :
+
 --Wind Attacks
+
 --Wind Control
+
 -Cloud :
+
 --Cloud Creation
+
 --Cloud Movements
+
 -Vibrations :
+
 --Vibrations Creation
+
 --Vibrations Absorption
+
 Lightning :
+
 --Lightning Attacks
+
 -Plasma :
+
 --Plasma Attacks
+
 --Plasma Body
+
 -Tempest :
+
 --Tempest Attacks
+
 Ice :
+
 --Ice Attacks
+
 --Ice Control (Grouping ice entities nearby)
+
 --Ice Creation
+
 -Cold :
+
 --Cold Augmentation
+
 -Snow :
+
 --Snow Attacks
+
 --Snow Body
+
 --Snow Creation
+
 --Snow Curing
+
 Drakness :
+
 --Darkness Attacks
+
 --Darkness Body
+
 -Soul :
+
 --Soul Steal
+
 --Soul Corruption (Using souls stealed to attack)
+
 -Void :
+
 --Void Attacks (Attacks suppress entities)
+
 Light :
+
 --Light Heal
+
 --Light Attacks
+
 --Light Boost (Using nearby light as source)
+
 -Life :
+
 --Life/Plants Attacks
+
 --Life/Plants Ultra Heal (Place healing sentries)
+
 -Creation :
+
 --Summoning
