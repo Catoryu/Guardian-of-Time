@@ -5,21 +5,21 @@ function love.conf(t)
     t.accelerometerjoystick = true      -- Enable the accelerometer on iOS and Android by exposing it as a Joystick (boolean) 
     t.externalstorage = false           -- True to save files (and read from the save directory) in external storage on Android (boolean)  
     t.gammacorrect = false              -- Enable gamma-correct rendering, when supported by the system (boolean) 
-  
-    t.window.title = "Guardian of Time" -- The window title (string) 
-    t.window.icon = nil                 -- Filepath to an image to use as the window's icon (string) 
-    t.window.width = 1280               -- The window width (number) 
-    t.window.height = 720               -- The window height (number) 
-    t.window.borderless = false         -- Remove all border visuals from the window (boolean) 
-    t.window.resizable = false          -- Let the window be user-resizable (boolean) 
-    t.window.minwidth = 1               -- Minimum window width if the window is resizable (number) 
-    t.window.minheight = 1              -- Minimum window height if the window is resizable (number) 
-    t.window.fullscreen = false         -- Enable fullscreen (boolean) 
-    t.window.fullscreentype = "desktop" -- Choose between "desktop" fullscreen or "exclusive" fullscreen mode (string) 
-    t.window.vsync = false              -- Enable vertical sync (boolean) 
-    t.window.msaa = 0                   -- The number of samples to use with multi-sampled antialiasing (number) 
-    t.window.display = 1                -- Index of the monitor to show the window in (number) 
-    t.window.highdpi = false            -- Enable high-dpi mode for the window on a Retina display (boolean) 
+
+    t.window.title = wdow.title         -- The window title (string)
+    t.window.icon = nil                 -- Filepath to an image to use as the window's icon (string)
+    t.window.width = wdow.wth           -- The window width (number)
+    t.window.height = wdow.hgt          -- The window height (number)
+    t.window.borderless = false         -- Remove all border visuals from the window (boolean)
+    t.window.resizable = false          -- Let the window be user-resizable (boolean)
+    t.window.minwidth = 1               -- Minimum window width if the window is resizable (number)
+    t.window.minheight = 1              -- Minimum window height if the window is resizable (number)
+    t.window.fullscreen = false         -- Enable fullscreen (boolean)
+    t.window.fullscreentype = "desktop" -- Choose between "desktop" fullscreen or "exclusive" fullscreen mode (string)
+    t.window.vsync = false              -- Enable vertical sync (boolean)
+    t.window.msaa = 0                   -- The number of samples to use with multi-sampled antialiasing (number)
+    t.window.display = 1                -- Index of the monitor to show the window in (number)
+    t.window.highdpi = false            -- Enable high-dpi mode for the window on a Retina display (boolean)
     t.window.x = nil                    -- The x-coordinate of the window's position in the specified display (number) 
     t.window.y = nil                    -- The y-coordinate of the window's position in the specified display (number) 
   
@@ -40,18 +40,14 @@ function love.conf(t)
     t.modules.window = true             -- Enable the window module (boolean) 
     t.modules.thread = true             -- Enable the thread module (boolean) 
 end 
- 
---Window informations 
-wdow = { 
-    mode = false, 
-    width = 1280, 
-    height = 720, 
-    wth = 1280, 
-    hgt = 720, 
-    title = "Guardian of Time", 
-}
 
-test = "value" 
+--Window informations 
+wdow = {
+    mode = false,
+    wth = 1600,
+    hgt = 900,
+    title = "Guardian of Time"
+}
  
 bground = { 
     color = {0, 0, 0} 
@@ -61,18 +57,18 @@ text = {
     color = {255, 255, 255}
 }
  
-debug = {
-    messages = {"wdow.wth"},
-    color = {0, 200, 0},
-    draw = function()
---        for i, v in pairs(debug.messages) do
---            local val = 0
---            for i = 1, #v do
---               if string.sub(v, i, i) == "." then
---                    val = _G[v][string.sub(v, i + 1, #v)]
---                end
+debug = {}
+debug.font = lg.newFont("fonts/consola.ttf")
+debug.messages = {"wdow.wth"}
+debug.color = {0, 200, 0}
+debug.draw = function()
+--    for i, v in pairs(debug.messages) do
+--        local val = 0
+--        for i = 1, #v do
+--           if string.sub(v, i, i) == "." then
+--                val = _G[v][string.sub(v, i + 1, #v)]
 --            end
---            lg.print(v.." : "..val, 10, i*20)
 --        end
-    end
-}
+--        lg.print(v.." : "..val, 10, i*20)
+--    end
+end

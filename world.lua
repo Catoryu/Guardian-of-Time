@@ -1,4 +1,7 @@
 --World/Map creation
+room = {}
 
 --Physics
-gravityStandard = 400
+gravity = 4000
+chapter = 0
+level = 0
