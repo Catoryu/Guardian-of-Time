@@ -8,7 +8,7 @@ function love.load()
   math.randomseed(os.time())
   inputs = {}
   gravity = 4000
-  
+
   mouse = {}
   mouse.firstX = 0
   mouse.firstY = 0
@@ -41,7 +41,7 @@ function love.load()
     end
   end
   player.moveX = function(moveSpeed)
-    
+
     if moveSpeed < 0 then
       --Collision bord de l'écran
       if player.x + moveSpeed < 0 then player.x = 0; return end
@@ -65,16 +65,16 @@ function love.load()
         end
       end
     end
-    
+
     player.x = player.x + moveSpeed
-    
+
     for i, v in pairs(platforms) do
       if (player.y >= v.y and player.y + player.hgt < v.y) and ((player.x >= v.x + v.wth) or (player.x + player.wth <= v.x)) then
         player.isJumping = true
       end
     end
   end
-  
+
   player.moveY = function(moveSpeed)
     if moveSpeed > 0 then
       --Collision bord de l'écran
@@ -102,25 +102,25 @@ function love.load()
         end
       end
     end
-    
+
     player.y = player.y + moveSpeed
   end
-  
+
   platforms = {}
   function createPlatform(x, y, wth, hgt)
     local platform = {}
-    
+
     platform.x = x
     platform.y = y
     platform.wth = wth
     platform.hgt = hgt
-    
+
     table.insert(platforms, platform)
   end
 end
 
 function love.keypressed(key)
-  if key == "w" or key == "space" then 
+  if key == "w" or key == "space" then
     player.jumpKeyDownTime = 0
     player.jumpKeyDown = true
     player.jump()
@@ -128,7 +128,7 @@ function love.keypressed(key)
   if key == "s" or key == "down" then table.insert(inputs, 1) end
   if key == "a" or key == "left" then table.insert(inputs, 2) end
   if key == "d" or key == "right" then table.insert(inputs, 3) end
-  
+
   if key == "escape" then love.event.quit() end
   if key == "delete" then table.remove(platforms, #platforms)end
 end
@@ -137,7 +137,7 @@ function love.keyreleased(key)
   if key == "w" or key == "space" then
     player.jumpKeyDown = false
   end
-  
+
   if key == "s" or key == "down" then
     for i, v in pairs(inputs) do
       if v == 1 then
@@ -145,7 +145,7 @@ function love.keyreleased(key)
       end
     end
   end
-  
+
   if key == "a" or key == "left" then
     for i, v in pairs(inputs) do
       if v == 2 then
@@ -153,7 +153,7 @@ function love.keyreleased(key)
       end
     end
   end
-  
+
   if key == "d" or key == "right" then
     for i, v in pairs(inputs) do
       if v == 3 then
@@ -172,7 +172,7 @@ function love.update(dt)
   elseif inputs[#inputs] == 3 then
     player.moveX(player.moveSpd * dt)
   end
-  
+
   if player.jumpKeyDown then
     player.jumpKeyDownTime = player.jumpKeyDownTime + 1000*dt
   end
@@ -191,7 +191,7 @@ function love.update(dt)
 
   --Applique la gravité
   player.ySpd = player.ySpd + gravity*dt
-  
+
   --Annule la gravité
   if player.canJumpHigher then
     player.ySpd = player.ySpd - gravity*dt
@@ -200,9 +200,9 @@ function love.update(dt)
 
   player.moveY(player.ySpd * dt)
   player.moveX(player.xSpd * dt)
-  
+
   if player.ySpd > 0 then player.isJumping = true end
-  
+
   if player.isJumping then
     player.airTime = player.airTime + 1000 * dt
   else
@@ -249,12 +249,12 @@ function love.draw()
   lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
   lg.print("#platforms : "..#platforms, 10, 230)
   lg.print("FPS : "..love.timer.getFPS(), 10, 250)
-  
+
   for i, v in pairs(platforms) do
     lg.setColor(255, 0, 0)
     lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)
   end
-  
+
   lg.setColor(0, 255, 0)
   lg.rectangle("fill", player.x, player.y, player.wth, player.hgt)
 end

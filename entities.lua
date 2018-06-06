@@ -4,8 +4,15 @@ class = {
 
 }
 
+player_basic_info = {
+    x = 20,
+    y = 20,
+    width = 50,
+    height = 100
+}
+
 player = {
-    hitbox = lobj_shape_rectangle:new(),
+    hitbox = lobj_shape_rectangle:new(player_basic_info),
     weapon = {
         {
             name = "Chain"
@@ -61,5 +68,3 @@ player = {
 
     }
 }
-
-player.hitbox:setXYWH(20, 20, 50, 100)

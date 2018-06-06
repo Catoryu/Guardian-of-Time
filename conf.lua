@@ -23,3 +23,6 @@ text = {
         b = 255
     }
 }
+
+--Configuration
+math.randomseed(os.time())
