@@ -42,7 +42,6 @@ function love.conf(t)
 end 
  
 --Window informations 
-window = { 
 wdow = { 
     mode = false, 
     width = 1280, 
@@ -50,43 +49,30 @@ wdow = {
     wth = 1280, 
     hgt = 720, 
     title = "Guardian of Time", 
-} 
- 
---Background 
-background = { 
-    color = { 
-        r = 0, 
-        g = 0, 
-        b = 0 
-    } 
+}
+
 test = "value" 
  
 bground = { 
     color = {0, 0, 0} 
 } 
+
+text = {
+    color = {255, 255, 255}
+}
  
---Texts 
-text = { 
-    color = { 
-        r = 255, 
-        g = 255, 
-        b = 255 
-    } 
-    color = {255, 255, 255} 
-} 
- 
-debug = { 
-    messages = {"wdow.wth"}, 
-    color = {0, 200, 0}, 
-    draw = function() 
-        for i, v in pairs(debug.messages) do 
-            local val = 0 
-            for i = 1, #v do 
-               if string.sub(v, i, i) == "." then 
-                    val = _G[v][string.sub(v, i + 1, #v)] 
-                end 
-            end 
-            lg.print(v.." : "..val, 10, i*20) 
-        end 
-    end 
+debug = {
+    messages = {"wdow.wth"},
+    color = {0, 200, 0},
+    draw = function()
+--        for i, v in pairs(debug.messages) do
+--            local val = 0
+--            for i = 1, #v do
+--               if string.sub(v, i, i) == "." then
+--                    val = _G[v][string.sub(v, i + 1, #v)]
+--                end
+--            end
+--            lg.print(v.." : "..val, 10, i*20)
+--        end
+    end
 }

@@ -1,5 +1,5 @@
 function love.load()
-    dofile("lobj.lua")
+    dofile("assets/lobj.lua")
     dofile("conf.lua")
     dofile("world.lua")
     dofile("entities.lua")
