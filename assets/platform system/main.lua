@@ -46,21 +46,23 @@ function love.load()
       --Collision bord de l'écran
       if player.x + moveSpeed < 0 then player.x = 0; return end
       --Collisions coté droit des plateformes
-      for i, v in pairs(platforms) do
+      for i, v in pairs(platforms.container) do
         if (player.y + player.hgt - 1 > v.y and player.y < v.y + v.hgt) and
         (player.x + moveSpeed < v.x + v.wth and player.x + moveSpeed + player.wth > v.x + v.wth) then
           player.x = player.x - (player.x - (v.x + v.wth))
+          player.xSpd = 0
           return
         end
       end
-    else
+    elseif moveSpeed > 0 then
       --Collision bord de l'écran
       if player.x + moveSpeed + player.wth > wdowHgt then player.x = wdowWth - player.wth; return end
       --Collisions coté gauche des plateformes
-      for i, v in pairs(platforms) do
+      for i, v in pairs(platforms.container) do
         if (player.y + player.hgt - 1 > v.y and player.y < v.y + v.hgt) and
         (player.x + moveSpeed < v.x and player.x + moveSpeed + player.wth > v.x) then
           player.x = player.x + (v.x - (player.x + player.wth))
+          player.xSpd = 0
           return
         end
       end
@@ -68,7 +70,7 @@ function love.load()
 
     player.x = player.x + moveSpeed
 
-    for i, v in pairs(platforms) do
+    for i, v in pairs(platforms.container) do
       if (player.y >= v.y and player.y + player.hgt < v.y) and ((player.x >= v.x + v.wth) or (player.x + player.wth <= v.x)) then
         player.isJumping = true
       end
@@ -76,11 +78,23 @@ function love.load()
   end
 
   player.moveY = function(moveSpeed)
-    if moveSpeed > 0 then
+    if moveSpeed < 0 then
+      --Collision bord de l'écran
+      if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return end
+      --Collisions coté dessous des plateformes
+      for i, v in pairs(platforms.container) do
+        if (player.y + moveSpeed > v.y + v.hgt - player.hgt and player.y + moveSpeed < v.y + v.hgt) and
+        (player.x < v.x + v.wth and player.x + player.wth > v.x) then
+          player.ySpd = 0
+          player.y = player.y - (player.y - (v.y + v.hgt))
+          return
+        end
+      end
+    elseif moveSpeed > 0 then
       --Collision bord de l'écran
       if player.y + moveSpeed + player.hgt > wdowHgt then player.y = wdowHgt - player.hgt; player.isJumping = false; player.ySpd = 0; return end
       --Collisions coté dessus des plateformes
-      for i, v in pairs(platforms) do
+      for i, v in pairs(platforms.container) do
         if (player.y + moveSpeed + player.hgt > v.y and player.y + moveSpeed < v.y) and
         (player.x < v.x + v.wth and player.x + player.wth > v.x) then
           player.isJumping = false
@@ -89,33 +103,60 @@ function love.load()
           return
         end
       end
-    else
-      --Collision bord de l'écran
-      if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return end
-      --Collisions coté dessous des plateformes
-      for i, v in pairs(platforms) do
-        if (player.y + moveSpeed > v.y + v.hgt - player.hgt and player.y + moveSpeed < v.y + v.hgt) and
-        (player.x < v.x + v.wth and player.x + player.wth > v.x) then
-          player.ySpd = 0
-          player.y = player.y - (player.y - (v.y + v.hgt))
-          return
-        end
-      end
     end
-
+    
     player.y = player.y + moveSpeed
   end
 
   platforms = {}
-  function createPlatform(x, y, wth, hgt)
+  platforms.container = {}
+  platforms.create = function(x, y, wth, hgt)
     local platform = {}
-
+    
     platform.x = x
     platform.y = y
     platform.wth = wth
     platform.hgt = hgt
-
-    table.insert(platforms, platform)
+    
+    table.insert(platforms.container, platform)
+  end
+  platforms.moveX = function(moveSpeed)
+    for i, v in pairs(platforms.container) do
+      v.x = v.x + moveSpeed
+      
+      if moveSpeed < 0 then
+        --Collision coté droit platformes
+        if (player.y + player.hgt - 1 > v.y and player.y < v.y + v.hgt) and
+        (player.x < v.x and player.x + player.wth > v.x) then
+          player.x = v.x - player.wth
+        end
+      elseif moveSpeed > 0 then
+        --Collision coté droit platformes
+        if (player.y + player.hgt - 1 > v.y and player.y < v.y + v.hgt) and
+        (player.x < v.x + v.wth and player.x + player.wth > v.x + v.wth) then
+          player.x = v.x + v.wth
+        end
+      end
+    end
+  end
+  platforms.moveY = function(moveSpeed)
+    for i, v in pairs(platforms.container) do
+      v.y = v.y + moveSpeed
+      
+      if moveSpeed < 0 then
+        --Collisions coté dessous des plateformes
+        if (player.y > v.y + v.hgt - player.hgt and player.y < v.y + v.hgt) and
+        (player.x < v.x + v.wth and player.x + player.wth > v.x) then
+          player.y = v.y + v.hgt
+        end
+      elseif moveSpeed > 0 then
+        --Collisions coté dessus des plateformes
+        if (player.y + player.hgt > v.y and player.y < v.y) and
+        (player.x < v.x + v.wth and player.x + player.wth > v.x) then
+          player.y = v.y - player.hgt
+        end
+      end
+    end
   end
 end
 
@@ -125,12 +166,12 @@ function love.keypressed(key)
     player.jumpKeyDown = true
     player.jump()
   end
-  if key == "s" or key == "down" then table.insert(inputs, 1) end
-  if key == "a" or key == "left" then table.insert(inputs, 2) end
-  if key == "d" or key == "right" then table.insert(inputs, 3) end
+  if key == "s" then table.insert(inputs, 1) end
+  if key == "a" then table.insert(inputs, 2) end
+  if key == "d" then table.insert(inputs, 3) end
 
   if key == "escape" then love.event.quit() end
-  if key == "delete" then table.remove(platforms, #platforms)end
+  if key == "delete" then table.remove(platforms.container, #platforms.container)end
 end
 
 function love.keyreleased(key)
@@ -138,7 +179,7 @@ function love.keyreleased(key)
     player.jumpKeyDown = false
   end
 
-  if key == "s" or key == "down" then
+  if key == "s" then
     for i, v in pairs(inputs) do
       if v == 1 then
         table.remove(inputs, i)
@@ -146,7 +187,7 @@ function love.keyreleased(key)
     end
   end
 
-  if key == "a" or key == "left" then
+  if key == "a" then
     for i, v in pairs(inputs) do
       if v == 2 then
         table.remove(inputs, i)
@@ -209,6 +250,22 @@ function love.update(dt)
     player.airTime = 0
     player.jumpLevel = 1
   end
+  
+  if keyDown("left") then
+    platforms.moveX(-50*dt)
+  end
+  
+  if keyDown("right") then
+    platforms.moveX(50*dt)
+  end
+  
+  if keyDown("up") then
+    platforms.moveY(-50*dt)
+  end
+  
+  if keyDown("down") then
+    platforms.moveY(50*dt)
+  end
 end
 
 function love.mousepressed(_, _, button)
@@ -221,13 +278,13 @@ function love.mousereleased(_, _, button)
   if button == 1 then
     mouse.secondX, mouse.secondY = love.mouse.getPosition()
     if mouse.secondX > mouse.firstX and mouse.secondY > mouse.firstY then
-      createPlatform(mouse.firstX, mouse.firstY, mouse.secondX - mouse.firstX, mouse.secondY - mouse.firstY)
+      platforms.create(mouse.firstX, mouse.firstY, mouse.secondX - mouse.firstX, mouse.secondY - mouse.firstY)
     elseif mouse.secondX < mouse.firstX and mouse.secondY > mouse.firstY then
-      createPlatform(mouse.secondX, mouse.firstY, mouse.firstX - mouse.secondX, mouse.secondY - mouse.firstY)
+      platforms.create(mouse.secondX, mouse.firstY, mouse.firstX - mouse.secondX, mouse.secondY - mouse.firstY)
     elseif mouse.secondX > mouse.firstX and mouse.secondY < mouse.firstY then
-      createPlatform(mouse.firstX, mouse.secondY, mouse.secondX - mouse.firstX, mouse.firstY - mouse.secondY)
+      platforms.create(mouse.firstX, mouse.secondY, mouse.secondX - mouse.firstX, mouse.firstY - mouse.secondY)
     else
-      createPlatform(mouse.secondX, mouse.secondY, mouse.firstX - mouse.secondX, mouse.firstY - mouse.secondY)
+      platforms.create(mouse.secondX, mouse.secondY, mouse.firstX - mouse.secondX, mouse.firstY - mouse.secondY)
     end
   end
 end
@@ -247,10 +304,10 @@ function love.draw()
   end
   lg.print("player.airTime : "..player.airTime, 10, 190)
   lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
-  lg.print("#platforms : "..#platforms, 10, 230)
+  lg.print("#platforms.container : "..#platforms.container, 10, 230)
   lg.print("FPS : "..love.timer.getFPS(), 10, 250)
 
-  for i, v in pairs(platforms) do
+  for i, v in pairs(platforms.container) do
     lg.setColor(255, 0, 0)
     lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)
   end
