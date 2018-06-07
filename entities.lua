@@ -4,7 +4,7 @@ entities = {}
 entities.container = {}
 entities.create = function(x, y, wth, hgt, id)
     local en = {}
-    
+
     en.x = tonumber(x)
     en.y = tonumber(y)
     en.wth = tonumber(wth)
@@ -15,16 +15,16 @@ entities.create = function(x, y, wth, hgt, id)
     en.isMovable = entity[id].isMovable
     en.isDestructible = entity[id].isDestructible
     en.colors = entity[id].colors
-    en.TTL = entity[id].TTL
+    en.ttl = entity[id].ttl
     en.solidResistance = entity[id].solidResistance
-    
+
     table.insert(entities.container, en)
 end
 
 entities.moveX = function(moveSpeed)
-    for i, v in pairs(entities.container) do        
+    for i, v in pairs(entities.container) do
         v.x = v.x + moveSpeed
-        
+
         if v.solidResistance == 100 then
             if moveSpeed < 0 then
                 --Collision coté droit entities
@@ -48,7 +48,7 @@ end
 entities.moveY = function(moveSpeed)
     for i, v in pairs(entities.container) do
         v.y = v.y + moveSpeed
-        
+
         if v.solidResistance == 100 then
             if moveSpeed < 0 then
                 --Collisions coté dessous des plateformes
@@ -73,7 +73,7 @@ entities.draw = function()
     for i, v in pairs(entities.container) do
         lg.setColor(unpack(entity[v.id].colors))
         lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)
-        
+
         lg.setFont(debug.font)
         lg.setColor(255, 255, 255)
         lg.rectangle("fill", v.x, v.y, debug.font:getWidth(v.id), debug.font:getHeight(v.id))

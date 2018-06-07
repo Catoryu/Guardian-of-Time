@@ -3,7 +3,11 @@ mouse.firstX = 0
 mouse.firstY = 0
 mouse.secondX = 0
 mouse.secondY = 0
-selectedEntity = 1
+selectedEntity = 3
+inputs = {}
+inputs.down = false
+inputs.left = false
+inputs.right = false
 
 function controls(dt)
     if keyDown("escape") then love.event.quit() end
@@ -20,9 +24,9 @@ function love.keypressed(key)
         player.jumpKeyDown = true
         player.jump()
     end
-    if key == "s" then table.insert(inputs, 1) end
-    if key == "a" then table.insert(inputs, 2) end
-    if key == "d" then table.insert(inputs, 3) end
+    if key == "s" then inputs.down = true end
+    if key == "a" then inputs.left = true end
+    if key == "d" then inputs.right = true end
   
     if key == "escape" then love.event.quit() end
     if key == "tab" then debug.visible = not debug.visible end
@@ -30,33 +34,10 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-    if key == "w" or key == "space" then
-        player.jumpKeyDown = false
-    end
-    
-    if key == "s" then
-        for i, v in pairs(inputs) do
-            if v == 1 then
-                table.remove(inputs, i)
-            end
-        end
-    end
-  
-    if key == "a" then
-        for i, v in pairs(inputs) do
-            if v == 2 then
-                table.remove(inputs, i)
-            end
-        end
-    end
-  
-    if key == "d" or key == "right" then
-        for i, v in pairs(inputs) do
-            if v == 3 then
-                table.remove(inputs, i)
-            end
-        end
-    end
+    if key == "w" or key == "space" then player.jumpKeyDown = false end
+    if key == "s" then inputs.down = false end
+    if key == "a" then inputs.left = false end
+    if key == "d" then inputs.right = false end
 end
 
 function love.mousepressed(_, _, button)

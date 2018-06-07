@@ -2,9 +2,9 @@ function love.load()
   lg = love.graphics
   keyDown = love.keyboard.isDown
   math.randomseed(os.time())
-  inputs = {}
-  
+
   dofile("conf.lua")
+  dofile("assets/lobj.lua")
   dofile("controls.lua")
   dofile("player.lua")
   dofile("entities.lua")
@@ -13,8 +13,9 @@ function love.load()
 end
 
 function love.update(dt)
-  player.update(dt)
-  controls(dt)
+    player.update(dt)
+    room.update(dt)
+    controls(dt)
 end
 
 function love.draw()
@@ -23,7 +24,7 @@ function love.draw()
     room.draw()
     entities.draw()
     player.draw()
-    
+
     --[[Debug]]--
     if debug.visible then
         lg.setFont(debug.font)

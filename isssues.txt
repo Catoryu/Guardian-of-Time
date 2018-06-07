@@ -1,2 +1,0 @@
-Mouvement des entités qui déplacent le joueur
-On peut "planer" juste au moment ou l'on quitte une plateforme
