@@ -68,7 +68,7 @@ player.overlapRectangle = function(x, y, wth, hgt)
     if math.abs(dx) <= w and math.abs(dy) <= h then
         wy = w * dy
         hx = h * dx
-
+        
         if (wy > hx) then
             if (wy > -hx) then
                 --En haut
@@ -107,7 +107,7 @@ player.moveX = function(moveSpeed)
     if moveSpeed < 0 then
         --Collision bord gauche de l'écran
         if player.x + moveSpeed < 0 then player.x = 0; return end
-
+        
         --Passe en revue toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions coté droit des entités
@@ -117,6 +117,23 @@ player.moveX = function(moveSpeed)
                     player.x = player.x - (player.x - (v.x + v.wth))
                     player.xSpd = 0
                     return
+                end
+            end
+        end
+        
+        --Passe en revue les blocs
+        for i, v in pairs(room.grid) do
+            for ii, vv in pairs(v) do
+                if vv.id == 1 then
+                    local x, y = room.getCellPosition(i, ii)
+                    
+                    --Collisions coté droit des blocs
+                    if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
+                    (player.x + moveSpeed < x + room.blocSize and player.x + moveSpeed + player.wth > x + room.blocSize) then
+                        player.x = player.x - (player.x - (x + room.blocSize))
+                        player.xSpd = 0
+                        return
+                    end
                 end
             end
         end
@@ -140,6 +157,23 @@ player.moveX = function(moveSpeed)
                     player.x = player.x + (v.x - (player.x + player.wth))
                     player.xSpd = 0
                     return
+                end
+            end
+        end
+        
+        --Passe en revue les blocs
+        for i, v in pairs(room.grid) do
+            for ii, vv in pairs(v) do
+                if vv.id == 1 then
+                    local x, y = room.getCellPosition(i, ii)
+                    
+                    --Collisions coté gauche des blocs
+                    if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
+                    (player.x + moveSpeed < x and player.x + moveSpeed + player.wth > x) then
+                        player.x = player.x + (x - (player.x + player.wth))
+                        player.xSpd = 0
+                        return
+                    end
                 end
             end
         end
@@ -181,7 +215,24 @@ player.moveY = function(moveSpeed)
                 end
             end
         end
-
+        
+        --Passe en revue les blocs
+        for i, v in pairs(room.grid) do
+            for ii, vv in pairs(v) do
+                if vv.id == 1 then
+                    local x, y = room.getCellPosition(i, ii)
+                    
+                    --Collisions dessous des blocs
+                    if (player.y + moveSpeed > y + room.blocSize - player.hgt and player.y + moveSpeed < y + room.blocSize) and
+                    (player.x < x + room.blocSize and player.x + player.wth > x) then
+                        player.ySpd = 0
+                        player.y = player.y - (player.y - (y + room.blocSize))
+                        return
+                    end
+                end
+            end
+        end
+        
         --Déplacement de la caméra
         if room.y < 1 and player.y + player.hgt/2 < wdow.hgt/2 then
             room.moveCameraY(-moveSpeed)
@@ -205,7 +256,25 @@ player.moveY = function(moveSpeed)
                 end
             end
         end
-
+        
+        
+        --Passe en revue les blocs
+        for i, v in pairs(room.grid) do
+            for ii, vv in pairs(v) do
+                if vv.id == 1 then
+                    local x, y = room.getCellPosition(i, ii)
+                    
+                    --Collisions dessus des blocs
+                    if (player.y + moveSpeed + player.hgt > y and player.y + moveSpeed < y) and
+                    (player.x < x + room.blocSize and player.x + player.wth > x) then
+                        player.isJumping = false
+                        player.ySpd = 0
+                        player.y = player.y + y - (player.y + player.hgt)
+                        return
+                    end
+                end
+            end
+        end
         --Déplacement de la caméra
         if room.y + room.hgt > wdow.hgt + 1 and player.y + player.hgt/2 > wdow.hgt/2 then
             room.moveCameraY(-moveSpeed)

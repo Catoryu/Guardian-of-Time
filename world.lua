@@ -20,6 +20,8 @@ cell = createClass({
     isActivable = false, --Indique si la cellule à une fonction à jouer à sa mort
     trigger = function(self) end, --Fonction qui se jouera à la mort de la cellule
 
+    --[MAXIM] Reset les variables à la fin du ttl--
+
     --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActivable"
     setTrigger = function(self, func)
         self.trigger = func
@@ -135,15 +137,25 @@ end
 room.update = function(dt)
     --Cooldown des cellules
     for i, v in pairs(room.grid) do
-        for ii, vv in pairs(v) do
-            vv.ttl = vv.ttl - 1000*dt
-
-            if vv.ttl <= 0 then
-                if vv.isActivable then vv:trigger()
-                else vv:reset() end
+        for ii, vv in pairs(v) do            
+            
+            if vv.isTimely then
+                vv.ttl = vv.ttl - 1000*dt
+                
+                if vv.ttl <= 0 then
+                    if vv.isActivable then vv:trigger()
+                    else vv:reset() end
+                end
             end
         end
     end
+end
+
+room.getCellPosition = function(x, y)
+    x = room.x + x * room.blocSize - room.blocSize
+    y = room.y + y * room.blocSize - room.blocSize
+    
+    return x, y
 end
 
 --temp
@@ -156,15 +168,14 @@ room.draw = function()
         for ii, vv in pairs(v) do
             local x = room.x + i*room.blocSize - room.blocSize
             local y = room.y + ii*room.blocSize - room.blocSize
-
+            
             --Test si la cellule est sur l'écran
             if (x + room.blocSize > 0 and x < wdow.wth) and
             (y + room.blocSize > 0 and y < wdow.hgt) and vv.id == 1 then
                 lg.setColor(0, 200, 0)
                 lg.rectangle("line", x, y, room.blocSize, room.blocSize)
                 lg.print("x"..i.." y"..ii, x, y)
-
-                --Passe en revue toutes les valeurs de la cellule
+                
                 lg.print(vv.ttl, x, y + 20)
             end
         end
@@ -176,12 +187,13 @@ end
 --0 : Vide
 --1 : Solide
 
---room.createBloc({15, 18, 1}, {16, 19, 1})
-
 room.grid[15][18].id = 1
 room.grid[16][19].id = 1
+room.grid[13][17].id = 1
+room.grid[14][17].id = 1
+room.grid[5][19].id = 1
 
-room.grid[16][19]:setTrigger(function(self) self.id = 0 end)
+room.grid[16][19]:setTrigger(function(self) self.id = 0; self.isTimely = false end)
 
 gravity = 4000
 chapter = 0
