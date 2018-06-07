@@ -18,13 +18,19 @@ cell = createClass({
     hp = 0,
     isTimely = false, --Meilleur nom ? : Indique si la cellule est affectée par le temps
     isActivable = false, --Indique si la cellule à une fonction à jouer à sa mort
-    trigger = function(self) end, --Fonction qui se jouera à la mort de la cellule
 
-    --[MAXIM] Reset les variables à la fin du ttl--
+    --Fonction passée en paramètre par ":setTrigger()"
+    rawTrigger = function(self) end,
+
+    --Fonction à utiliser à la mort de la cellule
+    trigger = function(self)
+        self:softReset()
+        self:rawTrigger()
+    end,
 
     --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActivable"
     setTrigger = function(self, func)
-        self.trigger = func
+        self.rawTrigger = func
         self.isActivable = true
     end,
 
@@ -34,8 +40,8 @@ cell = createClass({
         self.isTimely = true
     end,
 
-    --Reset la cellule.
-    reset = function(self)
+    --Reset les propriétés de la cellule mais pas les méthodes
+    softReset = function(self)
         self.id = nil
         self.ttl = nil
         self.isVisible = nil
@@ -43,7 +49,11 @@ cell = createClass({
         self.hp = nil
         self.isTimely = nil
         self.isActivable = nil
-        self.trigger = nil
+    end,
+
+    --Reset complètement la cellule
+    hardReset = function(self)
+        for k, _ in pairs(self) do self[k] = nil end
     end
 })
 
@@ -59,18 +69,6 @@ end
 --Modification de certains blocs
 room.grid[15][15]:setTTL(1000)
 room.grid[15][15].id = 1
-
----------------------------Exemple pour les trigger des cells----------------------------
---[[
-for i = 1, machin do
-    for j = 1, machin do
-        if cell.ttl <= 0 then
-            if cell.isActivable then cell:trigger()
-            else cell:reset() end
-        end
-    end
-end
-]]
 
 room.createBloc = function(...)--WAH TROP FORT Le sang de la veine
     for i, v in pairs({...}) do
@@ -137,14 +135,13 @@ end
 room.update = function(dt)
     --Cooldown des cellules
     for i, v in pairs(room.grid) do
-        for ii, vv in pairs(v) do            
-            
+        for ii, vv in pairs(v) do
             if vv.isTimely then
-                vv.ttl = vv.ttl - 1000*dt
-                
+                vv.ttl = vv.ttl - 1000 * dt
+
                 if vv.ttl <= 0 then
                     if vv.isActivable then vv:trigger()
-                    else vv:reset() end
+                    else vv:hardReset() end
                 end
             end
         end
@@ -154,7 +151,7 @@ end
 room.getCellPosition = function(x, y)
     x = room.x + x * room.blocSize - room.blocSize
     y = room.y + y * room.blocSize - room.blocSize
-    
+
     return x, y
 end
 
@@ -168,14 +165,14 @@ room.draw = function()
         for ii, vv in pairs(v) do
             local x = room.x + i*room.blocSize - room.blocSize
             local y = room.y + ii*room.blocSize - room.blocSize
-            
+
             --Test si la cellule est sur l'écran
             if (x + room.blocSize > 0 and x < wdow.wth) and
             (y + room.blocSize > 0 and y < wdow.hgt) and vv.id == 1 then
                 lg.setColor(0, 200, 0)
                 lg.rectangle("line", x, y, room.blocSize, room.blocSize)
                 lg.print("x"..i.." y"..ii, x, y)
-                
+
                 lg.print(vv.ttl, x, y + 20)
             end
         end
