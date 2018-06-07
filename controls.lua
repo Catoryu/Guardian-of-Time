@@ -25,6 +25,7 @@ function love.keypressed(key)
     if key == "d" then table.insert(inputs, 3) end
   
     if key == "escape" then love.event.quit() end
+    if key == "tab" then debug.visible = not debug.visible end
     if key == "delete" then table.remove(entities.container, #entities.container)end
 end
 

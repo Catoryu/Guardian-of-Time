@@ -44,8 +44,9 @@ end
 --Window informations 
 wdow = {
     mode = false,
-    wth = 1600,
-    hgt = 900,
+    wth = 1280, hgt = 720,
+--    wth = 1600, hgt = 900, --Pour 1920X1080
+--    wth = 1200, hgt = 675, --Pour 1366X768
     title = "Guardian of Time"
 }
  
@@ -58,6 +59,7 @@ text = {
 }
  
 debug = {}
+debug.visible = true
 debug.font = lg.newFont("fonts/consola.ttf")
 debug.messages = {"wdow.wth"}
 debug.color = {0, 200, 0}

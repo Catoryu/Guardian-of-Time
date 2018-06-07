@@ -40,8 +40,7 @@ entities.moveX = function(moveSpeed)
                 end
             end
         elseif player.overlapRectangle(v.x, v.y, v.wth, v.hgt) ~= 0 then
-            moveSpeed = moveSpeed/100 * (100-v.solidResistance)
-            player.moveX(moveSpeed + (moveSpeed/100 * (100-v.solidResistance)))
+            player.moveX(moveSpeed)
         end
     end
 end
@@ -65,7 +64,7 @@ entities.moveY = function(moveSpeed)
                 end
             end
         elseif player.overlapRectangle(v.x, v.y, v.wth, v.hgt) ~= 0 then
-            player.moveY(moveSpeed + (moveSpeed/100 * (100-v.solidResistance)))
+            player.moveY(moveSpeed)
         end
     end
 end

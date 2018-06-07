@@ -119,6 +119,13 @@ player.moveX = function(moveSpeed)
                 end
             end
         end
+        
+        --Déplacement de la caméra
+        if room.x < 0 and player.x + player.wth/2 < wdow.wth/2 then
+            room.moveCameraX(-moveSpeed)
+        else
+            player.x = player.x + moveSpeed
+        end
     elseif moveSpeed > 0 then
         --Collision bord droit de l'écran
         if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return end
@@ -135,9 +142,14 @@ player.moveX = function(moveSpeed)
                 end
             end
         end
+        
+        --Déplacement de la caméra
+        if room.x + room.wth > wdow.wth and player.x + player.wth/2 > wdow.wth/2 then
+            room.moveCameraX(-moveSpeed)
+        else
+            player.x = player.x + moveSpeed
+        end
     end
-  
-    player.x = player.x + moveSpeed
 end
 
 player.moveY = function(moveSpeed)
@@ -168,6 +180,13 @@ player.moveY = function(moveSpeed)
                 end
             end
         end
+        
+        --Déplacement de la caméra        
+        if room.y < 1 and player.y + player.hgt/2 < wdow.hgt/2 then
+            room.moveCameraY(-moveSpeed)
+        else
+            player.y = player.y + moveSpeed
+        end
     elseif moveSpeed > 0 then
         --Collision bord bas de l'écran
         if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return end
@@ -185,9 +204,14 @@ player.moveY = function(moveSpeed)
                 end
             end
         end
+        
+        --Déplacement de la caméra        
+        if room.y + room.hgt > wdow.hgt + 1 and player.y + player.hgt/2 > wdow.hgt/2 then
+            room.moveCameraY(-moveSpeed)
+        else
+            player.y = player.y + moveSpeed
+        end
     end
-    
-    player.y = player.y + moveSpeed
 end
 
 player.update = function(dt)
