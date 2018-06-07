@@ -36,3 +36,7 @@ Musique.
 Youtube : [Beat Nation](https://www.youtube.com/channel/UCgmVsLRg1mIr9uNLR9kuj_A)  
 Twitter : [Beat Nation Music](https://twitter.com/beatnationmusic)  
 Instagram : Beatnationmusic
+
+Théo Esseiva :  
+Aide à la musique et histoire.  
+Discord : Théo "Johnson" Esseiva#5524
