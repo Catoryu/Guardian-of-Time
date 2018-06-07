@@ -1,63 +1,34 @@
 In what elements/powers can interact with entities/blocks
 
-
-
 "Air/Wind" :
 
-
-
 -Can create entities that can move other entities.
-
-
 
 "Earth" :
 
 -Can transform blocks in entities that can be moved.
-
-
 -Can place blocks.
 
 -Can create entities that he can move to hit other entities.
 
-
-
 "Fire" :
 
 -Can be moved when created.
-
-
 -Can place (on block) entities that can't move.
-
 -Those entities can delete ice blocks.
-
-
 
 "Water" :
 
-
-
 -Can create entities that can move other entities.
-
 -Those entities can delete fire entities.
-
-
 
 "Ice" :
 
-
-
 -Can create entities that he can move to hit other entities.
-
 -Can place ice blocks.
-
-
 
 "Thunder" :
 
-
-
 -Can create "instant" entities that can't move or "hit" others entities.
-
-
 
 "Light/Darkness" are specials. Normaly only with entities.

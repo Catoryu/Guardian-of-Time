@@ -3,7 +3,7 @@ Here are only types of blocks
 Type    :	Move	Destroy	Create	Ghost	Gravity
 ----------------------------------------------------------------
 Normal  : 	N	N	N	N	N
-Ice	:	N	Y	Y	N	N
+Ice	 :	N	Y	Y	N	N
 Snow	:	Y	Y	Y	N	Y
 Sand	:	Y	Y	Y	N	Y
 Water	:	N	Y	N	Y	Y
