@@ -60,11 +60,6 @@ cell = createClass({
         self.isActive.touch = true
     end,
 
-    --Set le ttl de la cellule avec la valeur donnée et active l'attribut "isTimely"
-    setTTL = function(self, time)
-        self.ttl = time
-    end,
-
     --Reset les propriétés de la cellule mais pas les méthodes
     softReset = function(self)
         self.id = nil
@@ -156,7 +151,7 @@ room.update = function(dt)
         for ii, vv in pairs(v) do
             if vv.isTimely then
                 vv.ttl = vv.ttl - 1000 * dt
-                
+
                 if vv.ttl <= 0 then
                     if vv.isActive then vv:onTtlReached()
                     else vv:hardReset() end
@@ -180,14 +175,14 @@ room.draw = function()
         for ii, vv in pairs(v) do
             local x = room.x + i*room.blocSize - room.blocSize
             local y = room.y + ii*room.blocSize - room.blocSize
-            
+
             --Test si la cellule est sur l'écran
             if (x + room.blocSize > 0 and x < wdow.wth) and
             (y + room.blocSize > 0 and y < wdow.hgt) and vv.id == 1 then
                 lg.setColor(0, 200, 0)
                 lg.rectangle("line", x, y, room.blocSize, room.blocSize)
                 lg.print("x"..i.." y"..ii, x, y)
-            
+
                 lg.print(vv.ttl, x, y + 20)
             end
         end
