@@ -8,7 +8,8 @@ room.hgt = room.rows * room.blocSize
 room.x = 0
 room.y = -room.hgt + wdow.hgt
 room.image = lg.newImage("data/fond.jpg")--temp
-room.grid = {}
+room.cells = {}
+--room.grid = {}
 
 --Class des cellule.
 cell = createClass({
@@ -18,12 +19,14 @@ cell = createClass({
     1 : Solide
     ]]
     id = 0,
-    ttl = 0, --Durée de vie de l'élément (valeur en ms)
+    x = 0,
+    y = 0,
+    ttl = 0, --Durée de cie de l'élément (caleur en ms)
     isVisible = true, --Indique si la cellule est affichée
     isDestructible = false,
     hp = 0,
     isTimely = false, --Meilleur nom ? : Indique si la cellule est affectée par le temps
-    isActive = { --Indique si la cellule à une fonction à jouer à sa mort
+    isActice = { --Indique si la cellule à une fonction à jouer à sa mort
         ttlReach = false,
         touch = false,
     },
@@ -48,16 +51,16 @@ cell = createClass({
         self:rawOnTouch(direction)
     end,
 
-    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
+    --Ajoute la fonction passée en argument comme trigger et actice l'attribut "isActice"
     setOnTtlReached = function(self, func)
         self.rawOnTtlReached = func
-        self.isActive.ttlReach = true
+        self.isActice.ttlReach = true
     end,
 
-    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
+    --Ajoute la fonction passée en argument comme trigger et actice l'attribut "isActice"
     setOnTouch = function(self, func)
         self.rawOnTouch = func
-        self.isActive.touch = true
+        self.isActice.touch = true
     end,
 
     --Reset les propriétés de la cellule mais pas les méthodes
@@ -68,7 +71,7 @@ cell = createClass({
         self.isDestructible = nil
         self.hp = nil
         self.isTimely = nil
-        self.isActive = nil
+        self.isActice = nil
     end,
 
     --Reset complètement la cellule
@@ -77,85 +80,85 @@ cell = createClass({
     end
 })
 
-room.setBloc = function(...)
-    for i, v in pairs({...}) do
-       room.grid[v[1]][v[2]] = v[3]
+room.pushCell = function(...)
+    for _, cellInitValues in pairs({...}) do
+        local c = cell:new(cellInitValues)
+
+        table.insert(room.cells, c)
     end
 end
 
-room.moveCameraX = function(moveSpeed)
+room.moveCameraX = function(moceSpeed)
     local deltaX = 0
 
     --Marge d'erreur de la salle
-    if room.x + moveSpeed > 0 then
+    if room.x + moceSpeed > 0 then
         deltaX = room.x
         room.x = room.x - deltaX
-        for i, v in pairs(entities.container) do
-            v.x = v.x - deltaX
+        for i, c in pairs(entities.container) do
+            c.x = c.x - deltaX
         end
         player.x = player.x - deltaX
         return
-    elseif room.x + room.wth + moveSpeed < wdow.wth then
+    elseif room.x + room.wth + moceSpeed < wdow.wth then
         deltaX = room.x + room.wth - wdow.wth
         room.x = room.x - deltaX
-        for i, v in pairs(entities.container) do
-            v.x = v.x - deltaX
+        for i, c in pairs(entities.container) do
+            c.x = c.x - deltaX
         end
         player.x = player.x - deltaX
         return
     end
 
     --Bouge les entités
-    for i, v in pairs(entities.container) do
-        v.x = v.x + moveSpeed
+    for i, c in pairs(entities.container) do
+        c.x = c.x + moceSpeed
     end
 
     --Bouge les blocs
-    room.x = room.x + moveSpeed
+    room.x = room.x + moceSpeed
 end
 
-room.moveCameraY = function(moveSpeed)
+room.moceCameraY = function(moceSpeed)
     local deltaY = 0
 
-    --Marge d'erreur mouvement de la salle
-    if room.y + moveSpeed > 0 then
+    --Marge d'erreur moucement de la salle
+    if room.y + moceSpeed > 0 then
         deltaY = room.y
         room.y = room.y - deltaY
-        for i, v in pairs(entities.container) do
-            v.y = v.y - deltaY
+        for i, c in pairs(entities.container) do
+            c.y = c.y - deltaY
         end
         player.y = player.y - deltaY
         return
-    elseif room.y + room.hgt + moveSpeed < wdow.hgt then
+    elseif room.y + room.hgt + moceSpeed < wdow.hgt then
         deltaY = room.y + room.hgt - wdow.hgt
         room.y = room.y - deltaY
-        for i, v in pairs(entities.container) do
-            v.y = v.y - deltaY
+        for i, c in pairs(entities.container) do
+            c.y = c.y - deltaY
         end
         player.y = player.y - deltaY
         return
     end
 
     --Bouge les entités
-    for i, v in pairs(entities.container) do
-        v.y = v.y + moveSpeed
+    for i, c in pairs(entities.container) do
+        c.y = c.y + moceSpeed
     end
 
     --Bouge les blocs
-    room.y = room.y + moveSpeed
+    room.y = room.y + moceSpeed
 end
 
 room.update = function(dt)
-    --Cooldown des cellules
-    for i, v in pairs(room.grid) do
-        for ii, vv in pairs(v) do
-            if vv.isTimely then
-                vv.ttl = vv.ttl - 1000 * dt
+    --Itère à tracers toutes les cellules
+    for i, c in pairs(room.cells) do
+        if c.isTimely then
+            c.ttl = c.ttl - 1000 * dt
 
-                if vv.ttl <= 0 then
-                    if vv.isActive then vv:onTtlReached()
-                    else vv:hardReset() end
-                end
+            if c.ttl <= 0 then
+                if c.isActice then c:onTtlReached()
+                else c:hardReset() end
             end
         end
     end
@@ -171,29 +174,26 @@ end
 room.draw = function()
     lg.setColor(255, 255, 255)
     lg.draw(room.image, room.x, room.y)
-    for i, v in pairs(room.grid) do
-        for ii, vv in pairs(v) do
-            local x = room.x + i*room.blocSize - room.blocSize
-            local y = room.y + ii*room.blocSize - room.blocSize
 
-            --Test si la cellule est sur l'écran
-            if (x + room.blocSize > 0 and x < wdow.wth) and
-            (y + room.blocSize > 0 and y < wdow.hgt) and vv.id == 1 then
-                lg.setColor(0, 200, 0)
-                lg.rectangle("line", x, y, room.blocSize, room.blocSize)
-                lg.print("x"..i.." y"..ii, x, y)
+    for i, c in pairs(room.cells) do
+        local x, y = room.getCellPosition(c.x, c.y)
 
-                lg.print(vv.ttl, x, y + 20)
-            end
+        --Test si la cellule est sur l'écran
+        if (x + room.blocSize > 0 and x < wdow.wth) and
+        (y + room.blocSize > 0 and y < wdow.hgt) and c.id == 1 then
+            lg.setColor(0, 200, 0)
+            lg.rectangle("line", x, y, room.blocSize, room.blocSize)
+            lg.print("x" .. x .. " y" .. x , x, y)
+
+            lg.print(c.ttl, x, y + 20)
         end
     end
 end
-
---Chargement d'un niveau
-dofile("data/chapter/1.lua")
 
 gravity = 4000
 chapter = 0
 level = {}
 level.x = 0
 level.y = 0
+
+room.pushCell({x = 10, y = 10, id = 1})
