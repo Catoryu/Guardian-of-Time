@@ -24,7 +24,7 @@ end
 entities.moveX = function(moveSpeed)
     for i, v in pairs(entities.container) do
         v.x = v.x + moveSpeed
-
+        
         if v.solidResistance == 100 then
             if moveSpeed < 0 then
                 --Collision coté droit entities

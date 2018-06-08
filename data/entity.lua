@@ -4,6 +4,7 @@ entity_class = {
     isAffectedByGravity = false,
     isMovable = false,
     isDestructible = false,
+    canSwim = false,
     colors = {255, 255, 255, 255},
     ttl = nil, --valeur en ms
     solidResistance = 100 --pourcentage de ralentissement lorsqu'on traverse l'entité
@@ -26,7 +27,8 @@ entity = {
         colors = {87, 170, 242},
         affectedByGravity = true,
         isMovable = true,
-        solidResistance = 50,
+        canSwim = true,
+        solidResistance = 80,
     }),
     entity_class:new({
         name = "steam",
@@ -47,6 +49,7 @@ entity = {
     }),
     entity_class:new({
         name ="magma",
+        canSwim = true,
         affectedByGravity = true,
         solidResistance = 80,
     }),
