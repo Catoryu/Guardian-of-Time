@@ -21,12 +21,12 @@ cell = createClass({
     id = 0,
     x = 0,
     y = 0,
-    ttl = 0, --Durée de cie de l'élément (caleur en ms)
+    ttl = 0, --Durée de vie de l'élément (valeur en ms)
     isVisible = true, --Indique si la cellule est affichée
     isDestructible = false,
     hp = 0,
     isTimely = false, --Meilleur nom ? : Indique si la cellule est affectée par le temps
-    isActice = { --Indique si la cellule à une fonction à jouer à sa mort
+    isActive = { --Indique si la cellule à une fonction à jouer lors de certain événements
         ttlReach = false,
         touch = false,
     },
@@ -51,16 +51,16 @@ cell = createClass({
         self:rawOnTouch(direction)
     end,
 
-    --Ajoute la fonction passée en argument comme trigger et actice l'attribut "isActice"
+    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
     setOnTtlReached = function(self, func)
         self.rawOnTtlReached = func
-        self.isActice.ttlReach = true
+        self.isActive.ttlReach = true
     end,
 
-    --Ajoute la fonction passée en argument comme trigger et actice l'attribut "isActice"
+    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
     setOnTouch = function(self, func)
         self.rawOnTouch = func
-        self.isActice.touch = true
+        self.isActive.touch = true
     end,
 
     --Reset les propriétés de la cellule mais pas les méthodes
@@ -71,7 +71,7 @@ cell = createClass({
         self.isDestructible = nil
         self.hp = nil
         self.isTimely = nil
-        self.isActice = nil
+        self.isActive = nil
     end,
 
     --Reset complètement la cellule
@@ -88,11 +88,11 @@ room.pushCell = function(...)
     end
 end
 
-room.moveCameraX = function(moceSpeed)
+room.moveCameraX = function(moveSpeed)
     local deltaX = 0
 
-    --Marge d'erreur de la salle
-    if room.x + moceSpeed > 0 then
+    --Marge d'erreur mouvement de la salle
+    if room.x + moveSpeed > 0 then
         deltaX = room.x
         room.x = room.x - deltaX
         for i, c in pairs(entities.container) do
@@ -100,7 +100,7 @@ room.moveCameraX = function(moceSpeed)
         end
         player.x = player.x - deltaX
         return
-    elseif room.x + room.wth + moceSpeed < wdow.wth then
+    elseif room.x + room.wth + moveSpeed < wdow.wth then
         deltaX = room.x + room.wth - wdow.wth
         room.x = room.x - deltaX
         for i, c in pairs(entities.container) do
@@ -112,18 +112,18 @@ room.moveCameraX = function(moceSpeed)
 
     --Bouge les entités
     for i, c in pairs(entities.container) do
-        c.x = c.x + moceSpeed
+        c.x = c.x + moveSpeed
     end
 
     --Bouge les blocs
-    room.x = room.x + moceSpeed
+    room.x = room.x + moveSpeed
 end
 
-room.moceCameraY = function(moceSpeed)
+room.moceCameraY = function(moveSpeed)
     local deltaY = 0
 
-    --Marge d'erreur moucement de la salle
-    if room.y + moceSpeed > 0 then
+    --Marge d'erreur mouvement de la salle
+    if room.y + moveSpeed > 0 then
         deltaY = room.y
         room.y = room.y - deltaY
         for i, c in pairs(entities.container) do
@@ -131,7 +131,7 @@ room.moceCameraY = function(moceSpeed)
         end
         player.y = player.y - deltaY
         return
-    elseif room.y + room.hgt + moceSpeed < wdow.hgt then
+    elseif room.y + room.hgt + moveSpeed < wdow.hgt then
         deltaY = room.y + room.hgt - wdow.hgt
         room.y = room.y - deltaY
         for i, c in pairs(entities.container) do
@@ -143,21 +143,21 @@ room.moceCameraY = function(moceSpeed)
 
     --Bouge les entités
     for i, c in pairs(entities.container) do
-        c.y = c.y + moceSpeed
+        c.y = c.y + moveSpeed
     end
 
     --Bouge les blocs
-    room.y = room.y + moceSpeed
+    room.y = room.y + moveSpeed
 end
 
 room.update = function(dt)
-    --Itère à tracers toutes les cellules
+    --Itère à travers toutes les cellules
     for i, c in pairs(room.cells) do
         if c.isTimely then
             c.ttl = c.ttl - 1000 * dt
 
             if c.ttl <= 0 then
-                if c.isActice then c:onTtlReached()
+                if c.isActive then c:onTtlReached()
                 else c:hardReset() end
             end
         end
@@ -183,8 +183,8 @@ room.draw = function()
         (y + room.blocSize > 0 and y < wdow.hgt) and c.id == 1 then
             lg.setColor(0, 200, 0)
             lg.rectangle("line", x, y, room.blocSize, room.blocSize)
-            lg.print("x" .. x .. " y" .. x , x, y)
 
+            lg.print("x" .. c.x .. " y" .. c.y , x, y)
             lg.print(c.ttl, x, y + 20)
         end
     end

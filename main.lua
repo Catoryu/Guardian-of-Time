@@ -13,7 +13,6 @@ function love.load()
 end
 
 function love.update(dt)
---    dt = dt / 10
     player.update(dt)
     room.update(dt)
     controls(dt)
