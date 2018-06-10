@@ -11,7 +11,7 @@ inputs.right = false
 
 function controls(dt)
     if keyDown("escape") then love.event.quit() end
-    
+
     if keyDown("left") then entities.moveX(-50*dt) end
     if keyDown("right") then entities.moveX(50*dt) end
     if keyDown("up") then entities.moveY(-50*dt) end
@@ -27,7 +27,7 @@ function love.keypressed(key)
     if key == "s" then inputs.down = true end
     if key == "a" then inputs.left = true end
     if key == "d" then inputs.right = true end
-  
+
     if key == "escape" then love.event.quit() end
     if key == "tab" then debug.visible = not debug.visible end
     if key == "delete" then table.remove(entities.container, #entities.container)end
@@ -40,15 +40,17 @@ function love.keyreleased(key)
     if key == "d" then inputs.right = false end
 end
 
-function love.mousepressed(_, _, button)
+function love.mousepressed(x, y, button)
     if button == 1 then
         mouse.firstX, mouse.firstY = love.mouse.getPosition()
     end
+
+    if button == 2 then room.createBloc(x, y) end
 end
 
 function love.mousereleased(_, _, button)
     mouse.secondX, mouse.secondY = love.mouse.getPosition()
-    
+
     if button == 1 and mouse.firstX ~= mouse.secondX and mouse.firstY ~= mouse.secondY then
         if mouse.secondX > mouse.firstX and mouse.secondY > mouse.firstY then
             entities.create(mouse.firstX, mouse.firstY, mouse.secondX - mouse.firstX, mouse.secondY - mouse.firstY, selectedEntity)
