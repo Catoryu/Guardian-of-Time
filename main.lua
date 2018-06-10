@@ -50,6 +50,5 @@ function love.draw()
         lg.print("FPS : "..love.timer.getFPS(), 10, 270)
         lg.print("room.x : "..room.x, 10, 290)
         lg.print("room.y : "..room.y, 10, 310)
-        lg.print("Nbr cellules : "..#room.cells, 10, 330)
     end
 end

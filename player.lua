@@ -122,11 +122,11 @@ player.moveX = function(moveSpeed)
         end
 
         --Passe en revue les blocs
-        for i, c in pairs(room.cells) do
+        for i, c in pairs(room.blocs) do
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPos(c.x, c.y)
+                local x, y = room.getBlocPos(c.x, c.y)
 
                 --Collisions coté droit des blocs
                 if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
@@ -163,11 +163,11 @@ player.moveX = function(moveSpeed)
         end
 
         --Passe en revue les blocs
-        for i, c in pairs(room.cells) do
+        for i, c in pairs(room.blocs) do
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPos(c.x, c.y)
+                local x, y = room.getBlocPos(c.x, c.y)
 
                 --Collisions coté gauche des blocs
                 if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
@@ -219,11 +219,11 @@ player.moveY = function(moveSpeed)
         end
 
         --Passe en revue les blocs
-        for i, c in pairs(room.cells) do
+        for i, c in pairs(room.blocs) do
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPos(c.x, c.y)
+                local x, y = room.getBlocPos(c.x, c.y)
 
                 --Collisions dessous des blocs
                 if (player.y + moveSpeed > y + room.blocSize - player.hgt and player.y + moveSpeed < y + room.blocSize) and
@@ -261,11 +261,11 @@ player.moveY = function(moveSpeed)
         end
 
         --Passe en revue les blocs
-        for i, c in pairs(room.cells) do
+        for i, c in pairs(room.blocs) do
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPos(c.x, c.y)
+                local x, y = room.getBlocPos(c.x, c.y)
 
                 --Collisions dessus des blocs
                 if (player.y + moveSpeed + player.hgt > y and player.y + moveSpeed < y) and

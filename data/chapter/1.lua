@@ -1,8 +1,8 @@
---Initialisation de la grille avec des cellules
+--Initialisation de la grille avec des blocs
 for i = 1, room.cols do
     local col = {}
     for j = 1, room.rows do
-        table.insert(col, cell:new())
+        table.insert(col, bloc:new())
     end
     table.insert(room.grid, col)
 end

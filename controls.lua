@@ -45,7 +45,7 @@ function love.mousepressed(x, y, button)
         mouse.firstX, mouse.firstY = love.mouse.getPosition()
     end
 
-    if button == 2 then room.createCell(x, y) end
+    if button == 2 then room.createBloc(x, y) end
 end
 
 function love.mousereleased(_, _, button)

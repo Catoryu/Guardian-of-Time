@@ -8,11 +8,10 @@ room.hgt = room.rows * room.blocSize
 room.x = 0
 room.y = -room.hgt + wdow.hgt
 room.image = lg.newImage("data/fond.jpg")--temp
-room.cells = {}
---room.grid = {}
+room.blocs = {}
 
---Class des cellule.
-cell = createClass({
+--Class des blocs.
+bloc = createClass({
     --[[ID des blocs
     On en rajoutera plus tard
     0 : Vide
@@ -22,11 +21,11 @@ cell = createClass({
     x = 0,
     y = 0,
     ttl = 0, --Durée de vie de l'élément (valeur en ms)
-    isVisible = true, --Indique si la cellule est affichée
+    isVisible = true, --Indique si le bloc est affichée
     isDestructible = false,
     hp = 0,
-    isTimely = false, --Meilleur nom ? : Indique si la cellule est affectée par le temps
-    isActive = { --Indique si la cellule à une fonction à jouer lors de certain événements
+    isTimely = false, --Meilleur nom ? : Indique si le bloc est affectée par le temps
+    isActive = { --Indique si le bloc à une fonction à jouer lors de certain événements
         ttlReach = false,
         touch = false,
     },
@@ -35,12 +34,12 @@ cell = createClass({
     rawOnTtlReached = function(self) end,
     rawOnTouch = function(self) end,
 
-    --Fonction à utiliser à la mort de la cellule
+    --Fonction à utiliser à la mort de le bloc
     onTtlReached = function(self)
         self:rawOnTtlReached()
     end,
 
-    --Fonction à utiliser losque la cellule est touché (par le joueur)
+    --Fonction à utiliser losque le bloc est touché (par le joueur)
     onTouch = function(self, direction)
         --[[
         1 : Haut
@@ -63,7 +62,7 @@ cell = createClass({
         self.isActive.touch = true
     end,
 
-    --Reset les propriétés de la cellule mais pas les méthodes
+    --Reset les propriétés de le bloc mais pas les méthodes
     softReset = function(self)
         self.id = nil
         self.ttl = nil
@@ -74,35 +73,35 @@ cell = createClass({
         self.isActive = nil
     end,
 
-    --Reset complètement la cellule
+    --Reset complètement le bloc
     hardReset = function(self)
         for k, _ in pairs(self) do self[k] = nil end
     end
 })
 
-room.pushCell = function(...)
-    for _, cellInitValues in pairs({...}) do
-        local c = cell:new(cellInitValues)
+room.pushBloc = function(...)
+    for _, blocInitValues in pairs({...}) do
+        local c = bloc:new(blocInitValues)
 
-        table.insert(room.cells, c)
+        table.insert(room.blocs, c)
     end
 end
 
-room.flushCells = function()
-    room.cells = {}
+room.flushBlocs = function()
+    room.blocs = {}
 end
 
-room.popCell = function (x, y)
-    for i, v in ipairs(room.cells) do
-        if v.x == x and v.y == y then room.cells[i] = nil end
+room.popBloc = function (x, y)
+    for i, v in ipairs(room.blocs) do
+        if v.x == x and v.y == y then room.blocs[i] = nil end
     end
 end
 
-room.createCell = function(x, y)
+room.createBloc = function(x, y)
     local cx = math.floor((-room.x + x) / room.blocSize) + 1
     local cy = math.floor((-room.y + y) / room.blocSize) + 1
 
-    room.pushCell({x = cx, y = cy, id = 1})
+    room.pushBloc({x = cx, y = cy, id = 1})
 end
 
 room.moveCameraX = function(moveSpeed)
@@ -168,8 +167,8 @@ room.moveCameraY = function(moveSpeed)
 end
 
 room.update = function(dt)
-    --Itère à travers toutes les cellules
-    for i, c in pairs(room.cells) do
+    --Itère à travers tous les blocs
+    for i, c in pairs(room.blocs) do
         if c.isTimely then
             c.ttl = c.ttl - 1000 * dt
 
@@ -181,7 +180,7 @@ room.update = function(dt)
     end
 end
 
-room.getCellPos = function(x, y)
+room.getBlocPos = function(x, y)
     x = room.x + x * room.blocSize - room.blocSize
     y = room.y + y * room.blocSize - room.blocSize
 
@@ -192,10 +191,10 @@ room.draw = function()
     lg.setColor(255, 255, 255)
     lg.draw(room.image, room.x, room.y)
 
-    for i, c in pairs(room.cells) do
-        local x, y = room.getCellPos(c.x, c.y)
+    for i, c in pairs(room.blocs) do
+        local x, y = room.getBlocPos(c.x, c.y)
 
-        --Test si la cellule est sur l'écran
+        --Test si le bloc est sur l'écran
         if (x + room.blocSize > 0 and x < wdow.wth) and
         (y + room.blocSize > 0 and y < wdow.hgt) and c.id == 1 then
             lg.setColor(0, 200, 0)
@@ -213,5 +212,5 @@ level = {}
 level.x = 0
 level.y = 0
 
-room.pushCell({x = 10, y = 10, id = 1}, {x = 9, y = 10, id = 1}, {x = 10, y = 9, id = 1})
-room.popCell(10, 10)
+room.pushBloc({x = 10, y = 10, id = 1}, {x = 9, y = 10, id = 1}, {x = 10, y = 9, id = 1})
+room.popBloc(10, 10)
