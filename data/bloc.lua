@@ -1,6 +1,8 @@
 --Class des cellule.
 bloc_class = {
     id = 1,
+    x = 0,
+    y = 0,
     ttl = 0, --Durée de vie du bloc (valeur en ms)
     isVisible = true,
     isSolid = false,
@@ -39,6 +41,13 @@ bloc_class = {
         }
         onTtlReached = function(self) end
         onTouch = function(self, direction) end
+        
+        --Supression du bloc de la table contenant tous les blocs non vide (car le bloc se transforme en vide)
+        for i, v in pairs(room.updateBlocs) do
+            if v.x == self.x and v.y == self.y then
+                table.remove(room.updateBlocs, i)
+            end
+        end
     end,
 
     --Reset le bloc avec ses valeurs de base (Utile lorsqu'on change d'écran)

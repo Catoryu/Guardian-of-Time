@@ -9,6 +9,7 @@ player.y = wdow.hgt - player.hgt
 player.moveSpd = 200
 player.xSpd = 0
 player.ySpd = 0
+player.spdLimit = 1500
 player.airTime = 0
 player.isJumping = false
 player.jumpSpd = 550
@@ -39,63 +40,12 @@ player.jump = function()
     end
 end
 
-player.overlapCircle = function(x, y, r)
-    local rectX = player.x + player.wth/2
-    local rectY = player.y + player.hgt/2
-
-    local circleDistanceX = math.abs(x - rectX)
-    local circleDistanceY = math.abs(y - rectY)
-
-    if (circleDistanceX > (player.wth/2 + r)) then return false end
-    if (circleDistanceY > (player.hgt/2 + r)) then return false end
-
-    if (circleDistanceX <= (player.wth/2)) then return true end
-    if (circleDistanceY <= (player.hgt/2)) then return true end
-
-    local cornerDistance_sq = (circleDistanceX - player.wth/2)^2 + (circleDistanceY - player.hgt/2)^2
-
-    return (cornerDistance_sq <= (r^2))
-end
-
-player.overlapRectangle = function(x, y, wth, hgt)
-    w = 0.5 * (player.wth + wth)
-    h = 0.5 * (player.hgt + hgt)
-    dx = (player.x + player.wth/2) - (x + wth/2)
-    dy = (player.y + player.hgt/2) - (y + hgt/2)
-
-    if math.abs(dx) <= w and math.abs(dy) <= h then
-        wy = w * dy
-        hx = h * dx
-        
-        if (wy > hx) then
-            if (wy > -hx) then
-                --En bas
-                return 2
-            else
-                --A gauche
-                return 3
-            end
-        else
-            if (wy > -hx) then
-                --A droite
-                return 4
-            else
-                --En haut
-                return 1
-            end
-        end
-    else
-        --Aucune collision
-        return 0
-    end
-end
-
 player.moveX = function(moveSpeed)
 
     --Test si il joueur dans une matière qui le ralenti
     for i, v in pairs(entities.container) do
         if v.solidResistance ~= 100 then
-            if player.overlapRectangle(v.x, v.y, v.wth, v.hgt) ~= 0 then
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
                 moveSpeed = moveSpeed/100 * (100-v.solidResistance)
                 player.xSpd = player.xSpd/100 * (100-v.solidResistance)
             end
@@ -106,10 +56,10 @@ player.moveX = function(moveSpeed)
         --Collision bord gauche de l'écran
         if player.x + moveSpeed < 0 then player.x = 0; return end
         
-        --Passe en revue toutes les entités
+        --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions coté droit des entités
-            if rect.overlapRectangle(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 4 then
+            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 4 then
                 if v.solidResistance == 100 then
                     player.x = player.x - (player.x - (v.x + v.wth))
                     player.xSpd = 0
@@ -117,26 +67,24 @@ player.moveX = function(moveSpeed)
                 end
             end
         end
-
-        --Passe en revue les blocs
-        for i, v in pairs(room.grid) do
-            for ii, vv in pairs(v) do
-                --Si le bloc est solide
-                if vv.isSolid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = room.getCellPosition(i, ii)
-                    
-                    --Collisions coté droit des blocs
-                    if rect.overlapRectangle(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 4 then
-                        vv:onTouch(4)
-                        player.x = player.x - (player.x - (x + room.blocSize))
-                        player.xSpd = 0
-                        return
-                    end
+        
+        --Itère à travers tous les blocs
+        for i, v in pairs(room.updateBlocs) do
+            --Si le bloc est solide
+            if v.isSolid then
+                --Récupère les coordonnés du bloc
+                local x, y = room.getCellPosition(v.x, v.y)
+                
+                --Collisions coté droit des blocs
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 4 then
+                    room.grid[v.x][v.y]:onTouch(4)
+                    player.x = player.x - (player.x - (x + room.blocSize))
+                    player.xSpd = 0
+                    return
                 end
             end
         end
-
+        
         --Déplacement de la caméra
         if room.x < 0 and player.x + player.wth/2 < wdow.wth/2 then
             room.moveCameraX(-moveSpeed)
@@ -147,10 +95,10 @@ player.moveX = function(moveSpeed)
         --Collision bord droit de l'écran
         if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return end
 
-        --Passe en revue toutes les entités
+        --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions coté gauche des entités
-            if rect.overlapRectangle(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 3 then
+            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 3 then
                 if v.solidResistance == 100 then
                     player.x = player.x + (v.x - (player.x + player.wth))
                     player.xSpd = 0
@@ -159,7 +107,7 @@ player.moveX = function(moveSpeed)
             end
         end
 
-        --Passe en revue les blocs
+        --Itère à travers tous les blocs
         for i, v in pairs(room.grid) do
             for ii, vv in pairs(v) do
                 --Si le bloc est solide
@@ -168,7 +116,7 @@ player.moveX = function(moveSpeed)
                     local x, y = room.getCellPosition(i, ii)
                     
                     --Collisions coté gauche des blocs
-                    if rect.overlapRectangle(player.x + moveSpeed, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 3 then
+                    if collision_rectToRect(player.x + moveSpeed, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 3 then
                         vv:onTouch(3)
                         player.x = player.x + (x - (player.x + player.wth))
                         player.xSpd = 0
@@ -192,22 +140,21 @@ player.moveY = function(moveSpeed)
     --Test si le joueur est dans une matière qui le ralenti
     for i, v in pairs(entities.container) do
         if v.solidResistance ~= 100 then
-            if player.overlapRectangle(v.x, v.y, v.wth, v.hgt) ~= 0 then
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
                 moveSpeed = moveSpeed/100 * (100-v.solidResistance)
                 player.ySpd = player.ySpd/100 * (100-v.solidResistance)
             end
         end
     end
     
-
     if moveSpeed < 0 then
         --Collision bord haut de l'écran
         if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return end
         
-        --Passe en revue toutes les entités
+        --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions dessous des entités
-            if rect.overlapRectangle(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 2 then
+            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 2 then
                 if v.solidResistance == 100 then
                     player.ySpd = 0
                     player.y = player.y - (player.y - (v.y + v.hgt))
@@ -215,22 +162,20 @@ player.moveY = function(moveSpeed)
                 end
             end
         end
-
-        --Passe en revue les blocs
-        for i, v in pairs(room.grid) do
-            for ii, vv in pairs(v) do
-                --Si le bloc est solide
-                if vv.isSolid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = room.getCellPosition(i, ii)
-                    
-                    --Collisions dessous des blocs
-                    if rect.overlapRectangle(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 2 then
-                        vv:onTouch(2)
-                        player.ySpd = 0
-                        player.y = player.y - (player.y - (y + room.blocSize))
-                        return
-                    end
+        
+        --Itère à travers tous les blocs
+        for i, v in pairs(room.updateBlocs) do
+            --Si le bloc est solide
+            if v.isSolid then
+                --Récupère les coordonnés du bloc
+                local x, y = room.getCellPosition(v.x, v.y)
+                
+                --Collisions dessous des blocs
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 2 then
+                    room.grid[v.x][v.y]:onTouch(2)
+                    player.ySpd = 0
+                    player.y = player.y - (player.y - (y + room.blocSize))
+                    return
                 end
             end
         end
@@ -244,11 +189,11 @@ player.moveY = function(moveSpeed)
     elseif moveSpeed > 0 then
         --Collision bord bas de l'écran
         if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return end
-
-        --Passe en revue toutes les entités
+        
+        --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions dessus des entités
-            if rect.overlapRectangle(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 1 then
+            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 1 then
                 if v.solidResistance == 100 then
                     player.isJumping = false
                     player.ySpd = 0
@@ -258,35 +203,33 @@ player.moveY = function(moveSpeed)
             end
         end
         
-        --Passe en revue les blocs
-        for i, v in pairs(room.grid) do
-            for ii, vv in pairs(v) do
-                --Si le bloc est solide
-                if vv.isSolid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = room.getCellPosition(i, ii)
-                    
-                    --Collisions dessus des blocs
-                    if rect.overlapRectangle(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
-                        vv:onTouch(1)
-                        player.isJumping = false
-                        player.ySpd = 0
-                        player.y = player.y + y - (player.y + player.hgt)
-                        return
-                    end
-                --Si le bloc est solide mais seulement sur le dessus
-                elseif vv.id == 4 then
-                    --Récupère les coordonnés du bloc
-                    local x, y = room.getCellPosition(i, ii)
-                    
-                    --Collisions dessus des blocs
-                    if rect.overlapRectangle(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
-                        vv:onTouch(1)
-                        player.isJumping = false
-                        player.ySpd = 0
-                        player.y = player.y + y - (player.y + player.hgt)
-                        return
-                    end
+        --Itère à travers tous les blocs
+        for i, v in pairs(room.updateBlocs) do
+            --Si le bloc est solide
+            if v.isSolid then
+                --Récupère les coordonnés du bloc
+                local x, y = room.getCellPosition(v.x, v.y)
+                
+                --Collisions dessus des blocs
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
+                    room.grid[v.x][v.y]:onTouch(1)
+                    player.isJumping = false
+                    player.ySpd = 0
+                    player.y = player.y + y - (player.y + player.hgt)
+                    return
+                end
+            --Si le bloc est solide mais seulement sur le dessus
+            elseif v.id == 4 then
+                --Récupère les coordonnés du bloc
+                local x, y = room.getCellPosition(v.x, v.y)
+                
+                --Collisions dessus des blocs
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
+                    room.grid[v.x][v.y]:onTouch(1)
+                    player.isJumping = false
+                    player.ySpd = 0
+                    player.y = player.y + y - (player.y + player.hgt)
+                    return
                 end
             end
         end
@@ -337,23 +280,25 @@ player.update = function(dt)
         player.ySpd = player.ySpd + player.jumpSlow*dt
     end
 
+    --Limite la vitesse du joueur
+    if player.ySpd > player.spdLimit then player.ySpd = player.spdLimit elseif player.ySpd < -player.spdLimit then player.ySpd = -player.spdLimit end
+    if player.xSpd > player.spdLimit then player.xSpd = player.spdLimit elseif player.xSpd < -player.spdLimit then player.xSpd = -player.spdLimit end
+
     --Fait bouger le joueur
     player.moveY(player.ySpd * dt)
     player.moveX(player.xSpd * dt)
+
+    if player.ySpd > 0 then player.isJumping = true; player.canJumpHigher = false end
     
     --Test si le joueur est dans un objet où il peut nager [WIP]
 --    for i, v in pairs(entities.container) do
---        if player.overlapRectangle(v.x, v.y, v.wth, v.hgt) then
---            if v.canSwim then
---                player.isJumping = false
---                player.ySpd = 0
---                player.airTime = 0
---                player.jumpLevel = 1
---            end
+--        if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) then
+--            player.isJumping = false
+--            player.canJumpHigher = true
+--            player.airTime = 0
+--            player.jumpLevel = 1
 --        end
 --    end
-
-    if player.ySpd > 0 then player.isJumping = true; player.canJumpHigher = false end
 
     if player.isJumping then
         player.airTime = player.airTime + 1000 * dt
