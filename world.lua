@@ -1,3 +1,6 @@
+--Chargement de tous les types de blocs
+dofile("data/bloc.lua")
+
 --World/Map creation
 room = {}
 room.blocSize = 50
@@ -7,79 +10,11 @@ room.wth = room.cols * room.blocSize
 room.hgt = room.rows * room.blocSize
 room.x = 0
 room.y = -room.hgt + wdow.hgt
-room.image = lg.newImage("data/fond.jpg")--temp
 room.grid = {}
-
---Class des cellule.
-cell = createClass({
-    --[[ID des blocs
-    On en rajoutera plus tard
-    0 : Vide
-    1 : Solide
-    ]]
-    id = 0,
-    ttl = 0, --Durée de vie de l'élément (valeur en ms)
-    isVisible = true, --Indique si la cellule est affichée
-    isDestructible = false,
-    hp = 0,
-    isTimely = false, --Meilleur nom ? : Indique si la cellule est affectée par le temps
-    isActive = { --Indique si la cellule à une fonction à jouer à sa mort
-        ttlReach = false,
-        touch = false,
-    },
-
-    --Fonction passée en paramètre par ":setOnTtlReached()"
-    rawOnTtlReached = function(self) end,
-    rawOnTouch = function(self) end,
-
-    --Fonction à utiliser à la mort de la cellule
-    onTtlReached = function(self)
-        self:rawOnTtlReached()
-    end,
-
-    --Fonction à utiliser losque la cellule est touché (par le joueur)
-    onTouch = function(self, direction)
-        --[[
-        1 : Haut
-        2 : Bas
-        3 : Gauche
-        4 : Droit
-        ]]
-        self:rawOnTouch(direction)
-    end,
-
-    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
-    setOnTtlReached = function(self, func)
-        self.rawOnTtlReached = func
-        self.isActive.ttlReach = true
-    end,
-
-    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
-    setOnTouch = function(self, func)
-        self.rawOnTouch = func
-        self.isActive.touch = true
-    end,
-
-    --Reset les propriétés de la cellule mais pas les méthodes
-    softReset = function(self)
-        self.id = nil
-        self.ttl = nil
-        self.isVisible = nil
-        self.isDestructible = nil
-        self.hp = nil
-        self.isTimely = nil
-        self.isActive = nil
-    end,
-
-    --Reset complètement la cellule
-    hardReset = function(self)
-        for k, _ in pairs(self) do self[k] = nil end
-    end
-})
 
 room.setBloc = function(...)
     for i, v in pairs({...}) do
-       room.grid[v[1]][v[2]] = v[3]
+        room.grid[v[1]][v[2]] = bloc[v[3]]:new()
     end
 end
 
@@ -146,15 +81,14 @@ room.moveCameraY = function(moveSpeed)
 end
 
 room.update = function(dt)
-    --Cooldown des cellules
+    --Cooldown des blocs
     for i, v in pairs(room.grid) do
         for ii, vv in pairs(v) do
             if vv.isTimely then
                 vv.ttl = vv.ttl - 1000 * dt
-
-                if vv.ttl <= 0 then
-                    if vv.isActive then vv:onTtlReached()
-                    else vv:hardReset() end
+                
+                if vv.ttl <= 0 and vv.activeEvent.ttlReach then
+                    vv:onTtlReached()
                 end
             end
         end
@@ -170,30 +104,35 @@ end
 
 room.draw = function()
     lg.setColor(255, 255, 255)
-    lg.draw(room.image, room.x, room.y)
+    lg.draw(room.img.bground, room.x, room.y)
     for i, v in pairs(room.grid) do
         for ii, vv in pairs(v) do
             local x = room.x + i*room.blocSize - room.blocSize
             local y = room.y + ii*room.blocSize - room.blocSize
-
-            --Test si la cellule est sur l'écran
+            
+            --Test si la cellule est sur l'écran et qu'elle est visible
             if (x + room.blocSize > 0 and x < wdow.wth) and
-            (y + room.blocSize > 0 and y < wdow.hgt) and vv.id == 1 then
-                lg.setColor(0, 200, 0)
-                lg.rectangle("line", x, y, room.blocSize, room.blocSize)
-                lg.print("x"..i.." y"..ii, x, y)
-
-                lg.print(vv.ttl, x, y + 20)
+            (y + room.blocSize > 0 and y < wdow.hgt) and vv.id ~= 1 then
+                lg.setColor(255, 255, 255)
+                lg.draw(room.img.blocs[vv.id], x, y)
+                
+                --[[Debug]]--
+                if debug.visible then
+                    lg.setColor(unpack(debug.color))
+                    lg.print("x"..i.." y"..ii, x, y)
+                    lg.print(string.format("ttl %d", vv.ttl), x, y + 20)
+                end
             end
         end
     end
 end
 
---Chargement d'un niveau
-dofile("data/chapter/1.lua")
 
 gravity = 4000
-chapter = 0
+chapter = 1
 level = {}
 level.x = 0
 level.y = 0
+
+--Chargement d'un niveau
+dofile("data/chapter/1/load.lua")

@@ -1,15 +1,49 @@
 function love.load()
-  lg = love.graphics
-  keyDown = love.keyboard.isDown
-  math.randomseed(os.time())
+    --Temp
+    rect = {}
+    rect.overlapRectangle = function (x, y, wth, hgt, x2, y2, wth2, hgt2)
+        w = 0.5 * (wth + wth2)
+        h = 0.5 * (hgt + hgt2)
+        dx = (x + wth/2) - (x2 + wth2/2)
+        dy = (y + hgt/2) - (y2 + hgt2/2)
+        
+        if math.abs(dx) <= w and math.abs(dy) <= h then
+            wy = w * dy
+            hx = h * dx
+            
+            if (wy > hx) then
+                if (wy > -hx) then
+                    --En bas
+                    return 2
+                else
+                    --A gauche
+                    return 3
+                end
+            else
+                if (wy > -hx) then
+                    --A droite
+                    return 4
+                else
+                    --En haut
+                    return 1
+                end
+            end
+        else
+            --Aucune collision
+            return 0
+        end
+    end
+    
+    lg = love.graphics
+    keyDown = love.keyboard.isDown
+    math.randomseed(os.time())
 
-  dofile("conf.lua")
-  dofile("assets/lobj.lua")
-  dofile("controls.lua")
-  dofile("player.lua")
-  dofile("entities.lua")
-  dofile("world.lua")
-  dofile("data.lua")
+    dofile("conf.lua")
+    dofile("assets/lobj.lua")
+    dofile("controls.lua")
+    dofile("player.lua")
+    dofile("entities.lua")
+    dofile("world.lua")
 end
 
 function love.update(dt)
