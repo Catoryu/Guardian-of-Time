@@ -29,7 +29,7 @@ function love.draw()
     if debug.visible then
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
-        lg.rectangle("fill", 10, 10, 300, 300)
+        lg.rectangle("fill", 10, 10, 300, 340)
         lg.setColor(0, 0, 0)
         lg.print("player.x : "..player.x, 10, 10)
         lg.print("player.y : "..player.y, 10, 30)
@@ -48,5 +48,8 @@ function love.draw()
         lg.print("#entities.container : "..#entities.container, 10, 230)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 250)
         lg.print("FPS : "..love.timer.getFPS(), 10, 270)
+        lg.print("room.x : "..room.x, 10, 290)
+        lg.print("room.y : "..room.y, 10, 310)
+        lg.print("Nbr cellules : "..#room.cells, 10, 330)
     end
 end

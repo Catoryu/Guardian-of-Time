@@ -88,6 +88,23 @@ room.pushCell = function(...)
     end
 end
 
+room.flushCells = function()
+    room.cells = {}
+end
+
+room.popCell = function (x, y)
+    for i, v in ipairs(room.cells) do
+        if v.x == x and v.y == y then room.cells[i] = nil end
+    end
+end
+
+room.createCell = function(x, y)
+    local cx = math.floor((-room.x + x) / room.blocSize) + 1
+    local cy = math.floor((-room.y + y) / room.blocSize) + 1
+
+    room.pushCell({x = cx, y = cy, id = 1})
+end
+
 room.moveCameraX = function(moveSpeed)
     local deltaX = 0
 
@@ -119,7 +136,7 @@ room.moveCameraX = function(moveSpeed)
     room.x = room.x + moveSpeed
 end
 
-room.moceCameraY = function(moveSpeed)
+room.moveCameraY = function(moveSpeed)
     local deltaY = 0
 
     --Marge d'erreur mouvement de la salle
@@ -164,7 +181,7 @@ room.update = function(dt)
     end
 end
 
-room.getCellPosition = function(x, y)
+room.getCellPos = function(x, y)
     x = room.x + x * room.blocSize - room.blocSize
     y = room.y + y * room.blocSize - room.blocSize
 
@@ -176,7 +193,7 @@ room.draw = function()
     lg.draw(room.image, room.x, room.y)
 
     for i, c in pairs(room.cells) do
-        local x, y = room.getCellPosition(c.x, c.y)
+        local x, y = room.getCellPos(c.x, c.y)
 
         --Test si la cellule est sur l'écran
         if (x + room.blocSize > 0 and x < wdow.wth) and
@@ -196,4 +213,5 @@ level = {}
 level.x = 0
 level.y = 0
 
-room.pushCell({x = 10, y = 10, id = 1})
+room.pushCell({x = 10, y = 10, id = 1}, {x = 9, y = 10, id = 1}, {x = 10, y = 9, id = 1})
+room.popCell(10, 10)

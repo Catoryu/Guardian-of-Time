@@ -126,7 +126,7 @@ player.moveX = function(moveSpeed)
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPosition(c.x, c.y)
+                local x, y = room.getCellPos(c.x, c.y)
 
                 --Collisions coté droit des blocs
                 if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
@@ -167,12 +167,12 @@ player.moveX = function(moveSpeed)
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPosition(c.x, c.y)
+                local x, y = room.getCellPos(c.x, c.y)
 
                 --Collisions coté gauche des blocs
                 if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
                 (player.x + moveSpeed < x and player.x + moveSpeed + player.wth > x) then
-                    vv:onTouch(3)
+                    c:onTouch(3)
                     player.x = player.x + (x - (player.x + player.wth))
                     player.xSpd = 0
                     return
@@ -223,12 +223,12 @@ player.moveY = function(moveSpeed)
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPosition(c.x, c.y)
+                local x, y = room.getCellPos(c.x, c.y)
 
                 --Collisions dessous des blocs
                 if (player.y + moveSpeed > y + room.blocSize - player.hgt and player.y + moveSpeed < y + room.blocSize) and
                 (player.x < x + room.blocSize and player.x + player.wth > x) then
-                    vv:onTouch(2)
+                    c:onTouch(2)
                     player.ySpd = 0
                     player.y = player.y - (player.y - (y + room.blocSize))
                     return
@@ -265,12 +265,12 @@ player.moveY = function(moveSpeed)
             --Si le bloc est solide
             if c.id == 1 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPosition(c.x, c.y)
+                local x, y = room.getCellPos(c.x, c.y)
 
                 --Collisions dessus des blocs
                 if (player.y + moveSpeed + player.hgt > y and player.y + moveSpeed < y) and
                 (player.x < x + room.blocSize and player.x + player.wth > x) then
-                    vv:onTouch(1)
+                    c:onTouch(1)
                     player.isJumping = false
                     player.ySpd = 0
                     player.y = player.y + y - (player.y + player.hgt)
