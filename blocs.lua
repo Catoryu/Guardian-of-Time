@@ -1,4 +1,12 @@
+dofile("data/bloc.lua")
+
 --World/Map creation
+gravity = 4000
+chapter = 1
+level = {}
+level.x = 0
+level.y = 0
+
 room = {}
 room.blocSize = 50
 room.cols = 40
@@ -7,105 +15,39 @@ room.wth = room.cols * room.blocSize
 room.hgt = room.rows * room.blocSize
 room.x = 0
 room.y = -room.hgt + wdow.hgt
-room.image = lg.newImage("data/chapter/1/bground.jpg")--temp
 room.blocs = {}
 
---Class des blocs.
-bloc = createClass({
-    --[[ID des blocs
-    On en rajoutera plus tard
-    0 : Vide
-    1 : Solide
-    ]]
-    id = 0,
-    x = 0,
-    y = 0,
-    ttl = 0, --Durée de vie de l'élément (valeur en ms)
-    isVisible = true, --Indique si le bloc est affichée
-    isDestructible = false,
-    isSolid = true,
-    hp = 0,
-    isTimely = false, --Meilleur nom ? : Indique si le bloc est affectée par le temps
-    isActive = { --Indique si le bloc à une fonction à jouer lors de certain événements
-        ttlReach = false,
-        touch = false,
-    },
-
-    --Fonction passée en paramètre par ":setOnTtlReached()"
-    rawOnTtlReached = function(self) end,
-    rawOnTouch = function(self) end,
-
-    --Fonction à utiliser à la mort de le bloc
-    onTtlReached = function(self)
-        self:rawOnTtlReached()
-    end,
-
-    --Fonction à utiliser losque le bloc est touché (par le joueur)
-    onTouch = function(self, direction)
-        --[[
-        1 : Haut
-        2 : Bas
-        3 : Gauche
-        4 : Droit
-        ]]
-        self:rawOnTouch(direction)
-    end,
-
-    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
-    setOnTtlReached = function(self, func)
-        self.rawOnTtlReached = func
-        self.isActive.ttlReach = true
-    end,
-
-    --Ajoute la fonction passée en argument comme trigger et active l'attribut "isActive"
-    setOnTouch = function(self, func)
-        self.rawOnTouch = func
-        self.isActive.touch = true
-    end,
-
-    --Reset les propriétés de le bloc mais pas les méthodes
-    softReset = function(self)
-        self.id = nil
-        self.ttl = nil
-        self.isVisible = nil
-        self.isDestructible = nil
-        self.hp = nil
-        self.isTimely = nil
-        self.isActive = nil
-    end,
-
-    --Reset complètement le bloc
-    hardReset = function(self)
-        for k, _ in pairs(self) do self[k] = nil end
-    end
-})
-
-room.pushBloc = function(...)
-    for _, blocInitValues in pairs({...}) do
-        local b = bloc:new(blocInitValues)
-
-        table.insert(room.blocs, b)
+room.pushBloc = function(...)--Permet de créer un bloc (coordonnés sur la grille)
+    for _, blocValues in pairs({...}) do
+        table.insert(room.blocs, blocValues)
     end
 end
 
-room.flushBlocs = function()
+room.flushBlocs = function()--Permet de supprimer tous les blocs
     room.blocs = {}
 end
 
-room.popBloc = function (x, y)
+room.popBloc = function (x, y)--Permet de supprimer un bloc (coordonnés sur la grille)
     for i, v in ipairs(room.blocs) do
         if v.x == x and v.y == y then room.blocs[i] = nil end
     end
 end
 
-room.createBloc = function(x, y)
+room.createBloc = function(x, y)--Permet de créer un bloc (coordonnés en pixel)
     local bx = math.floor((-room.x + x) / room.blocSize) + 1
     local by = math.floor((-room.y + y) / room.blocSize) + 1
 
-    room.pushBloc({x = bx, y = by, id = 1})
+    room.pushBloc(bloc[2]:new({x = bx, y = by}))
 end
 
-room.moveCameraX = function(moveSpeed)
+room.getBlocPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
+    x = room.x + x * room.blocSize - room.blocSize
+    y = room.y + y * room.blocSize - room.blocSize
+
+    return x, y
+end
+
+room.moveCameraX = function(moveSpeed)--Bouge la caméra horizontalement
     local deltaX = 0
 
     --Marge d'erreur mouvement de la salle
@@ -129,14 +71,14 @@ room.moveCameraX = function(moveSpeed)
 
     --Bouge les entités
     for i, e in pairs(entities.container) do
-        e.x = exp.x + moveSpeed
+        e.x = e.x + moveSpeed
     end
 
     --Bouge les blocs
     room.x = room.x + moveSpeed
 end
 
-room.moveCameraY = function(moveSpeed)
+room.moveCameraY = function(moveSpeed)--Bouge la caméra verticalement
     local deltaY = 0
 
     --Marge d'erreur mouvement de la salle
@@ -174,44 +116,35 @@ room.update = function(dt)
             b.ttl = b.ttl - 1000 * dt
 
             if b.ttl <= 0 then
-                if b.isActive then b:onTtlReached()
-                else b:hardReset() end
+                if b.activeEvent.ttlReach then
+                    b:onTtlReached()
+                end
             end
         end
     end
 end
 
-room.getBlocPos = function(x, y)
-    x = room.x + x * room.blocSize - room.blocSize
-    y = room.y + y * room.blocSize - room.blocSize
-
-    return x, y
-end
 
 room.draw = function()
     lg.setColor(255, 255, 255)
-    lg.draw(room.image, room.x, room.y)
+    lg.draw(room.img.bground, room.x, room.y)
 
     for i, b in pairs(room.blocs) do
         local x, y = room.getBlocPos(b.x, b.y)
 
         --Test si le bloc est sur l'écran
         if (x + room.blocSize > 0 and x < wdow.wth) and
-        (y + room.blocSize > 0 and y < wdow.hgt) and b.id == 1 then
+        (y + room.blocSize > 0 and y < wdow.hgt) then
             lg.setColor(0, 200, 0)
             lg.rectangle("line", x, y, room.blocSize, room.blocSize)
 
             lg.print("x" .. b.x .. " y" .. b.y , x, y)
-            lg.print(b.ttl, x, y + 20)
+            lg.print("id:"..b.id, x, y + 10)
+            lg.print(string.format("%d ms", b.ttl), x, y + 20)
         end
     end
 end
 
-gravity = 4000
-chapter = 0
-level = {}
-level.x = 0
-level.y = 0
 
-room.pushBloc({x = 10, y = 10, id = 1}, {x = 9, y = 10, id = 1}, {x = 10, y = 9, id = 1})
-room.popBloc(10, 10)
+--Chargement d'un niveau
+dofile("data/chapter/1/load.lua")

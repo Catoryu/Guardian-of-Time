@@ -76,8 +76,7 @@ player.moveX = function(moveSpeed)
                 local x, y = room.getBlocPos(b.x, b.y)
 
                 --Collisions coté droit des blocs
-                if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
-                (player.x + moveSpeed < x + room.blocSize and player.x + moveSpeed + player.wth > x + room.blocSize) then
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, room.blocSize, room.blocSize) == 4 then
                     b:onTouch(4)
                     player.x = player.x - (player.x - (x + room.blocSize))
                     player.xSpd = 0
@@ -116,10 +115,9 @@ player.moveX = function(moveSpeed)
                 local x, y = room.getBlocPos(b.x, b.y)
 
                 --Collisions coté gauche des blocs
-                if (player.y + player.hgt - 1 > y and player.y < y + room.blocSize) and
-                (player.x + moveSpeed < x and player.x + moveSpeed + player.wth > x) then
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, room.blocSize, room.blocSize) == 3 then
                     b:onTouch(3)
-                    player.x = player.x + (player.x - (player.x + player.wth))
+                    player.x = player.x + (x - (player.x + player.wth))
                     player.xSpd = 0
                     return
                 end
@@ -171,8 +169,7 @@ player.moveY = function(moveSpeed)
                 local x, y = room.getBlocPos(b.x, b.y)
 
                 --Collisions dessous des blocs
-                if (player.y + moveSpeed > y + room.blocSize - player.hgt and player.y + moveSpeed < y + room.blocSize) and
-                (player.x < x + room.blocSize and player.x + player.wth > x) then
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 2 then
                     b:onTouch(2)
                     player.ySpd = 0
                     player.y = player.y - (player.y - (y + room.blocSize))
@@ -212,8 +209,7 @@ player.moveY = function(moveSpeed)
                 local x, y = room.getBlocPos(b.x, b.y)
 
                 --Collisions dessus des blocs
-                if (player.y + moveSpeed + player.hgt > y and player.y + moveSpeed < y) and
-                (player.x < x + room.blocSize and player.x + player.wth > x) then
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
                     b:onTouch(1)
                     player.isJumping = false
                     player.ySpd = 0
@@ -221,7 +217,7 @@ player.moveY = function(moveSpeed)
                     return
                 end
             --Si le bloc est solide mais seulement sur le dessus
-            elseif v.id == 4 then
+            elseif b.id == 4 then
                 --Récupère les coordonnés du bloc
                 local x, y = room.getCellPosition(v.x, v.y)
 
@@ -287,9 +283,9 @@ player.update = function(dt)
     if player.xSpd > player.spdLimit then player.xSpd = player.spdLimit elseif player.xSpd < -player.spdLimit then player.xSpd = -player.spdLimit end
 
     --Fait bouger le joueur
-    player.moveY(player.ySpd * dt)
-    player.moveX(player.xSpd * dt)
-
+    if player.ySpd ~= 0 then player.moveY(player.ySpd * dt) end
+    if player.xSpd ~= 0 then player.moveX(player.xSpd * dt) end
+    
     if player.ySpd > 0 then player.isJumping = true; player.canJumpHigher = false end
 
     --Test si le joueur est dans un objet où il peut nager [WIP]

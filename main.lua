@@ -18,6 +18,11 @@ function love.update(dt)
         player.update(dt)
         room.update(dt)
         controls(dt)
+    else
+        --Permet de ne pas faire avancer le joueur dans le vide après avoir bouger la fenêtre
+        inputs.down = false
+        inputs.left = false
+        inputs.right = false
     end
 end
 
@@ -50,6 +55,7 @@ function love.draw()
         lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
         lg.print("#entities.container : "..#entities.container, 10, 230)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 250)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 270)
+        lg.print("#room.blocs : "..#room.blocs, 10, 270)
+        lg.print("FPS : "..love.timer.getFPS(), 10, 290)
     end
 end
