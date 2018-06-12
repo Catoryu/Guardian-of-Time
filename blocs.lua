@@ -33,11 +33,11 @@ room.popBloc = function (x, y)--Permet de supprimer un bloc (coordonnés sur la 
     end
 end
 
-room.createBloc = function(x, y)--Permet de créer un bloc (coordonnés en pixel)
+room.createBloc = function(x, y, id)--Permet de créer un bloc (coordonnés en pixel)
     local bx = math.floor((-room.x + x) / room.blocSize) + 1
     local by = math.floor((-room.y + y) / room.blocSize) + 1
 
-    room.pushBloc(bloc[2]:new({x = bx, y = by}))
+    room.pushBloc(bloc[id]:new({x = bx, y = by}))
 end
 
 room.getBlocPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
@@ -135,12 +135,17 @@ room.draw = function()
         --Test si le bloc est sur l'écran
         if (x + room.blocSize > 0 and x < wdow.wth) and
         (y + room.blocSize > 0 and y < wdow.hgt) then
-            lg.setColor(0, 200, 0)
-            lg.rectangle("line", x, y, room.blocSize, room.blocSize)
-
-            lg.print("x" .. b.x .. " y" .. b.y , x, y)
-            lg.print("id:"..b.id, x, y + 10)
-            lg.print(string.format("%d ms", b.ttl), x, y + 20)
+            lg.setColor(255, 255, 255)
+            lg.draw(room.img.blocs[b.id], x, y)
+            
+            --[[Debug]]--
+            if debug.visible then
+                lg.setColor(unpack(debug.color))
+                --lg.rectangle("line", x, y, room.blocSize, room.blocSize)
+                lg.print("x" .. b.x .. " y" .. b.y , x, y)
+                lg.print("id:"..b.id, x, y + 10)
+                lg.print(string.format("%d ms", b.ttl), x, y + 20)
+            end
         end
     end
 end

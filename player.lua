@@ -2,6 +2,18 @@ player = {}
 player.clothe = 0
 player.weapon = 0
 player.specie = 0
+player.grid = lg.newCanvas(wdow.wth + room.blocSize, wdow.hgt + room.blocSize)
+lg.setCanvas(player.grid)
+    lg.setColor(255, 255, 255)
+    
+    for i = 0, wdow.wth + room.blocSize, room.blocSize do
+        lg.line(i, 0, i, wdow.hgt + room.blocSize)
+        for j = 0, wdow.hgt + room.blocSize, room.blocSize do
+            lg.line(0, j, wdow.wth + room.blocSize, j)
+        end
+    end
+lg.setCanvas()
+player.showGrid = false
 player.wth = 45
 player.hgt = 95
 player.x = wdow.wth/2 - player.wth/2
@@ -219,11 +231,11 @@ player.moveY = function(moveSpeed)
             --Si le bloc est solide mais seulement sur le dessus
             elseif b.id == 4 then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getCellPosition(v.x, v.y)
+                local x, y = room.getBlocPos(b.x, b.y)
 
                 --Collisions dessus des blocs
                 if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
-                    room.grid[v.x][v.y]:onTouch(1)
+                    b:onTouch(1)
                     player.isJumping = false
                     player.ySpd = 0
                     player.y = player.y + y - (player.y + player.hgt)
@@ -309,4 +321,13 @@ end
 player.draw = function()
     lg.setColor(255, 255, 255)
     lg.rectangle("fill", player.x, player.y, player.wth, player.hgt)
+    
+    if player.showGrid then
+        --Calcul la position de la grille
+        _, dump = math.modf(room.x/room.blocSize)
+        _, dump2 = math.modf(room.y/room.blocSize)
+        
+        --Affiche la grille
+        lg.draw(player.grid, dump*room.blocSize, dump2*room.blocSize)
+    end
 end

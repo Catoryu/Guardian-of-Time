@@ -85,12 +85,14 @@ bloc = {
     --Bloc solide classique
     bloc_class:new({
         id = 1,
+        name = "solid",
         isSolid = true
     }),
 
     --Bloc qui se détruit au toucher (dessus)
     bloc_class:new({
         id = 2,
+        name = "disappears when touched",
         activeEvent = {ttlReach = true, onTouch = true},
         isSolid = true,
         ttl = 1000,
@@ -105,6 +107,7 @@ bloc = {
     --Bloc qui apparait au bout d'un certain temps
     bloc_class:new({
         id = 3,
+        name = "appears with time",
         isSolid = false,
         ttl = 5000,
         isTimely = true,
@@ -122,6 +125,7 @@ bloc = {
     --WIP
     --Plateforme à sens unique (Uniquement collision du dessus)
     bloc_class:new({
-        id = 4
+        id = 4,
+        name = "platform"
     })
 }

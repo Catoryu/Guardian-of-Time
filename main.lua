@@ -6,9 +6,9 @@ function love.load()
     dofile("conf.lua")
     dofile("assets/lobj.lua")
     dofile("controls.lua")
+    dofile("blocs.lua")
     dofile("player.lua")
     dofile("entities.lua")
-    dofile("blocs.lua")
     dofile("functions.lua")
 end
 
@@ -27,14 +27,14 @@ function love.update(dt)
 end
 
 function love.draw()
-    lg.setFont(debug.font)
-    lg.setColor(0, 200, 0)
     room.draw()
     entities.draw()
     player.draw()
 
     --[[Debug]]--
     if debug.visible then
+        lg.draw(debug.helpText, 10, 400)
+        
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
         lg.rectangle("fill", 10, 10, 300, 340)
@@ -55,7 +55,8 @@ function love.draw()
         lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
         lg.print("#entities.container : "..#entities.container, 10, 230)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 250)
-        lg.print("#room.blocs : "..#room.blocs, 10, 270)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 290)
+        lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 270)
+        lg.print("#room.blocs : "..#room.blocs, 10, 290)
+        lg.print("FPS : "..love.timer.getFPS(), 10, 310)
     end
 end

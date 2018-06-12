@@ -61,16 +61,19 @@ text = {
 debug = {}
 debug.visible = true
 debug.font = lg.newFont("fonts/consola.ttf")
-debug.messages = {"wdow.wth"}
 debug.color = {0, 200, 0}
-debug.draw = function()
---    for i, v in pairs(debug.messages) do
---        local val = 0
---        for i = 1, #v do
---           if string.sub(v, i, i) == "." then
---                val = _G[v][string.sub(v, i + 1, #v)]
---            end
---        end
---        lg.print(v.." : "..val, 10, i*20)
---    end
-end
+debug.helpText = lg.newCanvas(300, 180)
+lg.setCanvas(debug.helpText)
+    lg.setFont(debug.font)
+    lg.setColor(180, 180, 180, 200)
+    lg.rectangle("fill", 0, 0, 300, 180)
+    lg.setColor(0, 0, 0)
+    lg.print("Controls : ", 10, 10)
+    lg.print("[TAB] Permet d'afficher/cacher les menus", 10, 30)
+    lg.print("[G] Permet d'afficher/cacher la grille", 10, 50)
+    lg.print("[clic gauche] Permet de créer une entitée", 10, 70)
+    lg.print("[clic droit] Permet de créer un bloc", 10, 90)
+    lg.print("[molette] Change l'entité créé", 10, 110)
+    lg.print("[shift + molette] Change le bloc créé", 10, 130)
+    lg.print("[ESC] Quitte le programme", 10, 150)
+lg.setCanvas()

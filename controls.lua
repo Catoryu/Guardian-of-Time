@@ -4,6 +4,7 @@ mouse.firstY = 0
 mouse.secondX = 0
 mouse.secondY = 0
 selectedEntity = 3
+selectedBloc = 1
 inputs = {}
 inputs.down = false
 inputs.left = false
@@ -28,6 +29,7 @@ function love.keypressed(key)
     if key == "a" then inputs.left = true end
     if key == "d" then inputs.right = true end
 
+    if key == "g" then player.showGrid = not player.showGrid end
     if key == "escape" then love.event.quit() end
     if key == "tab" then debug.visible = not debug.visible end
     if key == "delete" then table.remove(entities.container, #entities.container)end
@@ -45,7 +47,7 @@ function love.mousepressed(x, y, button)
         mouse.firstX, mouse.firstY = love.mouse.getPosition()
     end
 
-    if button == 2 then room.createBloc(x, y) end
+    if button == 2 then room.createBloc(x, y, selectedBloc) end
 end
 
 function love.mousereleased(_, _, button)
@@ -65,9 +67,17 @@ function love.mousereleased(_, _, button)
 end
 
 function love.wheelmoved(_, y)
-    if y > 0 then
-        selectedEntity = (selectedEntity + 1 < #entity) and selectedEntity + 1 or selectedEntity
-    elseif y < 0 then
-        selectedEntity = (selectedEntity - 1 > 0) and selectedEntity - 1 or selectedEntity
+    if keyDown("lshift") or keyDown("rshift") then
+        if y > 0 then
+            selectedBloc = (selectedBloc < #bloc) and selectedBloc + 1 or selectedBloc
+        elseif y < 0 then
+            selectedBloc = (selectedBloc - 1 > 0) and selectedBloc - 1 or selectedBloc
+        end
+    else
+        if y > 0 then
+            selectedEntity = (selectedEntity < #entity) and selectedEntity + 1 or selectedEntity
+        elseif y < 0 then
+            selectedEntity = (selectedEntity - 1 > 0) and selectedEntity - 1 or selectedEntity
+        end
     end
 end
