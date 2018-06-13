@@ -17,8 +17,42 @@ room.x = 0
 room.y = -room.hgt + wdow.hgt
 room.blocs = {}
 
+function room.calculateCardinality(bloc1, bloc2)
+    --Haut
+    if bloc1.x == bloc2.x and bloc1.y - 1 == bloc2.y then
+        bloc1.imgCardinality[1] = 1
+        bloc2.imgCardinality[2] = 1
+    end
+    --Bas
+    if bloc1.x == bloc2.x and bloc1.y + 1 == bloc2.y then
+        bloc1.imgCardinality[2] = 1
+        bloc2.imgCardinality[1] = 1
+    end
+    --Gauche
+    if bloc1.x - 1 == bloc2.x and bloc1.y == bloc2.y then
+        bloc1.imgCardinality[3] = 1
+        bloc2.imgCardinality[4] = 1
+    end
+    --Droite
+    if bloc1.x + 1 == bloc2.x and bloc1.y == bloc2.y then
+        bloc1.imgCardinality[4] = 1
+        bloc2.imgCardinality[3] = 1
+    end
+    
+    return bloc1, bloc2
+end
+
 room.pushBloc = function(...)--Permet de créer un bloc (coordonnés sur la grille)
     for _, blocValues in pairs({...}) do
+        --Modifie les images si un blocs est a coté
+        if blocValues.imgLink then
+            blocValues.imgCardinality = {0, 0, 0, 0}
+            for i, b in pairs(room.blocs) do
+                if b.imgLink then
+                    blocValues, b = room.calculateCardinality(blocValues, b)
+                end
+            end
+        end
         table.insert(room.blocs, blocValues)
     end
 end
@@ -132,11 +166,15 @@ room.draw = function()
     for i, b in pairs(room.blocs) do
         local x, y = room.getBlocPos(b.x, b.y)
 
-        --Test si le bloc est sur l'écran
+        --Si le bloc est sur l'écran
         if (x + room.blocSize > 0 and x < wdow.wth) and
         (y + room.blocSize > 0 and y < wdow.hgt) then
             lg.setColor(255, 255, 255)
-            lg.draw(room.img.blocs[b.id], x, y)
+            if b.imgLink then
+                lg.draw(src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x, y)
+            else
+                lg.draw(src.img.bloc[b.img], x, y)
+            end
             
             --[[Debug]]--
             if debug.visible then
@@ -144,7 +182,12 @@ room.draw = function()
                 --lg.rectangle("line", x, y, room.blocSize, room.blocSize)
                 lg.print("x" .. b.x .. " y" .. b.y , x, y)
                 lg.print("id:"..b.id, x, y + 10)
-                lg.print(string.format("%d ms", b.ttl), x, y + 20)
+                if b.isTimely then
+                    lg.print(string.format("%d ms", b.ttl), x, y + 20)
+                end
+                if b.imgLink then
+                    lg.print(table.concat(b.imgCardinality), x, y + 30)
+                end
             end
         end
     end

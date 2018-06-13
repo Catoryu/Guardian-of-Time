@@ -2,6 +2,19 @@ function love.load()
     lg = love.graphics
     keyDown = love.keyboard.isDown
     math.randomseed(os.time())
+    
+    --Chargement des images/sons/animations
+    src = {}
+    src.sound = {}
+    src.anim = {}
+    src.img = {}
+    src.img.bloc = {}
+    --Initialise toutes les images de blocs
+    for i, v in pairs(love.filesystem.getDirectoryItems("resource/bloc")) do
+        --Ajoute dans le tableau "src.img.bloc" une variable associative qui porte le nom de l'image
+        --Cette variable a comme valeur l'image elle même
+        src.img.bloc[string.sub(v, 1, #v - 4)] = lg.newImage("resource/bloc/"..v)
+    end
 
     dofile("conf.lua")
     dofile("assets/lobj.lua")
@@ -54,9 +67,9 @@ function love.draw()
         lg.print("player.airTime : "..player.airTime, 10, 190)
         lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
         lg.print("#entities.container : "..#entities.container, 10, 230)
-        lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 250)
+        lg.print("#room.blocs : "..#room.blocs, 10, 250)
         lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 270)
-        lg.print("#room.blocs : "..#room.blocs, 10, 290)
+        lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 290)
         lg.print("FPS : "..love.timer.getFPS(), 10, 310)
     end
 end

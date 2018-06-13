@@ -33,6 +33,28 @@ function love.keypressed(key)
     if key == "escape" then love.event.quit() end
     if key == "tab" then debug.visible = not debug.visible end
     if key == "delete" then table.remove(entities.container, #entities.container)end
+    if key == "backspace" then
+        --Recalcul les cardinalités
+        for i, b in pairs(room.blocs) do
+            --Haut
+            if room.blocs[#room.blocs].x == b.x and room.blocs[#room.blocs].y - 1 == b.y then
+                b.imgCardinality[2] = 0
+            end
+            --Bas
+            if room.blocs[#room.blocs].x == b.x and room.blocs[#room.blocs].y + 1 == b.y then
+                b.imgCardinality[1] = 0
+            end
+            --Gauche
+            if room.blocs[#room.blocs].x - 1 == b.x and room.blocs[#room.blocs].y == b.y then
+                b.imgCardinality[4] = 0
+            end
+            --Droite
+            if room.blocs[#room.blocs].x + 1 == b.x and room.blocs[#room.blocs].y == b.y then
+                b.imgCardinality[3] = 0
+            end
+        end
+        table.remove(room.blocs, #room.blocs)
+    end
 end
 
 function love.keyreleased(key)

@@ -45,28 +45,18 @@ end
 wdow = {
     mode = false,
     wth = 1280, hgt = 720,
---    wth = 1600, hgt = 900, --Pour 1920X1080
---    wth = 1200, hgt = 675, --Pour 1366X768
     title = "Guardian of Time"
-}
- 
-bground = { 
-    color = {0, 0, 0} 
-} 
-
-text = {
-    color = {255, 255, 255}
 }
  
 debug = {}
 debug.visible = true
 debug.font = lg.newFont("fonts/consola.ttf")
 debug.color = {0, 200, 0}
-debug.helpText = lg.newCanvas(300, 180)
+debug.helpText = lg.newCanvas(300, 220)
 lg.setCanvas(debug.helpText)
     lg.setFont(debug.font)
     lg.setColor(180, 180, 180, 200)
-    lg.rectangle("fill", 0, 0, 300, 180)
+    lg.rectangle("fill", 0, 0, 300, 220)
     lg.setColor(0, 0, 0)
     lg.print("Controls : ", 10, 10)
     lg.print("[TAB] Permet d'afficher/cacher les menus", 10, 30)
@@ -75,5 +65,7 @@ lg.setCanvas(debug.helpText)
     lg.print("[clic droit] Permet de créer un bloc", 10, 90)
     lg.print("[molette] Change l'entité créé", 10, 110)
     lg.print("[shift + molette] Change le bloc créé", 10, 130)
-    lg.print("[ESC] Quitte le programme", 10, 150)
+    lg.print("[DELETE] Supprime la dernière entité", 10, 150)
+    lg.print("[Backspace] Supprime le dernier bloc", 10, 170)
+    lg.print("[ESC] Quitte le programme", 10, 190)
 lg.setCanvas()

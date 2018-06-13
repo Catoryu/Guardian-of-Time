@@ -1,0 +1,6 @@
+On appelle les éléments dans la grille des blocs, pas des cellules
+
+1 : Haut
+2 : Bas
+3 : Gauche
+4 : Droite

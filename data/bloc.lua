@@ -8,6 +8,9 @@ bloc_class = {
     isSolid = false,
     isDestructible = false,
     hp = 0,
+    img = "",
+    imgCardinality = nil, --Permet de définir si le bloc a plusieurs images
+    imgLink = false,
     isTimely = false, --Meilleur nom ? : Indique si le bloc est affecté par le temps
     activeEvent = { --Indique les événements actifs du bloc
         ttlReach = false,
@@ -86,6 +89,8 @@ bloc = {
     bloc_class:new({
         id = 1,
         name = "solid",
+        img = "stone",
+        imgLink = true,
         isSolid = true
     }),
 
@@ -93,6 +98,7 @@ bloc = {
     bloc_class:new({
         id = 2,
         name = "disappears when touched",
+        img = "instable",
         activeEvent = {ttlReach = true, onTouch = true},
         isSolid = true,
         ttl = 1000,
@@ -108,6 +114,7 @@ bloc = {
     bloc_class:new({
         id = 3,
         name = "appears with time",
+        img = "instable2",
         isSolid = false,
         ttl = 5000,
         isTimely = true,
@@ -126,6 +133,7 @@ bloc = {
     --Plateforme à sens unique (Uniquement collision du dessus)
     bloc_class:new({
         id = 4,
-        name = "platform"
+        name = "platform",
+        img = "woodPlatform"
     })
 }
