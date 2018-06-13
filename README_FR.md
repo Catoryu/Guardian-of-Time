@@ -3,9 +3,9 @@ Guardian of time
 Jeu d'aventure où vous jouez un personnage nommé "Kootta", vous suivez son histoire.
 Le jeu se fera en lua tout en utilisant une bibliothèque nommée LOVE2D.
 
-Toutes les images seront faites par moi-même.  
+Toutes les images seront faites par moi-même ou des collaborateurs.  
 Toutes les musiques seront faites par Beat Nation.  
-Tous les personnages sont des produits de mon imagination, n'hésitez pas à me contacter si vous voulez en savoir plus sur l'histoire ou d'autres choses (je parle français, portugais, peut parler anglais et essayer d'apprendre le japonais OwO):  
+Tous les personnages sont des produits de mon imagination ou des collaborateurs, n'hésitez pas à nous contacter si vous voulez en savoir plus sur l'histoire ou d'autres choses (je parle français, portugais, peut parler anglais et essayer d'apprendre le japonais OwO):  
 Email : catoryu.kuroneko@gmail.com  
 Twitter account : [@Catoryu_](https://www.twitter.com/Catoryu_)  
 Discord account : Catoryu#9605  
@@ -18,7 +18,7 @@ Dans les versions futures...
 Personnes qui m'aident
 --
 FrankamaNaxos :  
-Createur de LOBJ.  
+Createur de LOBJ et code.  
 Discord : F.Nax_OS#0002
 
 Leandro Saraiva Maia :  
