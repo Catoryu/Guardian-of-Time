@@ -1,4 +1,6 @@
 mouse = {}
+mouse.x = 0
+mouse.y = 0
 mouse.firstX = 0
 mouse.firstY = 0
 mouse.secondX = 0

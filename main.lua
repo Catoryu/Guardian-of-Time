@@ -1,6 +1,7 @@
 function love.load()
     lg = love.graphics
     keyDown = love.keyboard.isDown
+    love.mouse.setVisible(false)
     math.randomseed(os.time())
     
     --Chargement des images/sons/animations
@@ -8,6 +9,7 @@ function love.load()
     src.sound = {}
     src.anim = {}
     src.img = {}
+    src.img.cursor = lg.newImage("resource/miscellaneous/cursor 32x32.png")
     src.img.bloc = {}
     --Initialise toutes les images de blocs
     for i, v in pairs(love.filesystem.getDirectoryItems("resource/bloc")) do
@@ -26,6 +28,9 @@ function love.load()
 end
 
 function love.update(dt)
+    --Actualise l'affichage de la souris
+    mouse.x, mouse.y = love.mouse.getPosition()
+    
     --Fait tourner le jeu uniquement lorsque l'utilisateur ne bouge pas la fenêtre
     if dt < 0.2 then
         player.update(dt)
@@ -72,4 +77,8 @@ function love.draw()
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 290)
         lg.print("FPS : "..love.timer.getFPS(), 10, 310)
     end
+    
+    --Affichage de la souris
+    lg.setColor(255, 255, 255)
+    lg.draw(src.img.cursor, mouse.x, mouse.y)
 end
