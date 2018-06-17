@@ -1,0 +1,15 @@
+Obligatoire :
+-Genre (Garçon ou fille)
+-Race (Humain, Homme-bête(N'importe quelle bête) ou vampire, dragon(peu de chance que je valide ceux là))
+-Element magique (Feu/Eau/Terre/Foudre/Air/Glace/Lumière/Ténèbres) (Il faut pas trop de personnages avec lumière ou ténèbres)
+-Pouvoir (N'importe lequel tant que c'est pas un des éléments ou en rapport avec des dragons)
+-Physique
+
+Pas obligatoire :
+-Nom + Prénom (Japonais de préférence)
+-Ce que le personnage pense des hommes-bêtes et des vampires
+-Age
+-Style de combat (Arme, tu peux choisir aucune)
+-Autres informations (Passé, envies, etc...)
+
+Si quelque chose ne va pas, je te préviendrai.
