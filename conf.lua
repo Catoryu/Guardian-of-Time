@@ -1,3 +1,6 @@
+--Téléchargement de la version 0.10.2
+--https://bitbucket.org/rude/love/downloads/love-0.10.2-win64.exe
+
 function love.conf(t) 
     t.identity = nil                    -- The name of the save directory (string) 
     t.version = "0.10.2"                -- The LÖVE version this game was made for (string) 
@@ -42,11 +45,11 @@ function love.conf(t)
 end 
 
 --Window informations 
-wdow = {
-    mode = false,
-    wth = 1280, hgt = 720,
-    title = "Guardian of Time"
-}
+wdow = {}
+wdow.mode = false
+wdow.wth = 1280
+wdow.hgt = 720
+wdow.title = "Guardian of Time"
  
 debug = {}
 debug.visible = true

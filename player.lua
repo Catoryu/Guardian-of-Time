@@ -65,38 +65,46 @@ player.moveX = function(moveSpeed)
     end
 
     if moveSpeed < 0 then
+        local dx = math.huge
+        
         --Collision bord gauche de l'écran
         if player.x + moveSpeed < 0 then player.x = 0; return end
-
+        
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions coté droit des entités
             if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 4 then
                 if v.solidResistance == 100 then
-                    player.x = player.x - (player.x - (v.x + v.wth))
-                    player.xSpd = 0
-                    return
+                    if player.x - (v.x + v.wth) < dx then
+                        dx = player.x - (v.x + v.wth)
+                    end
                 end
             end
         end
-
-        --Passe en revue les blocs
+        
+        --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
                 local x, y = room.getBlocPos(b.x, b.y)
-
+                
                 --Collisions coté droit des blocs
                 if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, room.blocSize, room.blocSize) == 4 then
                     b:onTouch(4)
-                    player.x = player.x - (player.x - (x + room.blocSize))
-                    player.xSpd = 0
-                    return
+                    if player.x - (x + room.blocSize) < dx then
+                        dx = player.x - (x + room.blocSize)
+                    end
                 end
             end
         end
-
+        
+        if dx ~= math.huge then
+            player.x = player.x - dx
+            player.xSpd = 0
+            return
+        end
+        
         --Déplacement de la caméra
         if room.x < 0 and player.x + player.wth/2 < wdow.wth/2 then
             room.moveCameraX(-moveSpeed)
@@ -104,38 +112,46 @@ player.moveX = function(moveSpeed)
             player.x = player.x + moveSpeed
         end
     elseif moveSpeed > 0 then
+        local dx = math.huge
+        
         --Collision bord droit de l'écran
         if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return end
-
+        
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions coté gauche des entités
             if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 3 then
                 if v.solidResistance == 100 then
-                    player.x = player.x + (v.x - (player.x + player.wth))
-                    player.xSpd = 0
-                    return
+                    if v.x - (player.x + player.wth) < dx then
+                        dx = v.x - (player.x + player.wth)
+                    end
                 end
             end
         end
-
-        --Passe en revue les blocs
+        
+        --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
                 local x, y = room.getBlocPos(b.x, b.y)
-
+                
                 --Collisions coté gauche des blocs
                 if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, room.blocSize, room.blocSize) == 3 then
                     b:onTouch(3)
-                    player.x = player.x + (x - (player.x + player.wth))
-                    player.xSpd = 0
-                    return
+                    if x - (player.x + player.wth) < dx then
+                        dx = x - (player.x + player.wth)
+                    end
                 end
             end
         end
-
+        
+        if dx ~= math.huge then
+            player.x = player.x + dx
+            player.xSpd = 0
+            return
+        end
+        
         --Déplacement de la caméra
         if room.x + room.wth > wdow.wth and player.x + player.wth/2 > wdow.wth/2 then
             room.moveCameraX(-moveSpeed)
@@ -158,38 +174,47 @@ player.moveY = function(moveSpeed)
     end
 
     if moveSpeed < 0 then
+        local dy = math.huge
+        
         --Collision bord haut de l'écran
         if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return end
-
+        
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions dessous des entités
             if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 2 then
                 if v.solidResistance == 100 then
-                    player.ySpd = 0
-                    player.y = player.y - (player.y - (v.y + v.hgt))
-                    return
+                    if player.y - (v.y + v.hgt) < dy then
+                        dy = player.y - (v.y + v.hgt)
+                    end
                 end
             end
         end
-
-        --Passe en revue les blocs
+        
+        --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
                 local x, y = room.getBlocPos(b.x, b.y)
-
+                
                 --Collisions dessous des blocs
                 if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 2 then
                     b:onTouch(2)
-                    player.ySpd = 0
-                    player.y = player.y - (player.y - (y + room.blocSize))
-                    return
+                    if player.y - (y + room.blocSize) < dy then
+                        dy = player.y - (y + room.blocSize)
+                    end
                 end
             end
         end
-
+        
+        if dy ~= math.huge then
+            player.ySpd = 0
+            player.y = player.y - dy
+            return
+        end
+        
+        
         --Déplacement de la caméra
         if room.y < 0 and player.y + player.hgt/2 < wdow.hgt/2 then
             room.moveCameraY(-moveSpeed)
@@ -197,53 +222,48 @@ player.moveY = function(moveSpeed)
             player.y = player.y + moveSpeed
         end
     elseif moveSpeed > 0 then
+        local dy = math.huge
+        
         --Collision bord bas de l'écran
         if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return end
-
+        
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
             --Collisions dessus des entités
             if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 1 then
                 if v.solidResistance == 100 then
-                    player.isJumping = false
-                    player.ySpd = 0
-                    player.y = player.y + v.y - (player.y + player.hgt)
-                    return
+                    if v.y - (player.y + player.hgt) < dy then
+                        dy = v.y - (player.y + player.hgt)
+                    end
                 end
             end
         end
-
-        --Passe en revue les blocs
+        
+        --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
                 local x, y = room.getBlocPos(b.x, b.y)
-
+                
                 --Collisions dessus des blocs
                 if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
                     b:onTouch(1)
-                    player.isJumping = false
-                    player.ySpd = 0
-                    player.y = player.y + y - (player.y + player.hgt)
-                    return
-                end
-            --Si le bloc est solide mais seulement sur le dessus
-            elseif b.id == 4 then
-                --Récupère les coordonnés du bloc
-                local x, y = room.getBlocPos(b.x, b.y)
-
-                --Collisions dessus des blocs
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
-                    b:onTouch(1)
-                    player.isJumping = false
-                    player.ySpd = 0
-                    player.y = player.y + y - (player.y + player.hgt)
-                    return
+                    if y - (player.y + player.hgt) < dy then
+                        dy = y - (player.y + player.hgt)
+                    end
                 end
             end
         end
-
+        
+        --Déplacement du joueur
+        if dy ~= math.huge then
+            player.isJumping = false
+            player.ySpd = 0
+            player.y = player.y + dy
+            return
+        end
+        
         --Déplacement de la caméra
         if room.y + room.hgt > wdow.hgt + 1 and player.y + player.hgt/2 > wdow.hgt/2 then
             room.moveCameraY(-moveSpeed)

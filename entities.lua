@@ -33,7 +33,7 @@ entities.moveX = function(moveSpeed)
                     player.x = v.x + v.wth
                 end
             end
-        elseif player.overlapRectangle(v.x, v.y, v.wth, v.hgt) ~= 0 then
+        elseif collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
             player.moveX(moveSpeed)
         end
     end
@@ -57,7 +57,7 @@ entities.moveY = function(moveSpeed)
                     player.y = v.y - player.hgt
                 end
             end
-        elseif player.overlapRectangle(v.x, v.y, v.wth, v.hgt) ~= 0 then
+        elseif collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
             player.moveY(moveSpeed)
         end
     end
