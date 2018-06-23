@@ -56,3 +56,22 @@ collision_circleToCircle = function(x, y, rad, x2, y2, rad2)
     if math.sqrt(math.pow(x - x2, 2) + math.pow(y - y2, 2)) <= rad + rad2 then return true
     else return false end
 end
+
+--Permet de rapprocher d'amener une valeur à zero
+toZero = function(value, step)
+    if value > 0 then
+        if value - step < 0 then
+            value = 0
+        else
+            value = value - step
+        end
+    elseif value < 0 then
+        if value + step > 0 then
+            value = 0
+        else
+            value = value + step
+        end
+    end
+    
+    return value
+end

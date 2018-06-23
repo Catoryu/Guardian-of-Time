@@ -17,48 +17,71 @@ end
 
 entities.moveX = function(moveSpeed)
     for i, v in pairs(entities.container) do
-        v.x = v.x + moveSpeed
-        
         if v.solidResistance == 100 then
+            local canMove = false
+            
             if moveSpeed < 0 then
-                --Collision coté droit entities
-                if (player.y + player.hgt - 1 > v.y and player.y < v.y + v.hgt) and
-                (player.x < v.x and player.x + player.wth > v.x) then
-                    player.x = v.x - player.wth
+                --Collision coté gauche entities
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt - 1, v.x + moveSpeed, v.y, v.wth, v.hgt) == 3 then
+                    if player.moveX(v.x + moveSpeed - (player.x + player.wth)) then canMove = true end
+                else
+                    canMove = true
                 end
             elseif moveSpeed > 0 then
                 --Collision coté droit entities
-                if (player.y + player.hgt - 1 > v.y and player.y < v.y + v.hgt) and
-                (player.x < v.x + v.wth and player.x + player.wth > v.x + v.wth) then
-                    player.x = v.x + v.wth
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt - 1, v.x + moveSpeed, v.y, v.wth, v.hgt) == 4 then
+                    if player.moveX((v.x + moveSpeed + v.wth) - player.x) then canMove = true end
+                else
+                    canMove = true
                 end
             end
-        elseif collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-            player.moveX(moveSpeed)
+            
+            if canMove then
+                v.x = v.x + moveSpeed
+            else
+                print("Le joueur est ecrase par une entite !!")
+            end
+        else
+            v.x = v.x + moveSpeed
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
+                player.moveX(moveSpeed * v.solidResistance / 100, true)
+            end
         end
     end
 end
 
 entities.moveY = function(moveSpeed)
     for i, v in pairs(entities.container) do
-        v.y = v.y + moveSpeed
-        
         if v.solidResistance == 100 then
+            local canMove = false
+            
             if moveSpeed < 0 then
                 --Collisions coté dessous des plateformes
-                if (player.y > v.y + v.hgt - player.hgt and player.y < v.y + v.hgt) and
-                (player.x < v.x + v.wth and player.x + player.wth > v.x) then
-                    player.y = v.y + v.hgt
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y + moveSpeed, v.wth, v.hgt) == 1 then
+                    if player.moveY(v.y + moveSpeed - (player.y + player.hgt)) then canMove = true end
+                else
+                    canMove = true
                 end
             elseif moveSpeed > 0 then
                 --Collisions coté dessus des plateformes
-                if (player.y + player.hgt > v.y and player.y < v.y) and
-                (player.x < v.x + v.wth and player.x + player.wth > v.x) then
-                    player.y = v.y - player.hgt
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y + moveSpeed, v.wth, v.hgt) == 2 then
+                    if player.moveY(player.y - (v.y + v.hgt + moveSpeed)) then canMove = true end
+                else
+                    canMove = true
                 end
             end
-        elseif collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-            player.moveY(moveSpeed)
+            
+            if canMove then
+                v.y = v.y + moveSpeed
+            else
+                print("Le joueur est ecrase par une entite !!")
+            end
+            
+        else
+            v.y = v.y + moveSpeed
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
+                player.moveY(moveSpeed * v.solidResistance / 100, true)
+            end
         end
     end
 end

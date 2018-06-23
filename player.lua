@@ -52,23 +52,25 @@ player.jump = function()
     end
 end
 
-player.moveX = function(moveSpeed)
-
-    --Test si il joueur dans une matière qui le ralenti
-    for i, v in pairs(entities.container) do
-        if v.solidResistance ~= 100 then
-            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-                moveSpeed = moveSpeed/100 * (100-v.solidResistance)
-                player.xSpd = player.xSpd/100 * (100-v.solidResistance)
+player.moveX = function(moveSpeed, isPushed)
+    
+    if not isPushed then
+        --Test si il joueur dans une matière qui le ralenti
+        for i, v in pairs(entities.container) do
+            if v.solidResistance ~= 100 then
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
+                    moveSpeed = moveSpeed * (100 -v.solidResistance) / 100
+                    player.xSpd = (100 -v.solidResistance) * player.xSpd / 100
+                end
             end
         end
     end
-
+    
     if moveSpeed < 0 then
         local dx = math.huge
         
         --Collision bord gauche de l'écran
-        if player.x + moveSpeed < 0 then player.x = 0; return end
+        if player.x + moveSpeed < 0 then player.x = 0; return false end
         
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
@@ -102,7 +104,7 @@ player.moveX = function(moveSpeed)
         if dx ~= math.huge then
             player.x = player.x - dx
             player.xSpd = 0
-            return
+            return false
         end
         
         --Déplacement de la caméra
@@ -111,11 +113,13 @@ player.moveX = function(moveSpeed)
         else
             player.x = player.x + moveSpeed
         end
+        
+        return true
     elseif moveSpeed > 0 then
         local dx = math.huge
         
         --Collision bord droit de l'écran
-        if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return end
+        if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return false end
         
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
@@ -149,7 +153,7 @@ player.moveX = function(moveSpeed)
         if dx ~= math.huge then
             player.x = player.x + dx
             player.xSpd = 0
-            return
+            return false
         end
         
         --Déplacement de la caméra
@@ -158,26 +162,30 @@ player.moveX = function(moveSpeed)
         else
             player.x = player.x + moveSpeed
         end
+        
+        return true
     end
 end
 
 player.moveY = function(moveSpeed)
-
-    --Test si le joueur est dans une matière qui le ralenti
-    for i, v in pairs(entities.container) do
-        if v.solidResistance ~= 100 then
-            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-                moveSpeed = moveSpeed/100 * (100-v.solidResistance)
-                player.ySpd = player.ySpd/100 * (100-v.solidResistance)
+    
+    if not isPushed then
+        --Test si il joueur dans une matière qui le ralenti
+        for i, v in pairs(entities.container) do
+            if v.solidResistance ~= 100 then
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
+                    moveSpeed = moveSpeed * (100 -v.solidResistance) / 100
+                    player.ySpd = (100 -v.solidResistance) * player.ySpd / 100
+                end
             end
         end
     end
-
+    
     if moveSpeed < 0 then
         local dy = math.huge
         
         --Collision bord haut de l'écran
-        if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return end
+        if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return false end
         
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
@@ -211,7 +219,7 @@ player.moveY = function(moveSpeed)
         if dy ~= math.huge then
             player.ySpd = 0
             player.y = player.y - dy
-            return
+            return false
         end
         
         
@@ -221,11 +229,13 @@ player.moveY = function(moveSpeed)
         else
             player.y = player.y + moveSpeed
         end
+        
+        return true
     elseif moveSpeed > 0 then
         local dy = math.huge
         
         --Collision bord bas de l'écran
-        if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return end
+        if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return false end
         
         --Itère à travers toutes les entités
         for i, v in pairs(entities.container) do
@@ -261,7 +271,7 @@ player.moveY = function(moveSpeed)
             player.isJumping = false
             player.ySpd = 0
             player.y = player.y + dy
-            return
+            return false
         end
         
         --Déplacement de la caméra
@@ -270,6 +280,14 @@ player.moveY = function(moveSpeed)
         else
             player.y = player.y + moveSpeed
         end
+        
+        if moveSpeed > 0 then
+            --Réinitialise le saut (vu que le joueur est en train de tomber)
+            player.isJumping = true
+            player.canJumpHigher = false
+        end
+        
+        return true
     end
 end
 
@@ -304,12 +322,15 @@ player.update = function(dt)
     --Applique la gravité
     player.ySpd = player.ySpd + gravity*dt
 
-    --Annule la gravité
+    --Applique le frottement de l'air (pour la vitesse horizontal uniquement)
+    player.xSpd = toZero(player.xSpd, airFriction*dt)
+
+    --Annule la gravité si le joueur est en train de sauter
     if player.canJumpHigher then
         player.ySpd = player.ySpd - gravity*dt
         player.ySpd = player.ySpd + player.jumpSlow*dt
     end
-
+    
     --Limite la vitesse du joueur
     if player.ySpd > player.spdLimit then player.ySpd = player.spdLimit elseif player.ySpd < -player.spdLimit then player.ySpd = -player.spdLimit end
     if player.xSpd > player.spdLimit then player.xSpd = player.spdLimit elseif player.xSpd < -player.spdLimit then player.xSpd = -player.spdLimit end
@@ -317,8 +338,6 @@ player.update = function(dt)
     --Fait bouger le joueur
     if player.ySpd ~= 0 then player.moveY(player.ySpd * dt) end
     if player.xSpd ~= 0 then player.moveX(player.xSpd * dt) end
-    
-    if player.ySpd > 0 then player.isJumping = true; player.canJumpHigher = false end
 
     --Test si le joueur est dans un objet où il peut nager [WIP]
 --    for i, v in pairs(entities.container) do

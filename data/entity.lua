@@ -7,7 +7,7 @@ entity_class = {
     canSwim = false,
     colors = {255, 255, 255, 255},
     ttl = nil, --valeur en ms
-    solidResistance = 100 --pourcentage de ralentissement lorsqu'on traverse l'entité
+    solidResistance = 100 --pourcentage de ralentissement lorsqu'on traverse l'entité (100 = solide)
 }
 
 --Un peu de magie dans ce monde de brutes
@@ -31,7 +31,7 @@ entity = {
         affectedByGravity = true,
         isMovable = true,
         canSwim = true,
-        solidResistance = 80,
+        solidResistance = 30,
     }),
     entity_class:new({
         name = "steam",

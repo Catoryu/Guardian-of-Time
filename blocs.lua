@@ -2,6 +2,7 @@ dofile("data/bloc.lua")
 
 --World/Map creation
 gravity = 4000
+airFriction = 100
 chapter = 1
 level = {}
 level.x = 0

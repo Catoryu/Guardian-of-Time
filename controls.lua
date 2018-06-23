@@ -15,10 +15,10 @@ inputs.right = false
 function controls(dt)
     if keyDown("escape") then love.event.quit() end
 
-    if keyDown("left") then entities.moveX(-50*dt) end
-    if keyDown("right") then entities.moveX(50*dt) end
-    if keyDown("up") then entities.moveY(-50*dt) end
-    if keyDown("down") then entities.moveY(50*dt) end
+    if keyDown("left") then entities.moveX(-200*dt) end
+    if keyDown("right") then entities.moveX(200*dt) end
+    if keyDown("up") then entities.moveY(-200*dt) end
+    if keyDown("down") then entities.moveY(200*dt) end
 end
 
 function love.keypressed(key)
