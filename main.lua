@@ -17,9 +17,9 @@ function love.load()
     --World/Map creation
     gravity = 4000
     airFriction = 100
-    chapter = 1
+    chapterNumber = 1
     
-    loadChapter(chapter)
+    loadChapter(chapterNumber)
 end
 
 function love.update(dt)

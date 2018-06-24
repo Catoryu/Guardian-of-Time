@@ -70,7 +70,18 @@ player.moveX = function(moveSpeed, isPushed)
         local dx = math.huge
         
         --Collision bord gauche de l'écran
-        if player.x + moveSpeed < 0 then player.x = 0; return false end
+        if player.x + moveSpeed < 0 then
+            if room.cardinality[3] == 0 then
+                player.x = 0
+                return false
+            else
+                chapter.roomNumber = room.cardinality[3]
+                chapter.rooms[chapter.roomNumber]()
+                player.x = wdow.wth - player.wth
+                room.x = - room.wth + wdow.wth
+                return true
+            end
+        end
         
         --Itère à travers toutes les entités
         for i, v in pairs(room.entities) do
@@ -119,7 +130,18 @@ player.moveX = function(moveSpeed, isPushed)
         local dx = math.huge
         
         --Collision bord droit de l'écran
-        if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return false end
+        if player.x + moveSpeed + player.wth > wdow.wth then
+            if room.cardinality[4] == 0 then
+                player.x = wdow.wth - player.wth
+                return false
+            else
+                chapter.roomNumber = room.cardinality[4]
+                chapter.rooms[chapter.roomNumber]()
+                player.x = 0
+                room.x = 0
+                return true
+            end
+        end
         
         --Itère à travers toutes les entités
         for i, v in pairs(room.entities) do
@@ -185,7 +207,19 @@ player.moveY = function(moveSpeed)
         local dy = math.huge
         
         --Collision bord haut de l'écran
-        if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return false end
+        if player.y + moveSpeed < 0 then
+            if room.cardinality[1] == 0 then
+                player.y = 0
+                player.ySpd = 0
+                return false
+            else
+                chapter.roomNumber = room.cardinality[1]
+                chapter.rooms[chapter.roomNumber]()
+                player.y = wdow.hgt - player.hgt
+                room.y = - room.hgt + wdow.hgt
+                return true
+            end
+        end
         
         --Itère à travers toutes les entités
         for i, v in pairs(room.entities) do
@@ -235,7 +269,19 @@ player.moveY = function(moveSpeed)
         local dy = math.huge
         
         --Collision bord bas de l'écran
-        if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return false end
+        if player.y + moveSpeed + player.hgt > wdow.hgt then
+            if room.cardinality[2] == 0 then
+                player.y = wdow.hgt - player.hgt
+                player.isJumping = false
+                player.ySpd = 0
+                return false
+            else
+                chapter.roomNumber = room.cardinality[2]
+                chapter.rooms[chapter.roomNumber]()
+                player.y = 0
+                room.y = 0
+            end
+        end
         
         --Itère à travers toutes les entités
         for i, v in pairs(room.entities) do

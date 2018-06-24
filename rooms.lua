@@ -8,7 +8,7 @@ end
 rooms.draw = function()
     --Affiche l'image de fond
     lg.setColor(255, 255, 255)
-    lg.draw(src.img.bground.c1r1, room.x, room.y)
+    lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x, room.y)
     
     --Affiche les blocs
     blocs.draw()

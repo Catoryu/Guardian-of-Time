@@ -1,15 +1,19 @@
-rooms.load = {}
+--[[Chapter configuration]]--
+chapter = {}
+chapter.roomNumber = 1
+chapter.name = "Introduction"
+chapter.rooms = {false}
 
 --[[Room 1]]--
-rooms.load[1] = function()
+chapter.rooms[1] = function()
     room = {}
-    room.cols = 40
-    room.rows = 20
+    room.cols = 38
+    room.rows = 22
     room.wth = room.cols * blocs.size
     room.hgt = room.rows * blocs.size
     room.x = 0
     room.y = -room.hgt + wdow.hgt
-    room.cardinality = {0, 0, 0, 0}
+    room.cardinality = {3, 0, 0, 2}
     room.blocs = {}
     room.entities = {}
     room.events = {}
@@ -19,6 +23,46 @@ rooms.load[1] = function()
 end
 
 --[[Room 2]]--
-rooms.load[2] = function()
+chapter.rooms[2] = function()
+    room = {}
+    room.cols = 38
+    room.rows = 22
+    room.wth = room.cols * blocs.size
+    room.hgt = room.rows * blocs.size
+    room.x = 0
+    room.y = -room.hgt + wdow.hgt
+    room.cardinality = {4, 0, 1, 0}
+    room.blocs = {}
+    room.entities = {}
+    room.events = {}
+end
 
+--[[Room 3]]--
+chapter.rooms[3] = function()
+    room = {}
+    room.cols = 38
+    room.rows = 22
+    room.wth = room.cols * blocs.size
+    room.hgt = room.rows * blocs.size
+    room.x = 0
+    room.y = -room.hgt + wdow.hgt
+    room.cardinality = {0, 1, 0, 4}
+    room.blocs = {}
+    room.entities = {}
+    room.events = {}
+end
+
+--[[Room 4]]--
+chapter.rooms[4] = function()
+    room = {}
+    room.cols = 38
+    room.rows = 22
+    room.wth = room.cols * blocs.size
+    room.hgt = room.rows * blocs.size
+    room.x = 0
+    room.y = -room.hgt + wdow.hgt
+    room.cardinality = {0, 2, 3, 0}
+    room.blocs = {}
+    room.entities = {}
+    room.events = {}
 end

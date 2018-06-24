@@ -101,5 +101,5 @@ loadChapter = function(chapterNumber)
     dofile("chapters/"..chapterNumber..".lua")
     
     --Chargement de la première salle
-    rooms.load[1]()
+    chapter.rooms[1]()
 end
