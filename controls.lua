@@ -24,10 +24,38 @@ function love.keypressed(key)
         player.jumpKeyDown = true
         player.jump()
     end
-    if key == "s" then table.insert(inputs, 2) end
+    if key == "s" then
+        table.insert(inputs, 2)
+    end
     if key == "a" then table.insert(inputs, 3) end
     if key == "d" then table.insert(inputs, 4) end
     
+    if key == "e" then
+        --Sauvegarde de la salle
+        id = 0
+        
+        --Trouve un nom de fichier libre
+        for i, v in pairs(love.filesystem.getDirectoryItems("saves")) do
+            if string.sub(v, 1, #v - 4) == tostring(id) then id = id + 1 end
+        end
+        
+        --Génère la table pour les blocs
+        local dump = "blocs.push("
+        for i, v in pairs(room.blocs) do
+            dump = dump .. "bloc["..v.id.."]:new({x = "..v.x..", y = "..v.y.."})"
+            if i < #room.blocs then
+                dump = dump..","
+            end
+        end
+        dump = dump..")"
+        
+        file = io.open("saves/"..id..".lua", "w")
+        io.output(file)
+        io.write(dump)
+        io.close(file)
+        
+        love.window.showMessageBox("Salle sauvegardée", "Vous avez sauvegardé la salle actuelle dans saves/"..id..".lua")
+    end
 
     if key == "g" then player.showGrid = not player.showGrid end
     if key == "escape" then love.event.quit() end

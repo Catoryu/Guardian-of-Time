@@ -15,7 +15,7 @@ rooms.load[1] = function()
     room.events = {}
     
     --Blocs
-    blocs.push(bloc[1]:new({x = 10, y = 10, room = 1}), bloc[1]:new({x = 9, y = 10, room = 1}), bloc[1]:new({x = 10, y = 9, room = 1}))
+    blocs.push(bloc[1]:new({x = 10, y = 10}), bloc[1]:new({x = 9, y = 10}), bloc[1]:new({x = 10, y = 9}))
 end
 
 --[[Room 2]]--
