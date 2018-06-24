@@ -4,27 +4,22 @@ function love.load()
     love.mouse.setVisible(false)
     math.randomseed(os.time())
     
-    --Chargement des images/sons/animations
-    src = {}
-    src.sound = {}
-    src.anim = {}
-    src.img = {}
-    src.img.cursor = lg.newImage("resource/miscellaneous/cursor 32x32.png")
-    src.img.bloc = {}
-    --Initialise toutes les images de blocs
-    for i, v in pairs(love.filesystem.getDirectoryItems("resource/bloc")) do
-        --Ajoute dans le tableau "src.img.bloc" une variable associative qui porte le nom de l'image
-        --Cette variable a comme valeur l'image elle même
-        src.img.bloc[string.sub(v, 1, #v - 4)] = lg.newImage("resource/bloc/"..v)
-    end
-
+    dofile("functions.lua")
+    dofile("load.lua")
     dofile("conf.lua")
     dofile("assets/lobj.lua")
     dofile("controls.lua")
+    dofile("rooms.lua")
     dofile("blocs.lua")
     dofile("player.lua")
     dofile("entities.lua")
-    dofile("functions.lua")
+    
+    --World/Map creation
+    gravity = 4000
+    airFriction = 100
+    chapter = 1
+    
+    loadChapter(chapter)
 end
 
 function love.update(dt)
@@ -34,7 +29,7 @@ function love.update(dt)
     --Fait tourner le jeu uniquement lorsque l'utilisateur ne bouge pas la fenêtre
     if dt < 0.2 then
         player.update(dt)
-        room.update(dt)
+        rooms.update(dt)
         controls(dt)
     else
         --Permet de ne pas faire avancer le joueur dans le vide après avoir bouger la fenêtre
@@ -45,8 +40,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    room.draw()
-    entities.draw()
+    rooms.draw()
     player.draw()
 
     --[[Debug]]--
@@ -71,7 +65,7 @@ function love.draw()
         end
         lg.print("player.airTime : "..player.airTime, 10, 190)
         lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
-        lg.print("#entities.container : "..#entities.container, 10, 230)
+        lg.print("#room.entities : "..#room.entities, 10, 230)
         lg.print("#room.blocs : "..#room.blocs, 10, 250)
         lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 270)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 290)

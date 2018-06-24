@@ -42,18 +42,22 @@ function love.conf(t)
     t.modules.video = true              -- Enable the video module (boolean) 
     t.modules.window = true             -- Enable the window module (boolean) 
     t.modules.thread = true             -- Enable the thread module (boolean) 
-end 
+end
 
---Window informations 
+
+--Window configuration
 wdow = {}
 wdow.mode = false
 wdow.wth = 1280
 wdow.hgt = 720
 wdow.title = "Guardian of Time"
- 
+love.window.setTitle(wdow.title)
+love.window.setMode(wdow.wth, wdow.hgt)
+
+--Debug values
 debug = {}
 debug.visible = true
-debug.font = lg.newFont("fonts/consola.ttf")
+debug.font = src.font.consola
 debug.color = {0, 200, 0}
 debug.helpText = lg.newCanvas(300, 220)
 lg.setCanvas(debug.helpText)

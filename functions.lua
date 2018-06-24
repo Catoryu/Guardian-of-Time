@@ -75,3 +75,31 @@ toZero = function(value, step)
     
     return value
 end
+
+loadSrc = function(dir, srcType)
+    --Itère à travers tous les fichiers d'un dossier
+    --Ajoute dans un tableau une variable associative qui porte le nom du fichier (sans l'extension)
+    --Cette variable a comme valeur l'objet love2d souhaité (srcType)
+    --Attention les extensions doivent avoir 3 caractères (.png, .jpg)
+    
+    value = {}
+    
+    if srcType == "image" then
+        for i, v in pairs(love.filesystem.getDirectoryItems(dir)) do
+            value[string.sub(v, 1, #v - 4)] = lg.newImage(dir.."/"..v)
+        end
+    elseif srcType == "font" then
+        for i, v in pairs(love.filesystem.getDirectoryItems(dir)) do
+            value[string.sub(v, 1, #v - 4)] = lg.newFont(dir.."/"..v)
+        end
+    end
+    
+    return value
+end
+
+loadChapter = function(chapterNumber)
+    dofile("chapters/"..chapterNumber..".lua")
+    
+    --Chargement de la première salle
+    rooms.load[1]()
+end

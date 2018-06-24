@@ -4,3 +4,7 @@ On appelle les éléments dans la grille des blocs, pas des cellules
 2 : Bas
 3 : Gauche
 4 : Droite
+
+Dans le dossier resource/backgrounds
+après le c : numéro de chapitre
+après le r : numéro de room (salle)

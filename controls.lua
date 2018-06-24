@@ -8,9 +8,6 @@ mouse.secondY = 0
 selectedEntity = 3
 selectedBloc = 1
 inputs = {}
-inputs.down = false
-inputs.left = false
-inputs.right = false
 
 function controls(dt)
     if keyDown("escape") then love.event.quit() end
@@ -27,14 +24,15 @@ function love.keypressed(key)
         player.jumpKeyDown = true
         player.jump()
     end
-    if key == "s" then inputs.down = true end
-    if key == "a" then inputs.left = true end
-    if key == "d" then inputs.right = true end
+    if key == "s" then table.insert(inputs, 2) end
+    if key == "a" then table.insert(inputs, 3) end
+    if key == "d" then table.insert(inputs, 4) end
+    
 
     if key == "g" then player.showGrid = not player.showGrid end
     if key == "escape" then love.event.quit() end
     if key == "tab" then debug.visible = not debug.visible end
-    if key == "delete" then table.remove(entities.container, #entities.container)end
+    if key == "delete" then table.remove(room.entities, #room.entities)end
     if key == "backspace" then
         --Recalcul les cardinalités
         for i, b in pairs(room.blocs) do
@@ -60,10 +58,21 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-    if key == "w" or key == "space" then player.jumpKeyDown = false end
-    if key == "s" then inputs.down = false end
-    if key == "a" then inputs.left = false end
-    if key == "d" then inputs.right = false end
+    if key == "w" or key == "space" then
+        player.jumpKeyDown = false
+    end
+  
+    if key == "s" then 
+        for i, v in pairs(inputs) do if v == 2 then table.remove(inputs, i) end end
+    end
+    
+    if key == "a" then 
+        for i, v in pairs(inputs) do if v == 3 then table.remove(inputs, i) end end
+    end
+    
+    if key == "d" then 
+        for i, v in pairs(inputs) do if v == 4 then table.remove(inputs, i) end end
+    end
 end
 
 function love.mousepressed(x, y, button)
@@ -71,7 +80,7 @@ function love.mousepressed(x, y, button)
         mouse.firstX, mouse.firstY = love.mouse.getPosition()
     end
 
-    if button == 2 then room.createBloc(x, y, selectedBloc) end
+    if button == 2 then blocs.create(x, y, selectedBloc) end
 end
 
 function love.mousereleased(_, _, button)

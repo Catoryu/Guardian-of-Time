@@ -2,14 +2,14 @@ player = {}
 player.clothe = 0
 player.weapon = 0
 player.specie = 0
-player.grid = lg.newCanvas(wdow.wth + room.blocSize, wdow.hgt + room.blocSize)
+player.grid = lg.newCanvas(wdow.wth + blocs.size, wdow.hgt + blocs.size)
 lg.setCanvas(player.grid)
     lg.setColor(255, 255, 255)
     
-    for i = 0, wdow.wth + room.blocSize, room.blocSize do
-        lg.line(i, 0, i, wdow.hgt + room.blocSize)
-        for j = 0, wdow.hgt + room.blocSize, room.blocSize do
-            lg.line(0, j, wdow.wth + room.blocSize, j)
+    for i = 0, wdow.wth + blocs.size, blocs.size do
+        lg.line(i, 0, i, wdow.hgt + blocs.size)
+        for j = 0, wdow.hgt + blocs.size, blocs.size do
+            lg.line(0, j, wdow.wth + blocs.size, j)
         end
     end
 lg.setCanvas()
@@ -56,7 +56,7 @@ player.moveX = function(moveSpeed, isPushed)
     
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
-        for i, v in pairs(entities.container) do
+        for i, v in pairs(room.entities) do
             if v.solidResistance ~= 100 then
                 if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
                     moveSpeed = moveSpeed * (100 -v.solidResistance) / 100
@@ -73,7 +73,7 @@ player.moveX = function(moveSpeed, isPushed)
         if player.x + moveSpeed < 0 then player.x = 0; return false end
         
         --Itère à travers toutes les entités
-        for i, v in pairs(entities.container) do
+        for i, v in pairs(room.entities) do
             --Collisions coté droit des entités
             if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 4 then
                 if v.solidResistance == 100 then
@@ -89,13 +89,13 @@ player.moveX = function(moveSpeed, isPushed)
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getBlocPos(b.x, b.y)
+                local x, y = blocs.getPos(b.x, b.y)
                 
                 --Collisions coté droit des blocs
-                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, room.blocSize, room.blocSize) == 4 then
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, blocs.size, blocs.size) == 4 then
                     b:onTouch(4)
-                    if player.x - (x + room.blocSize) < dx then
-                        dx = player.x - (x + room.blocSize)
+                    if player.x - (x + blocs.size) < dx then
+                        dx = player.x - (x + blocs.size)
                     end
                 end
             end
@@ -109,7 +109,7 @@ player.moveX = function(moveSpeed, isPushed)
         
         --Déplacement de la caméra
         if room.x < 0 and player.x + player.wth/2 < wdow.wth/2 then
-            room.moveCameraX(-moveSpeed)
+            rooms.moveCameraX(-moveSpeed)
         else
             player.x = player.x + moveSpeed
         end
@@ -122,7 +122,7 @@ player.moveX = function(moveSpeed, isPushed)
         if player.x + moveSpeed + player.wth > wdow.wth then player.x = wdow.wth - player.wth; return false end
         
         --Itère à travers toutes les entités
-        for i, v in pairs(entities.container) do
+        for i, v in pairs(room.entities) do
             --Collisions coté gauche des entités
             if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 3 then
                 if v.solidResistance == 100 then
@@ -138,10 +138,10 @@ player.moveX = function(moveSpeed, isPushed)
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getBlocPos(b.x, b.y)
+                local x, y = blocs.getPos(b.x, b.y)
                 
                 --Collisions coté gauche des blocs
-                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, room.blocSize, room.blocSize) == 3 then
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, blocs.size, blocs.size) == 3 then
                     b:onTouch(3)
                     if x - (player.x + player.wth) < dx then
                         dx = x - (player.x + player.wth)
@@ -158,7 +158,7 @@ player.moveX = function(moveSpeed, isPushed)
         
         --Déplacement de la caméra
         if room.x + room.wth > wdow.wth and player.x + player.wth/2 > wdow.wth/2 then
-            room.moveCameraX(-moveSpeed)
+            rooms.moveCameraX(-moveSpeed)
         else
             player.x = player.x + moveSpeed
         end
@@ -171,7 +171,7 @@ player.moveY = function(moveSpeed)
     
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
-        for i, v in pairs(entities.container) do
+        for i, v in pairs(room.entities) do
             if v.solidResistance ~= 100 then
                 if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
                     moveSpeed = moveSpeed * (100 -v.solidResistance) / 100
@@ -188,7 +188,7 @@ player.moveY = function(moveSpeed)
         if player.y + moveSpeed < 0 then player.y = 0; player.ySpd = 0; return false end
         
         --Itère à travers toutes les entités
-        for i, v in pairs(entities.container) do
+        for i, v in pairs(room.entities) do
             --Collisions dessous des entités
             if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 2 then
                 if v.solidResistance == 100 then
@@ -204,13 +204,13 @@ player.moveY = function(moveSpeed)
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getBlocPos(b.x, b.y)
+                local x, y = blocs.getPos(b.x, b.y)
                 
                 --Collisions dessous des blocs
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 2 then
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, blocs.size, blocs.size) == 2 then
                     b:onTouch(2)
-                    if player.y - (y + room.blocSize) < dy then
-                        dy = player.y - (y + room.blocSize)
+                    if player.y - (y + blocs.size) < dy then
+                        dy = player.y - (y + blocs.size)
                     end
                 end
             end
@@ -225,7 +225,7 @@ player.moveY = function(moveSpeed)
         
         --Déplacement de la caméra
         if room.y < 0 and player.y + player.hgt/2 < wdow.hgt/2 then
-            room.moveCameraY(-moveSpeed)
+            rooms.moveCameraY(-moveSpeed)
         else
             player.y = player.y + moveSpeed
         end
@@ -238,7 +238,7 @@ player.moveY = function(moveSpeed)
         if player.y + moveSpeed + player.hgt > wdow.hgt then player.y = wdow.hgt - player.hgt; player.isJumping = false; player.ySpd = 0; return false end
         
         --Itère à travers toutes les entités
-        for i, v in pairs(entities.container) do
+        for i, v in pairs(room.entities) do
             --Collisions dessus des entités
             if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 1 then
                 if v.solidResistance == 100 then
@@ -254,10 +254,10 @@ player.moveY = function(moveSpeed)
             --Si le bloc est solide
             if b.isSolid then
                 --Récupère les coordonnés du bloc
-                local x, y = room.getBlocPos(b.x, b.y)
+                local x, y = blocs.getPos(b.x, b.y)
                 
                 --Collisions dessus des blocs
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 1 then
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, blocs.size, blocs.size) == 1 then
                     b:onTouch(1)
                     if y - (player.y + player.hgt) < dy then
                         dy = y - (player.y + player.hgt)
@@ -276,7 +276,7 @@ player.moveY = function(moveSpeed)
         
         --Déplacement de la caméra
         if room.y + room.hgt > wdow.hgt + 1 and player.y + player.hgt/2 > wdow.hgt/2 then
-            room.moveCameraY(-moveSpeed)
+            rooms.moveCameraY(-moveSpeed)
         else
             player.y = player.y + moveSpeed
         end
@@ -293,11 +293,13 @@ end
 
 player.update = function(dt)
     --Direction du joueur
-    if inputs.down then
-        --Vers le bas
-    elseif inputs.left then
-        player.moveX(- player.moveSpd * dt)
-    elseif inputs.right then
+    if inputs[#inputs] == 2 then
+        --Appuie sur "s"
+    elseif inputs[#inputs] == 3 then
+        --Appuie sur "a"
+        player.moveX( - player.moveSpd * dt)
+    elseif inputs[#inputs] == 4 then
+        --Appuie sur "d"
         player.moveX(player.moveSpd * dt)
     end
 
@@ -340,7 +342,7 @@ player.update = function(dt)
     if player.xSpd ~= 0 then player.moveX(player.xSpd * dt) end
 
     --Test si le joueur est dans un objet où il peut nager [WIP]
---    for i, v in pairs(entities.container) do
+--    for i, v in pairs(room.entities) do
 --        if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) then
 --            player.isJumping = false
 --            player.canJumpHigher = true
@@ -363,10 +365,10 @@ player.draw = function()
     
     if player.showGrid then
         --Calcul la position de la grille
-        _, dump = math.modf(room.x/room.blocSize)
-        _, dump2 = math.modf(room.y/room.blocSize)
+        _, dump = math.modf(room.x/blocs.size)
+        _, dump2 = math.modf(room.y/blocs.size)
         
         --Affiche la grille
-        lg.draw(player.grid, dump*room.blocSize, dump2*room.blocSize)
+        lg.draw(player.grid, dump*blocs.size, dump2*blocs.size)
     end
 end

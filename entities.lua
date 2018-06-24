@@ -1,7 +1,7 @@
 dofile("data/entity.lua")
 
 entities = {}
-entities.container = {}
+
 entities.create = function(x, y, wth, hgt, id)
     local en = {}
     
@@ -12,11 +12,11 @@ entities.create = function(x, y, wth, hgt, id)
     en.wth = wth
     en.hgt = hgt
 
-    table.insert(entities.container, en)
+    table.insert(room.entities, en)
 end
 
 entities.moveX = function(moveSpeed)
-    for i, v in pairs(entities.container) do
+    for i, v in pairs(room.entities) do
         if v.solidResistance == 100 then
             local canMove = false
             
@@ -39,7 +39,7 @@ entities.moveX = function(moveSpeed)
             if canMove then
                 v.x = v.x + moveSpeed
             else
-                print("Le joueur est ecrase par une entite !!")
+                print("Le joueur est ecrase par une entite avec une vitesse de "..moveSpeed.." x !!")
             end
         else
             v.x = v.x + moveSpeed
@@ -51,7 +51,7 @@ entities.moveX = function(moveSpeed)
 end
 
 entities.moveY = function(moveSpeed)
-    for i, v in pairs(entities.container) do
+    for i, v in pairs(room.entities) do
         if v.solidResistance == 100 then
             local canMove = false
             
@@ -74,7 +74,7 @@ entities.moveY = function(moveSpeed)
             if canMove then
                 v.y = v.y + moveSpeed
             else
-                print("Le joueur est ecrase par une entite !!")
+                print("Le joueur est ecrase par une entite avec une vitesse de "..moveSpeed.." y !!")
             end
             
         else
@@ -86,8 +86,12 @@ entities.moveY = function(moveSpeed)
     end
 end
 
+entities.update = function(dt)
+    
+end
+
 entities.draw = function()
-    for i, v in pairs(entities.container) do
+    for i, v in pairs(room.entities) do
         lg.setColor(unpack(v.colors))
         lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)
         
