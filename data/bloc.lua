@@ -1,4 +1,4 @@
---Class des cellule.
+--Class des blocs
 bloc_class = {
     id = 1,
     x = 0,

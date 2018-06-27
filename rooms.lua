@@ -1,11 +1,13 @@
+--Table qui contient tous les fonctions concernant les rooms "salles"
 rooms = {}
 
-rooms.update = function(dt)
+rooms.update = function(dt)--Actualisation de la salle
     blocs.update(dt)
     entities.update(dt)
+    events.update(dt)
 end
 
-rooms.draw = function()
+rooms.draw = function()--Dessine tous les objets de la salle
     --Affiche l'image de fond
     lg.setColor(255, 255, 255)
     lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x, room.y)
@@ -15,9 +17,12 @@ rooms.draw = function()
     
     --Affiche les entitées
     entities.draw()
+    
+    --Affiche les événements (Debug)
+    events.draw()
 end
 
-rooms.moveCameraX = function(moveSpeed)--Bouge la caméra horizontalement
+rooms.moveCameraX = function(moveSpeed)--Mouvement horizontal de la caméra
     local deltaX = 0
 
     --Marge d'erreur mouvement de la salle
@@ -43,12 +48,17 @@ rooms.moveCameraX = function(moveSpeed)--Bouge la caméra horizontalement
     for i, e in pairs(room.entities) do
         e.x = e.x + moveSpeed
     end
-
-    --Bouge les blocs
+    
+    --Bouge les événements
+    for i, v in pairs(chapter.events) do
+        v.x = v.x + moveSpeed
+    end
+    
+    --Bouge la salle (donc les blocs avec)
     room.x = room.x + moveSpeed
 end
 
-rooms.moveCameraY = function(moveSpeed)--Bouge la caméra verticalement
+rooms.moveCameraY = function(moveSpeed)--Mouvement vertical de la caméra
     local deltaY = 0
 
     --Marge d'erreur mouvement de la salle
@@ -74,7 +84,12 @@ rooms.moveCameraY = function(moveSpeed)--Bouge la caméra verticalement
     for i, e in pairs(room.entities) do
         e.y = e.y + moveSpeed
     end
+    
+    --Bouge les événements
+    for i, v in pairs(chapter.events) do
+        v.y = v.y + moveSpeed
+    end
 
-    --Bouge les blocs
+    --Bouge la salle (donc les blocs avec)
     room.y = room.y + moveSpeed
 end

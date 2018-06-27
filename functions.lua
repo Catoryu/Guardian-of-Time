@@ -1,5 +1,4 @@
---Collision rectange à rectangle
-collision_rectToRect = function (x, y, wth, hgt, x2, y2, wth2, hgt2)
+collision_rectToRect = function (x, y, wth, hgt, x2, y2, wth2, hgt2)--Collision rectange à rectangle
     local w = 0.5 * (wth + wth2)
     local h = 0.5 * (hgt + hgt2)
     local dx = (x + wth/2) - (x2 + wth2/2)
@@ -32,8 +31,7 @@ collision_rectToRect = function (x, y, wth, hgt, x2, y2, wth2, hgt2)
     end
 end
 
---Collision rectangle à cercle
-collision_rectToCircle = function(rectX, rectY, rectWth, rectHgt, circleX, circleY, circleRad)
+collision_rectToCircle = function(rectX, rectY, rectWth, rectHgt, circleX, circleY, circleRad)--Collision rectangle à cercle
     local x = rectX + rectWth/2
     local y = rectY + rectHgt/2
 
@@ -51,14 +49,12 @@ collision_rectToCircle = function(rectX, rectY, rectWth, rectHgt, circleX, circl
     return (cornerDistance_sq <= (circleRad^2))
 end
 
---Collision cercle à cercle
-collision_circleToCircle = function(x, y, rad, x2, y2, rad2)
+collision_circleToCircle = function(x, y, rad, x2, y2, rad2)--Collision cercle à cercle
     if math.sqrt(math.pow(x - x2, 2) + math.pow(y - y2, 2)) <= rad + rad2 then return true
     else return false end
 end
 
---Permet de rapprocher d'amener une valeur à zero
-toZero = function(value, step)
+toZero = function(value, step)--Permet de rapprocher d'amener une valeur à zero
     if value > 0 then
         if value - step < 0 then
             value = 0
@@ -76,7 +72,7 @@ toZero = function(value, step)
     return value
 end
 
-loadSrc = function(dir, srcType)
+loadSrc = function(dir, srcType)--Chargement d'une resource
     --Itère à travers tous les fichiers d'un dossier
     --Ajoute dans un tableau une variable associative qui porte le nom du fichier (sans l'extension)
     --Cette variable a comme valeur l'objet love2d souhaité (srcType)
@@ -97,7 +93,7 @@ loadSrc = function(dir, srcType)
     return value
 end
 
-loadChapter = function(chapterNumber)
+loadChapter = function(chapterNumber)--Charge un chapitre
     dofile("chapters/"..chapterNumber..".lua")
     
     --Chargement de la première salle

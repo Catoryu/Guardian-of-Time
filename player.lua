@@ -2,6 +2,8 @@ player = {}
 player.clothe = 0
 player.weapon = 0
 player.specie = 0
+
+--Création d'une image de grille ayant la taille de l'écran
 player.grid = lg.newCanvas(wdow.wth + blocs.size, wdow.hgt + blocs.size)
 lg.setCanvas(player.grid)
     lg.setColor(255, 255, 255)
@@ -13,6 +15,7 @@ lg.setCanvas(player.grid)
         end
     end
 lg.setCanvas()
+
 player.showGrid = false
 player.wth = 45
 player.hgt = 95
@@ -32,7 +35,7 @@ player.jumpLevels = {100, 200, 250, 300}
 player.jumpSlow = 500
 player.canJumpHigher = false
 
-player.attacks = {
+player.attacks = {--cc Rui
     jump = 0,
     dash = 0,
     front_attack = 0,
@@ -44,7 +47,7 @@ player.attacks = {
     special_attack = 0
 }
 
-player.jump = function()
+player.jump = function()--Fait sauter du joueur
     if not player.isJumping then
         player.isJumping = true
         player.ySpd = -player.jumpSpd
@@ -52,7 +55,7 @@ player.jump = function()
     end
 end
 
-player.moveX = function(moveSpeed, isPushed)
+player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
@@ -189,7 +192,7 @@ player.moveX = function(moveSpeed, isPushed)
     end
 end
 
-player.moveY = function(moveSpeed)
+player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
     
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
@@ -337,7 +340,7 @@ player.moveY = function(moveSpeed)
     end
 end
 
-player.update = function(dt)
+player.update = function(dt)--Gère les mouvements joueur
     --Direction du joueur
     if inputs[#inputs] == 2 then
         --Appuie sur "s"
@@ -405,7 +408,7 @@ player.update = function(dt)
     end
 end
 
-player.draw = function()
+player.draw = function()--Dessine le joueur
     lg.setColor(255, 255, 255)
     lg.rectangle("fill", player.x, player.y, player.wth, player.hgt)
     

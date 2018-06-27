@@ -1,8 +1,10 @@
+--Chargement du fichier qui contient tous les types d'entité
 dofile("data/entity.lua")
 
+--Table qui contient tous les fonctons concernant les entités
 entities = {}
 
-entities.create = function(x, y, wth, hgt, id)
+entities.create = function(x, y, wth, hgt, id)--Création d'une entité
     local en = {}
     
     en = entity[id]:new()
@@ -15,7 +17,7 @@ entities.create = function(x, y, wth, hgt, id)
     table.insert(room.entities, en)
 end
 
-entities.moveX = function(moveSpeed)
+entities.moveX = function(moveSpeed)--Gère le mouvement horizontal des entités
     for i, v in pairs(room.entities) do
         if v.solidResistance == 100 then
             local canMove = false
@@ -50,7 +52,7 @@ entities.moveX = function(moveSpeed)
     end
 end
 
-entities.moveY = function(moveSpeed)
+entities.moveY = function(moveSpeed)--Gère le mouvement vertical des entités
     for i, v in pairs(room.entities) do
         if v.solidResistance == 100 then
             local canMove = false
@@ -86,11 +88,11 @@ entities.moveY = function(moveSpeed)
     end
 end
 
-entities.update = function(dt)
+entities.update = function(dt)--Pas encore utilisé
     
 end
 
-entities.draw = function()
+entities.draw = function()--Dessine les entités
     for i, v in pairs(room.entities) do
         lg.setColor(unpack(v.colors))
         lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)

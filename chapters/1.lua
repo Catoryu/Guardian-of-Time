@@ -2,7 +2,11 @@
 chapter = {}
 chapter.roomNumber = 1
 chapter.name = "Introduction"
-chapter.rooms = {false}
+chapter.rooms = {}
+chapter.events = {}
+
+--Events
+table.insert(chapter.events, event[1]:new({x = 200, y = 200, wth = 100, hgt = 100, room = 1}))
 
 --[[Room 1]]--
 chapter.rooms[1] = function()
@@ -16,7 +20,6 @@ chapter.rooms[1] = function()
     room.cardinality = {3, 0, 0, 2}
     room.blocs = {}
     room.entities = {}
-    room.events = {}
     
     --Blocs
     blocs.push(bloc[1]:new({x = 10, y = 10}), bloc[1]:new({x = 9, y = 10}), bloc[1]:new({x = 10, y = 9}))

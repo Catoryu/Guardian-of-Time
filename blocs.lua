@@ -1,10 +1,13 @@
+--Chargement du fichier qui contient tous les types de blocs
 dofile("data/bloc.lua")
 
+--Table qui contient tous les fonctions concernant les blocs
 blocs = {}
 
+--Taille des blocs
 blocs.size = 50
 
-blocs.calculateCardinality = function(bloc1, bloc2)
+blocs.calculateCardinality = function(bloc1, bloc2)--Calcul les les cardinalités  du bloc choisi
     --Haut
     if bloc1.x == bloc2.x and bloc1.y - 1 == bloc2.y then
         bloc1.imgCardinality[1] = 1
@@ -68,7 +71,7 @@ blocs.getPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
     return x, y
 end
 
-blocs.update = function(dt)
+blocs.update = function(dt)--Vérification des événements des blocs
     --Itère à travers tous les blocs
     for i, b in pairs(room.blocs) do
         if b.isTimely then
@@ -84,7 +87,7 @@ blocs.update = function(dt)
 end
 
 
-blocs.draw = function()
+blocs.draw = function()--Dessine les blocs
     lg.setColor(255, 255, 255)
 
     for i, b in pairs(room.blocs) do

@@ -9,32 +9,53 @@ selectedEntity = 3
 selectedBloc = 1
 inputs = {}
 
-function controls(dt)
-    if keyDown("escape") then love.event.quit() end
+--[[Liste des contrôles
+[W] Saute
+[S] Se baisse (pas encore implémenté)
+[A] Va à gauche
+[D] Va a droite
 
+[TAB] Permet d'afficher/cacher les menus
+[G] Permet d'afficher/cacher la grille
+[clic gauche] Permet de créer une entité
+[clic droit] Permet de créer un bloc
+[molette] Change l'entité créé
+[shift + molette] Change le bloc créé
+[DELETE] Supprime la dernière entité
+[Backspace] Supprime le dernier bloc
+[ESC] Quitte le programme
+]]--
+
+function controls(dt)--Une touche du clavier est enfoncé
+    --Permet de bouger toutes les entités [Temporaire]
     if keyDown("left") then entities.moveX(-200*dt) end
     if keyDown("right") then entities.moveX(200*dt) end
     if keyDown("up") then entities.moveY(-200*dt) end
     if keyDown("down") then entities.moveY(200*dt) end
 end
 
-function love.keypressed(key)
+function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
+    --Saute
     if key == "w" or key == "space" then
         player.jumpKeyDownTime = 0
         player.jumpKeyDown = true
         player.jump()
     end
-    if key == "s" then
-        table.insert(inputs, 2)
-    end
+    
+    --Se baisse
+    if key == "s" then table.insert(inputs, 2) end
+    
+    --Va à gauche
     if key == "a" then table.insert(inputs, 3) end
+    
+    --Va à droite
     if key == "d" then table.insert(inputs, 4) end
     
+    --Sauvegarde de la salle
     if key == "e" then
-        --Sauvegarde de la salle
         id = 0
         
-        --Trouve un nom de fichier libre
+        --Trouve un nom de fichier libre (numerique)
         for i, v in pairs(love.filesystem.getDirectoryItems("saves")) do
             if string.sub(v, 1, #v - 4) == tostring(id) then id = id + 1 end
         end
@@ -49,18 +70,29 @@ function love.keypressed(key)
         end
         dump = dump..")"
         
+        --Ecrit le script de création de salle dans un fichier
         file = io.open("saves/"..id..".lua", "w")
         io.output(file)
         io.write(dump)
         io.close(file)
         
+        --Affiche un message pour informer que la sauvegarde c'est correctement effectuée
         love.window.showMessageBox("Salle sauvegardée", "Vous avez sauvegardé la salle actuelle dans saves/"..id..".lua")
     end
 
+    --Affiche/cache la grille
     if key == "g" then player.showGrid = not player.showGrid end
+    
+    --Quitte le programme
     if key == "escape" then love.event.quit() end
+    
+    --Affiche/cache les informations de déboguage
     if key == "tab" then debug.visible = not debug.visible end
+    
+    --Supprime la dernière entité
     if key == "delete" then table.remove(room.entities, #room.entities)end
+    
+    --Supprime le dernier bloc et recalcul les cardinalités
     if key == "backspace" then
         --Recalcul les cardinalités
         for i, b in pairs(room.blocs) do
@@ -85,35 +117,43 @@ function love.keypressed(key)
     end
 end
 
-function love.keyreleased(key)
+function love.keyreleased(key)--Une touche du clavier viens d'être relachée
+    --Saute
     if key == "w" or key == "space" then
         player.jumpKeyDown = false
     end
   
+    --Se baisse
     if key == "s" then 
         for i, v in pairs(inputs) do if v == 2 then table.remove(inputs, i) end end
     end
     
+    --Va à gauche
     if key == "a" then 
         for i, v in pairs(inputs) do if v == 3 then table.remove(inputs, i) end end
     end
     
+    --Va à droite
     if key == "d" then 
         for i, v in pairs(inputs) do if v == 4 then table.remove(inputs, i) end end
     end
 end
 
-function love.mousepressed(x, y, button)
+function love.mousepressed(x, y, button)--Un bouton de la souris viens d'être enfoncé
+    --Clic gauche (créé une entité)
     if button == 1 then
         mouse.firstX, mouse.firstY = love.mouse.getPosition()
     end
 
+    --Clic droit (créé un bloc)
     if button == 2 then blocs.create(x, y, selectedBloc) end
 end
 
-function love.mousereleased(_, _, button)
+function love.mousereleased(_, _, button)--Un bouton de la souris viens d'être relaché
+    --Création d'une entité lorsqu'on relâche le clic de la souris
     mouse.secondX, mouse.secondY = love.mouse.getPosition()
 
+    --Calcul la position et la taille de l'entité
     if button == 1 and mouse.firstX ~= mouse.secondX and mouse.firstY ~= mouse.secondY then
         if mouse.secondX > mouse.firstX and mouse.secondY > mouse.firstY then
             entities.create(mouse.firstX, mouse.firstY, mouse.secondX - mouse.firstX, mouse.secondY - mouse.firstY, selectedEntity)
@@ -127,14 +167,18 @@ function love.mousereleased(_, _, button)
     end
 end
 
-function love.wheelmoved(_, y)
+function love.wheelmoved(_, y)--La molette de la souris est bougée
+    --Si la touche "shift" est enfoncée
     if keyDown("lshift") or keyDown("rshift") then
+        --Selon la direction de la molette, change le bloc séléctionné
         if y > 0 then
             selectedBloc = (selectedBloc < #bloc) and selectedBloc + 1 or selectedBloc
         elseif y < 0 then
             selectedBloc = (selectedBloc - 1 > 0) and selectedBloc - 1 or selectedBloc
         end
+    --Si la touche "shift" n'est pas enfoncée
     else
+        --Selon la direction de la molette, change l'entité séléctionné
         if y > 0 then
             selectedEntity = (selectedEntity < #entity) and selectedEntity + 1 or selectedEntity
         elseif y < 0 then

@@ -6,7 +6,7 @@ function love.conf(t)
     t.version = "0.10.2"                -- The LÖVE version this game was made for (string) 
     t.console = true                    -- Attach a console (boolean, Windows only) 
     t.accelerometerjoystick = true      -- Enable the accelerometer on iOS and Android by exposing it as a Joystick (boolean) 
-    t.externalstorage = false           -- True to save files (and read from the save directory) in external storage on Android (boolean)  
+    t.externalstorage = false           -- True to save files (and read from the save directory) in external storage on Android (boolean)
     t.gammacorrect = false              -- Enable gamma-correct rendering, when supported by the system (boolean) 
 
     t.window.title = wdow.title         -- The window title (string)
@@ -44,8 +44,7 @@ function love.conf(t)
     t.modules.thread = true             -- Enable the thread module (boolean) 
 end
 
-
---Window configuration
+--Configuration de la fenêtre
 wdow = {}
 wdow.mode = false
 wdow.wth = 1280
@@ -54,13 +53,14 @@ wdow.title = "Guardian of Time"
 love.window.setTitle(wdow.title)
 love.window.setMode(wdow.wth, wdow.hgt)
 
---Debug values
+--Valeur de deboguage
 debug = {}
 debug.visible = true
 debug.font = src.font.consola
 debug.color = {0, 200, 0}
 debug.helpText = lg.newCanvas(300, 220)
 lg.setCanvas(debug.helpText)
+    love.graphics.clear()
     lg.setFont(debug.font)
     lg.setColor(180, 180, 180, 200)
     lg.rectangle("fill", 0, 0, 300, 220)
@@ -68,7 +68,7 @@ lg.setCanvas(debug.helpText)
     lg.print("Controls : ", 10, 10)
     lg.print("[TAB] Permet d'afficher/cacher les menus", 10, 30)
     lg.print("[G] Permet d'afficher/cacher la grille", 10, 50)
-    lg.print("[clic gauche] Permet de créer une entitée", 10, 70)
+    lg.print("[clic gauche] Permet de créer une entité", 10, 70)
     lg.print("[clic droit] Permet de créer un bloc", 10, 90)
     lg.print("[molette] Change l'entité créé", 10, 110)
     lg.print("[shift + molette] Change le bloc créé", 10, 130)

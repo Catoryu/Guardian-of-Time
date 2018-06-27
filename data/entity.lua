@@ -1,4 +1,4 @@
---Valeur par défaut des entitées
+--Class des entités
 entity_class = {
     name = "",
     isAffectedByGravity = false,

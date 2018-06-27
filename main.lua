@@ -1,9 +1,9 @@
-function love.load()
+function love.load()--Chargement du jeu
+    --[[Raccourcis]]--
     lg = love.graphics
     keyDown = love.keyboard.isDown
-    love.mouse.setVisible(false)
-    math.randomseed(os.time())
     
+    --[[Appel des autres fichiers]]--
     dofile("functions.lua")
     dofile("load.lua")
     dofile("conf.lua")
@@ -13,16 +13,30 @@ function love.load()
     dofile("blocs.lua")
     dofile("player.lua")
     dofile("entities.lua")
+    dofile("events.lua")
     
-    --World/Map creation
+    --[[Variable global]]--
     gravity = 4000
     airFriction = 100
     chapterNumber = 1
+    time = 0
     
+    --[[Instructions initiales]]--
+    
+    --Rend la souris invisible
+    love.mouse.setVisible(false)
+    
+    --Réactualiser l'aléatoire
+    math.randomseed(os.time())
+    
+    --Chargement du chapitre
     loadChapter(chapterNumber)
 end
 
-function love.update(dt)
+function love.update(dt)--Actualisation du jeu
+    --Incrémente le temps
+    time = time + dt
+    
     --Actualise l'affichage de la souris
     mouse.x, mouse.y = love.mouse.getPosition()
     
@@ -33,18 +47,21 @@ function love.update(dt)
         controls(dt)
     else
         --Permet de ne pas faire avancer le joueur dans le vide après avoir bouger la fenêtre
-        inputs.down = false
-        inputs.left = false
-        inputs.right = false
+        inputs = {}
     end
 end
 
-function love.draw()
+function love.draw()--Affichage du jeu
+    
+    --Dessine la salle
     rooms.draw()
+    
+    --Dessine le joueur
     player.draw()
 
     --[[Debug]]--
     if debug.visible then
+        --love.graphics.setBlendMode("alpha", "premultiplied")
         lg.draw(debug.helpText, 10, 400)
         
         lg.setFont(debug.font)
@@ -67,9 +84,11 @@ function love.draw()
         lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
         lg.print("#room.entities : "..#room.entities, 10, 230)
         lg.print("#room.blocs : "..#room.blocs, 10, 250)
-        lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 270)
-        lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 290)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 310)
+        lg.print("#chapter.events : "..#chapter.events, 10, 270)
+        lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 290)
+        lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 310)
+        lg.print(string.format("%.2f s", time), 10, 330)
+        lg.print("FPS : "..love.timer.getFPS(), 10, 350)
     end
     
     --Affichage de la souris
