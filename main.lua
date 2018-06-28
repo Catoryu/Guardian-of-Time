@@ -14,6 +14,7 @@ function love.load()--Chargement du jeu
     dofile("player.lua")
     dofile("entities.lua")
     dofile("events.lua")
+    dofile("weather.lua")
     
     --[[Variable global]]--
     gravity = 4000
@@ -58,15 +59,20 @@ function love.draw()--Affichage du jeu
     
     --Dessine le joueur
     player.draw()
+    
+    --Dessine la météo
+    weather.draw()
 
     --[[Debug]]--
     if debug.visible then
-        --love.graphics.setBlendMode("alpha", "premultiplied")
+        love.graphics.setBlendMode("alpha", "premultiplied")
+        lg.setColor(255, 255, 255, 255)
         lg.draw(debug.helpText, 10, 400)
+        love.graphics.setBlendMode("alpha")
         
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
-        lg.rectangle("fill", 10, 10, 300, 340)
+        lg.rectangle("fill", 10, 10, 300, 360)
         lg.setColor(0, 0, 0)
         lg.print("player.x : "..player.x, 10, 10)
         lg.print("player.y : "..player.y, 10, 30)
@@ -87,7 +93,7 @@ function love.draw()--Affichage du jeu
         lg.print("#chapter.events : "..#chapter.events, 10, 270)
         lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 290)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 310)
-        lg.print(string.format("%.2f s", time), 10, 330)
+        lg.print(string.format("time : %.2f s", time), 10, 330)
         lg.print("FPS : "..love.timer.getFPS(), 10, 350)
     end
     

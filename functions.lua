@@ -97,5 +97,16 @@ loadChapter = function(chapterNumber)--Charge un chapitre
     dofile("chapters/"..chapterNumber..".lua")
     
     --Chargement de la première salle
-    chapter.rooms[1]()
+    loadRoom(1)
+end
+
+loadRoom = function(roomNumber)
+    --Actualise la variable qui définit la salle actuelle
+    chapter.roomNumber = roomNumber
+    
+    --Chargement de la salle
+    chapter.rooms[roomNumber]()
+    
+    --Chargement de la météo
+    weather.load()
 end

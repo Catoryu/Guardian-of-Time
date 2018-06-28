@@ -18,8 +18,10 @@ chapter.rooms[1] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {3, 0, 0, 2}
+    room.filter = {255, 255, 255, 255}
     room.blocs = {}
     room.entities = {}
+    weather.id = 1
     
     --Blocs
     blocs.push(bloc[1]:new({x = 10, y = 10}), bloc[1]:new({x = 9, y = 10}), bloc[1]:new({x = 10, y = 9}))
@@ -35,9 +37,10 @@ chapter.rooms[2] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {4, 0, 1, 0}
+    room.filter = {255, 200, 200, 150}
     room.blocs = {}
     room.entities = {}
-    room.events = {}
+    weather.id = 0
 end
 
 --[[Room 3]]--
@@ -50,9 +53,11 @@ chapter.rooms[3] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {0, 1, 0, 4}
+    room.filter = {255, 255, 255, 255}
     room.blocs = {}
     room.entities = {}
     room.events = {}
+    weather.id = 0
 end
 
 --[[Room 4]]--
@@ -65,7 +70,9 @@ chapter.rooms[4] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {0, 2, 3, 0}
+    room.filter = {255, 255, 255, 255}
     room.blocs = {}
     room.entities = {}
     room.events = {}
+    weather.id = 0
 end

@@ -5,11 +5,14 @@ rooms.update = function(dt)--Actualisation de la salle
     blocs.update(dt)
     entities.update(dt)
     events.update(dt)
+    weather.update(dt)
 end
 
 rooms.draw = function()--Dessine tous les objets de la salle
+    --Affiche le filtre de la salle
+    lg.setColor(unpack(room.filter))
+    
     --Affiche l'image de fond
-    lg.setColor(255, 255, 255)
     lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x, room.y)
     
     --Affiche les blocs
@@ -54,6 +57,11 @@ rooms.moveCameraX = function(moveSpeed)--Mouvement horizontal de la caméra
         v.x = v.x + moveSpeed
     end
     
+    --Bouge les particules de météo
+    for i, v in pairs(weather.drops) do
+        v.x = v.x + moveSpeed
+    end
+    
     --Bouge la salle (donc les blocs avec)
     room.x = room.x + moveSpeed
 end
@@ -87,6 +95,11 @@ rooms.moveCameraY = function(moveSpeed)--Mouvement vertical de la caméra
     
     --Bouge les événements
     for i, v in pairs(chapter.events) do
+        v.y = v.y + moveSpeed
+    end
+    
+    --Bouge les particules de météo
+    for i, v in pairs(weather.drops) do
         v.y = v.y + moveSpeed
     end
 
