@@ -28,10 +28,10 @@ inputs = {}
 
 function controls(dt)--Une touche du clavier est enfoncé
     --Permet de bouger toutes les entités [Temporaire]
-    if keyDown("left") then entities.moveX(-200*dt) end
-    if keyDown("right") then entities.moveX(200*dt) end
-    if keyDown("up") then entities.moveY(-200*dt) end
-    if keyDown("down") then entities.moveY(200*dt) end
+    if keyDown("left") then entities.moveX(-220*dt) end
+    if keyDown("right") then entities.moveX(220*dt) end
+    if keyDown("up") then entities.moveY(-220*dt) end
+    if keyDown("down") then entities.moveY(220*dt) end
 end
 
 function love.keypressed(key)--Une touche du clavier viens d'être enfoncée

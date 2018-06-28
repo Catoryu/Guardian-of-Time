@@ -40,6 +40,11 @@ entities.moveX = function(moveSpeed)--Gère le mouvement horizontal des entités
             
             if canMove then
                 v.x = v.x + moveSpeed
+                
+                --Test si le joueur est sur l'entité lorsqu'elle se déplace
+                if (player.y + player.hgt == v.y) and (player.x < v.x - moveSpeed + v.wth and player.x + player.wth > v.x) then
+                    player.moveX(moveSpeed)
+                end
             else
                 print("Le joueur est ecrase par une entite avec une vitesse de "..moveSpeed.." x !!")
             end
@@ -75,6 +80,11 @@ entities.moveY = function(moveSpeed)--Gère le mouvement vertical des entités
             
             if canMove then
                 v.y = v.y + moveSpeed
+                
+                --Test si le joueur est sur l'entité lorsqu'elle se déplace
+                if (player.y + player.hgt == v.y - moveSpeed) and (player.x < v.x + v.wth and player.x + player.wth > v.x) then
+                    player.moveY(moveSpeed)
+                end
             else
                 print("Le joueur est ecrase par une entite avec une vitesse de "..moveSpeed.." y !!")
             end
