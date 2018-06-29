@@ -108,5 +108,5 @@ loadRoom = function(roomNumber)
     chapter.rooms[roomNumber]()
     
     --Chargement de la météo
-    weather.load()
+    weathers.load()
 end

@@ -30,6 +30,8 @@ event = {
         id = 1,
         touch = true,
         onTouch = function(self)
+            weathers.id = 2
+            weathers.load()
             print(string.format("Evenement declenche a %.2f s", time))
             self.touch = false
         end,

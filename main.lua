@@ -14,7 +14,7 @@ function love.load()--Chargement du jeu
     dofile("player.lua")
     dofile("entities.lua")
     dofile("events.lua")
-    dofile("weather.lua")
+    dofile("weathers.lua")
     
     --[[Variable global]]--
     gravity = 4000
@@ -61,7 +61,7 @@ function love.draw()--Affichage du jeu
     player.draw()
     
     --Dessine la météo
-    weather.draw()
+    weathers.draw()
 
     --[[Debug]]--
     if debug.visible then
@@ -72,7 +72,7 @@ function love.draw()--Affichage du jeu
         
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
-        lg.rectangle("fill", 10, 10, 300, 360)
+        lg.rectangle("fill", 10, 10, 300, 380)
         lg.setColor(0, 0, 0)
         lg.print("player.x : "..player.x, 10, 10)
         lg.print("player.y : "..player.y, 10, 30)
@@ -94,7 +94,8 @@ function love.draw()--Affichage du jeu
         lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 290)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 310)
         lg.print(string.format("time : %.2f s", time), 10, 330)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 350)
+        lg.print(string.format("weathers.wind : %.2f px/s", weathers.wind), 10, 350)
+        lg.print("FPS : "..love.timer.getFPS(), 10, 370)
     end
     
     --Affichage de la souris

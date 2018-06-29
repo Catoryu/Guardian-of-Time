@@ -52,7 +52,20 @@ player.jump = function()--Fait sauter du joueur
         player.isJumping = true
         player.ySpd = -player.jumpSpd
         player.jumpKeyDown = true
+        
+        --Affiche une petite animation de levé de particules
+        
+        --Joue le son de saut
     end
+end
+
+player.touchGround = function()--Instructions lorsque le joueur touche le sol
+    player.ySpd = 0
+    player.isJumping = false
+    
+    --Affiche une petite animation de levé de particules
+    
+    --Joue le son d'atterissage
 end
 
 player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
@@ -81,7 +94,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[3]
-                chapter.rooms[chapter.roomNumber]()
+                loadRoom(chapter.roomNumber)
                 player.x = wdow.wth - player.wth
                 room.x = - room.wth + wdow.wth
                 return true
@@ -143,7 +156,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[4]
-                chapter.rooms[chapter.roomNumber]()
+                loadRoom(chapter.roomNumber)
                 player.x = 0
                 room.x = 0
                 return true
@@ -223,7 +236,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[1]
-                chapter.rooms[chapter.roomNumber]()
+                loadRoom(chapter.roomNumber)
                 player.y = wdow.hgt - player.hgt
                 room.y = - room.hgt + wdow.hgt
                 return true
@@ -282,8 +295,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             if room.cardinality[2] == 0 then
                 --Se bloque à la sortie de l'écran
                 player.y = wdow.hgt - player.hgt
-                player.isJumping = false
-                player.ySpd = 0
+                player.touchGround()
                 return false
             else
                 --Change de salle
@@ -324,8 +336,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         --Déplacement du joueur
         if dy ~= math.huge then
-            player.isJumping = false
-            player.ySpd = 0
+            player.touchGround()
             player.y = player.y + dy
             return false
         end
@@ -341,6 +352,8 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             --Réinitialise le saut (vu que le joueur est en train de tomber)
             player.isJumping = true
             player.canJumpHigher = false
+            
+            --Affiche une petite animation de particules qui tombe
         end
         
         return true

@@ -5,7 +5,7 @@ rooms.update = function(dt)--Actualisation de la salle
     blocs.update(dt)
     entities.update(dt)
     events.update(dt)
-    weather.update(dt)
+    weathers.update(dt)
 end
 
 rooms.draw = function()--Dessine tous les objets de la salle
@@ -58,7 +58,7 @@ rooms.moveCameraX = function(moveSpeed)--Mouvement horizontal de la caméra
     end
     
     --Bouge les particules de météo
-    for i, v in pairs(weather.drops) do
+    for i, v in pairs(weathers.drops) do
         v.x = v.x + moveSpeed
     end
     
@@ -99,7 +99,7 @@ rooms.moveCameraY = function(moveSpeed)--Mouvement vertical de la caméra
     end
     
     --Bouge les particules de météo
-    for i, v in pairs(weather.drops) do
+    for i, v in pairs(weathers.drops) do
         v.y = v.y + moveSpeed
     end
 
