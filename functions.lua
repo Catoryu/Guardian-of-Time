@@ -100,7 +100,7 @@ loadChapter = function(chapterNumber)--Charge un chapitre
     loadRoom(1)
 end
 
-loadRoom = function(roomNumber)
+loadRoom = function(roomNumber)--Charge un salle
     --Actualise la variable qui définit la salle actuelle
     chapter.roomNumber = roomNumber
     
@@ -109,4 +109,28 @@ loadRoom = function(roomNumber)
     
     --Chargement de la météo
     weathers.load()
+end
+
+spairs = function(t, order)--Permet de trier les valeurs d'une table
+    --https://stackoverflow.com/questions/15706270/sort-a-table-in-lua
+    -- collect the keys
+    local keys = {}
+    for k in pairs(t) do keys[#keys+1] = k end
+
+    -- if order function given, sort by it by passing the table and keys a, b,
+    -- otherwise just sort the keys 
+    if order then
+        table.sort(keys, function(a,b) return order(t, a, b) end)
+    else
+        table.sort(keys)
+    end
+
+    -- return the iterator function
+    local i = 0
+    return function()
+        i = i + 1
+        if keys[i] then
+            return keys[i], t[keys[i]]
+        end
+    end
 end

@@ -7,29 +7,69 @@ blocs = {}
 --Taille des blocs
 blocs.size = 50
 
-blocs.calculateCardinality = function(bloc1, bloc2)--Calcul les les cardinalités  du bloc choisi
-    --Haut
-    if bloc1.x == bloc2.x and bloc1.y - 1 == bloc2.y then
-        bloc1.imgCardinality[1] = 1
-        bloc2.imgCardinality[2] = 1
-    end
-    --Bas
-    if bloc1.x == bloc2.x and bloc1.y + 1 == bloc2.y then
-        bloc1.imgCardinality[2] = 1
-        bloc2.imgCardinality[1] = 1
-    end
-    --Gauche
-    if bloc1.x - 1 == bloc2.x and bloc1.y == bloc2.y then
-        bloc1.imgCardinality[3] = 1
-        bloc2.imgCardinality[4] = 1
-    end
-    --Droite
-    if bloc1.x + 1 == bloc2.x and bloc1.y == bloc2.y then
-        bloc1.imgCardinality[4] = 1
-        bloc2.imgCardinality[3] = 1
+blocs.exists = function(x, y)--Test si un bloc existe dans une certaine coordonné
+    for i, b in pairs(room.blocs) do
+        if b.x == x and b.y == y then
+            return true
+        end
     end
     
-    return bloc1, bloc2
+    return false
+end
+
+blocs.calculateCardinality = function(bloc, destroy)--Calcul les les cardinalités du bloc choisi (Regarde autour du bloc)
+    if destroy then
+        for i, b in pairs(room.blocs) do
+            if b.imgLink then
+                --Bloc en dessous de celui qui est détruit
+                if bloc.x == b.x and bloc.y + 1 == b.y then
+                    b.imgCardinality[1] = 0
+                end
+                --Bloc en dessus de celui qui est détruit
+                if bloc.x == b.x and bloc.y - 1 == b.y then
+                    b.imgCardinality[2] = 0
+                end
+                --Bloc à droite de celui qui est détruit
+                if bloc.x + 1 == b.x and bloc.y == b.y then
+                    b.imgCardinality[3] = 0
+                end
+                --Bloc à gauche de celui qui est détruit
+                if bloc.x - 1 == b.x and bloc.y == b.y then
+                    b.imgCardinality[4] = 0
+                end
+            end
+        end
+    else
+        --Réinitialise la cardinality du bloc
+        bloc.imgCardinality = {0, 0, 0, 0}
+        
+        for i, b in pairs(room.blocs) do
+            if b.imgLink then
+                --Haut
+                if bloc.x == b.x and bloc.y - 1 == b.y then
+                    bloc.imgCardinality[1] = 1
+                    b.imgCardinality[2] = 1
+                end
+                --Bas
+                if bloc.x == b.x and bloc.y + 1 == b.y then
+                    bloc.imgCardinality[2] = 1
+                    b.imgCardinality[1] = 1
+                end
+                --Gauche
+                if bloc.x - 1 == b.x and bloc.y == b.y then
+                    bloc.imgCardinality[3] = 1
+                    b.imgCardinality[4] = 1
+                end
+                --Droite
+                if bloc.x + 1 == b.x and bloc.y == b.y then
+                    bloc.imgCardinality[4] = 1
+                    b.imgCardinality[3] = 1
+                end
+            end
+        end
+    end
+    
+    return bloc
 end
 
 blocs.push = function(...)--Permet de créer un bloc (coordonnés sur la grille)
@@ -37,12 +77,11 @@ blocs.push = function(...)--Permet de créer un bloc (coordonnés sur la grille)
         --Modifie les images si un blocs est a coté
         if blocValues.imgLink then
             blocValues.imgCardinality = {0, 0, 0, 0}
-            for i, b in pairs(room.blocs) do
-                if b.imgLink then
-                    blocValues, b = blocs.calculateCardinality(blocValues, b)
-                end
-            end
+            blocValues = blocs.calculateCardinality(blocValues)
         end
+        
+        blocValues.frame = time + blocValues.refreshRate
+        
         table.insert(room.blocs, blocValues)
     end
 end
@@ -72,13 +111,31 @@ blocs.getPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
 end
 
 blocs.update = function(dt)--Vérification des événements des blocs
-    --Itère à travers tous les blocs
-    for i, b in pairs(room.blocs) do
-        if b.isTimely then
-            b.ttl = b.ttl - 1000 * dt
+    --Itère à travers tous les blocs dans l'ordre décroissant de remplissage
+    for i, b in spairs(room.blocs, function(t, a, b) return t[b].fillingRate < t[a].fillingRate end) do
+        
+        if time > b.frame then
+            b.frame = b.frame + b.refreshRate
             
+            if b.isGravityAffected then
+                b:moveY(1)
+            end
+            
+            if b.isLiquid then
+                b:flow()
+            end
+        end
+        
+        --Si le bloc est déclenché au bout d'un moment
+        if b.isTimely then
+            
+            --Diminue la durée avant que l'événement commence
+            b.ttl = b.ttl - 1000*dt
+            
+            --Test si la durée avant que l'événement commence est inférieur ou égale à 0
             if b.ttl <= 0 then
                 if b.activeEvent.ttlReach then
+                    --Déclenche l'événement
                     b:onTtlReached()
                 end
             end
@@ -91,16 +148,25 @@ blocs.draw = function()--Dessine les blocs
     lg.setColor(255, 255, 255)
 
     for i, b in pairs(room.blocs) do
+        --Récupère les coordonnées du bloc
         local x, y = blocs.getPos(b.x, b.y)
         
         --Si le bloc est sur l'écran
         if (x + blocs.size > 0 and x < wdow.wth) and
         (y + blocs.size > 0 and y < wdow.hgt) then
-            lg.setColor(255, 255, 255)
-            if b.imgLink then
-                lg.draw(src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x, y)
+            
+            --Si le bloc est un liquide
+            if b.isLiquid then
+                lg.setColor(unpack(b.colors))
+                lg.rectangle("fill", x, y + (100-(b.fillingRate*blocs.size/100) - blocs.size), blocs.size, (b.fillingRate*blocs.size/100))
+            --Si le bloc n'est pas liquide
             else
-                lg.draw(src.img.bloc[b.img], x, y)
+                lg.setColor(255, 255, 255)
+                if b.imgLink then
+                    lg.draw(src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x, y)
+                else
+                    lg.draw(src.img.bloc[b.img], x, y)
+                end
             end
             
             --[[Debug]]--
@@ -109,11 +175,15 @@ blocs.draw = function()--Dessine les blocs
                 --lg.rectangle("line", x, y, blocs.size, blocs.size)
                 lg.print("x" .. b.x .. " y" .. b.y , x, y)
                 lg.print("id:"..b.id, x, y + 10)
+--                lg.print(string.format("%d frame/s", b.frame), x, y + 20)
                 if b.isTimely then
                     lg.print(string.format("%d ms", b.ttl), x, y + 20)
                 end
                 if b.imgLink then
                     lg.print(table.concat(b.imgCardinality), x, y + 30)
+                end
+                if b.isLiquid then
+                    lg.print(b.fillingRate, x, y + 40)
                 end
             end
         end

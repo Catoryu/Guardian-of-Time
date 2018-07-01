@@ -94,25 +94,7 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     
     --Supprime le dernier bloc et recalcul les cardinalités
     if key == "backspace" then
-        --Recalcul les cardinalités
-        for i, b in pairs(room.blocs) do
-            --Haut
-            if room.blocs[#room.blocs].x == b.x and room.blocs[#room.blocs].y - 1 == b.y then
-                b.imgCardinality[2] = 0
-            end
-            --Bas
-            if room.blocs[#room.blocs].x == b.x and room.blocs[#room.blocs].y + 1 == b.y then
-                b.imgCardinality[1] = 0
-            end
-            --Gauche
-            if room.blocs[#room.blocs].x - 1 == b.x and room.blocs[#room.blocs].y == b.y then
-                b.imgCardinality[4] = 0
-            end
-            --Droite
-            if room.blocs[#room.blocs].x + 1 == b.x and room.blocs[#room.blocs].y == b.y then
-                b.imgCardinality[3] = 0
-            end
-        end
+        room.blocs[#room.blocs] = blocs.calculateCardinality(room.blocs[#room.blocs], true)
         table.remove(room.blocs, #room.blocs)
     end
 end

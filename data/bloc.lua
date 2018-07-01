@@ -6,10 +6,15 @@ bloc_class = {
     ttl = 0, --Durée de vie du bloc (valeur en ms)
     isVisible = true,
     isSolid = false,
+    isLiquid = false,
     isDestructible = false,
+    isGravityAffected = false,
+    fillingRate = 0,
+    refreshRate = 0.05,
+    frame = 0,
     hp = 0,
     img = "",
-    imgCardinality = nil, --Permet de définir si le bloc a plusieurs images
+    imgCardinality = {}, --Permet de définir si le bloc a plusieurs images
     imgLink = false,
     isTimely = false, --Meilleur nom ? : Indique si le bloc est affecté par le temps
     activeEvent = { --Indique les événements actifs du bloc
@@ -70,6 +75,94 @@ bloc_class = {
     --Reset le bloc avec ses valeurs de base (Utile lorsqu'on change d'écran)
     setBaseValues = function(self)
         for k, _ in pairs(self) do self[k] = nil end
+    end,
+    
+    moveX = function(self, moveSpeed)
+        local canMove = false
+        
+        if self.x + moveSpeed <= room.cols and not blocs.exists(self.x + moveSpeed, self.y) then
+            canMove = true
+        end
+        
+        if canMove then
+            x, y = blocs.getPos(self.x + moveSpeed, self.y)
+            
+            --Test si le bloc touche le joueur
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, x, y, blocs.size, blocs.size) ~= 0 then
+                print("Le joueur est ecrase par \""..self.name.."\" , ce bloc se deplacait de "..moveSpeed.." case[s] horizontalement")
+                return
+            end
+            
+            --Actualise les cardinalités des blocs autour
+            blocs.calculateCardinality(self, true)
+            
+            --Fait bouger le bloc
+            self.x = self.x + moveSpeed
+            
+            --Actualise les cardinalités du bloc
+            self = blocs.calculateCardinality(self)
+        end
+    end,
+    
+    moveY = function(self, moveSpeed)
+        local canMove = false
+        
+        if self.y + moveSpeed <= room.rows and not blocs.exists(self.x, self.y + moveSpeed) then
+            canMove = true
+        end
+        
+        if canMove then
+            x, y = blocs.getPos(self.x, self.y + moveSpeed)
+            
+            --Test si le bloc touche le joueur
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, x, y, blocs.size, blocs.size) ~= 0 then
+                print("Le joueur est ecrase par \""..self.name.."\" , ce bloc se deplacait de "..moveSpeed.." case[s] verticalement")
+                return
+            end
+            
+            --Actualise les cardinalités des blocs autour
+            blocs.calculateCardinality(self, true)
+            
+            --Fait bouger le bloc
+            self.y = self.y + moveSpeed
+            
+            --Actualise les cardinalités du bloc
+            self = blocs.calculateCardinality(self)
+        end
+    end,
+    
+    flow = function(self)
+        local canFlow = {false, true, false, false}
+        
+        for i, v in pairs(room.blocs) do
+            --Vérifie les blocs autour--
+            
+            --Si il y a un bloc vers le bas ou que l'on touche le bas de la salle
+            if (self.x == v.x and self.y + 1 == v.y) or self.y + 1 > room.rows then
+                canFlow[2] = false
+            end
+            
+            --Si il n'y a pas de bloc là où le liquide veut couler
+            --if self.x + 1 <= room.cols and not blocs.exists(self.x, self.y) then
+                
+            --end
+        end
+        
+        if canFlow[2] then
+            --Coule l'entièreté du liquide vers le bas
+            self.y = self.y + 1
+        end
+    end,
+    
+    onScreen = function(self)
+        local x, y = blocs.getPos(self.x, self.y)
+        
+        if (x + blocs.size > 0 and x - blocs.size < wdow.wth) and
+        (y + blocs.size > 0 and y - blocs.size < wdow.hgt) then
+            return true
+        else
+            return false
+        end
     end
 }
 
@@ -115,13 +208,12 @@ bloc = {
         id = 3,
         name = "appears with time",
         img = "instable2",
-        isSolid = false,
         ttl = 5000,
         isTimely = true,
         activeEvent = {ttlReach = true, onTouch = false},
         rawOnTtlReached = function(self)
             --Test si le bloc n'est pas en collision avec le joueur
-            x, y = room.getBlocPos(self.x, self.y)
+            x, y = blocs.getPos(self.x, self.y)
             if collision_rectToRect(player.x, player.y, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 0 then
                 room.popBloc(self.x, self.y)
                 room.pushBloc(bloc[2]:new({x = self.x, y = self.y}))
@@ -135,5 +227,32 @@ bloc = {
         id = 4,
         name = "platform",
         img = "woodPlatform"
+    }),
+
+    bloc_class:new({
+        id = 5,
+        name = "water",
+        colors = {51, 153, 255, 150},
+        refreshRate = 1,
+        isLiquid = true,
+        fillingRate = 100,
+    }),
+
+    bloc_class:new({
+        id = 6,
+        name = "sand",
+        colors = {228, 206, 64, 255},
+        refreshRate = .2,
+        isLiquid = true,
+        fillingRate = 100,
+    }),
+
+    bloc_class:new({
+        id = 7,
+        name = "sandBloc",
+        img = "sand",
+        isGravityAffected = true,
+        imgLink = true,
+        isSolid = true
     })
 }

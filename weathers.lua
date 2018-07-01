@@ -20,6 +20,7 @@ weathers.load = function()--Initialise la météo
     if weathers.id == 0 then
         --Réinitialise les particules de la météo
         weathers.drops = {}
+        return
     end
     
     --Modifie les valeurs selon l'id de la météo

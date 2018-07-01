@@ -115,8 +115,8 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         
         --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide
-            if b.isSolid then
+            --Si le bloc est solide et visible à l'écran
+            if b.isSolid and b:onScreen() then
                 --Récupère les coordonnés du bloc
                 local x, y = blocs.getPos(b.x, b.y)
                 
@@ -177,8 +177,8 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         
         --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide
-            if b.isSolid then
+            --Si le bloc est solide et visible à l'écran
+            if b.isSolid and b:onScreen() then
                 --Récupère les coordonnés du bloc
                 local x, y = blocs.getPos(b.x, b.y)
                 
@@ -257,8 +257,8 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide
-            if b.isSolid then
+            --Si le bloc est solide et visible à l'écran
+            if b.isSolid and b:onScreen() then
                 --Récupère les coordonnés du bloc
                 local x, y = blocs.getPos(b.x, b.y)
                 
@@ -319,8 +319,8 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         --Itère à travers tous les blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide
-            if b.isSolid then
+            --Si le bloc est solide et visible à l'écran
+            if b.isSolid and b:onScreen() then
                 --Récupère les coordonnés du bloc
                 local x, y = blocs.getPos(b.x, b.y)
                 
