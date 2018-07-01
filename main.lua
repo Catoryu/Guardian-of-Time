@@ -99,6 +99,8 @@ function love.draw()--Affichage du jeu
     end
     
     --Affichage de la souris
-    lg.setColor(255, 255, 255)
-    lg.draw(src.img.cursor, mouse.x, mouse.y)
+    if mouse.visible then
+        lg.setColor(255, 255, 255)
+        lg.draw(src.img.cursor, mouse.x, mouse.y)
+    end
 end

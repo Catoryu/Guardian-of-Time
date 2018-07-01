@@ -11,6 +11,7 @@ bloc_class = {
     isGravityAffected = false,
     fillingRate = 0,
     refreshRate = 0.05,
+    viscousRate = 25,
     frame = 0,
     hp = 0,
     img = "",
@@ -77,7 +78,7 @@ bloc_class = {
         for k, _ in pairs(self) do self[k] = nil end
     end,
     
-    moveX = function(self, moveSpeed)
+    moveX = function(self, moveSpeed)--Bouge le bloc horizontalement
         local canMove = false
         
         if self.x + moveSpeed <= room.cols and not blocs.exists(self.x + moveSpeed, self.y) then
@@ -104,7 +105,7 @@ bloc_class = {
         end
     end,
     
-    moveY = function(self, moveSpeed)
+    moveY = function(self, moveSpeed)--Bouge le bloc verticalement
         local canMove = false
         
         if self.y + moveSpeed <= room.rows and not blocs.exists(self.x, self.y + moveSpeed) then
@@ -131,27 +132,197 @@ bloc_class = {
         end
     end,
     
-    flow = function(self)
-        local canFlow = {false, true, false, false}
+    
+    spread = function(self, direction, hasAlreadyBloc, quantity)
+        --hasAlreadyBloc :
+        --0 : no
+        --1 : yes
         
+        if hasAlreadyBloc == 1 then
+            if direction == 1 then--Haut
+                
+            elseif direction == 2 then--Bas
+                for i, b in pairs(room.blocs) do
+                    if b.x == self.x and b.y == self.y + 1 then
+                        b.fillingRate = b.fillingRate + quantity
+                        
+                        if b.fillingRate > 100 then
+                            quantity = b.fillingRate - 100
+                            b.fillingRate = 100
+                        else
+                            quantity = 0
+                        end
+                    end
+                end
+            elseif direction == 3 then--Gauche
+                for i, b in pairs(room.blocs) do
+                    if b.x == self.x - 1 and b.y == self.y then
+                        --Si le liquide essaye de se verser dans un bloc qui a plus de liquide, annulle le déversement
+                        if b.fillingRate > self.fillingRate then return quantity end
+                        
+                        b.fillingRate = b.fillingRate + quantity
+                        
+                        if b.fillingRate > 100 then
+                            quantity = b.fillingRate - 100
+                            b.fillingRate = 100
+                        else
+                            quantity = 0
+                        end
+                    end
+                end
+            elseif direction == 4 then--Droit
+                for i, b in pairs(room.blocs) do
+                    if b.x == self.x + 1 and b.y == self.y then
+                        --Si le liquide essaye de se verser dans un bloc qui a plus de liquide, annulle le déversement
+                        if b.fillingRate > self.fillingRate then return quantity end
+                        
+                        b.fillingRate = b.fillingRate + quantity
+                        
+                        if b.fillingRate > 100 then
+                            quantity = b.fillingRate - 100
+                            b.fillingRate = 100
+                        else
+                            quantity = 0
+                        end
+                    end
+                end
+            end
+        elseif hasAlreadyBloc == 0 then
+            if direction == 1 then--Haut
+                
+            elseif direction == 2 then--Bas
+                self.y = self.y + 1
+            elseif direction == 3 then--Gauche
+                blocs.push(bloc[self.id]:new({x = self.x - 1, y = self.y, fillingRate = quantity}))
+                quantity = 0
+            elseif direction == 4 then--Droit
+                blocs.push(bloc[self.id]:new({x = self.x + 1, y = self.y, fillingRate = quantity}))
+                quantity = 0
+            end
+        end
+        
+        --Retourne la quantité restante qui n'a pas pu être déversé
+        return quantity
+    end,
+    
+    flow = function(self)--Fait couler les blocs liquide
+        --Haut, Bas, Gauche, Droite
+        --0 : Bloqué
+        --1 : Vide
+        --2 : Même liquide
+        local canFlow = {0, 1, 1, 1}
+        
+        --Test où est-ce que le liquide peut couler--
         for i, v in pairs(room.blocs) do
-            --Vérifie les blocs autour--
-            
-            --Si il y a un bloc vers le bas ou que l'on touche le bas de la salle
-            if (self.x == v.x and self.y + 1 == v.y) or self.y + 1 > room.rows then
-                canFlow[2] = false
+            --Test si le bloc peut couler en bas
+            if self.x == v.x and self.y + 1 == v.y then
+                --Si c'est le même liquide
+                if self.id == v.id then
+                    canFlow[2] = 2
+                else
+                    canFlow[2] = 0
+                end
             end
             
-            --Si il n'y a pas de bloc là où le liquide veut couler
-            --if self.x + 1 <= room.cols and not blocs.exists(self.x, self.y) then
-                
-            --end
+            --Test si le bloc peut couler à gauche
+            if self.x - 1 == v.x and self.y == v.y then
+                --Si c'est le même liquide
+                if self.id == v.id then
+                    canFlow[3] = 2
+                else
+                    canFlow[3] = 0
+                end
+            end
+            
+            --Test si le bloc peut couler à droite
+            if self.x + 1 == v.x and self.y == v.y then
+                --Si c'est le même liquide
+                if self.id == v.id then
+                    canFlow[4] = 2
+                else
+                    canFlow[4] = 0
+                end
+            end
         end
         
-        if canFlow[2] then
-            --Coule l'entièreté du liquide vers le bas
-            self.y = self.y + 1
+        
+        --Vérifie que le liquide ne coule pas dans les bord de la salle
+        if self.y + 1 > room.rows then canFlow[2] = 0 end--En bas
+        
+        if self.x - 1 < 1 then canFlow[3] = 0 end--A gauche
+        
+        if self.x + 1 > room.cols then canFlow[4] = 0 end--A droite
+        
+        
+        --Fait couler le liquide--
+        
+        --Coule vers le bas libre
+        if canFlow[2] ~= 0 then
+            --Calcul du montant à donner
+            local fillLoss = self.fillingRate
+            local liquidNotspread = 0
+            
+            --Donne du liquide en bas
+            liquidNotspread = self:spread(2, canFlow[2] - 1, fillLoss)
+            
+            --Vide son liquide
+            self.fillingRate = self.fillingRate - fillLoss + liquidNotspread
+--            self.fillingRate = self.fillingRate - fillLoss
+            
+        --Coule vers la gauche et la droite libre
+        elseif canFlow[3] ~= 0 and canFlow[4] ~= 0 then
+            --Si le bloc a assez de liquide, il le déverse
+            if self.fillingRate > self.viscousRate then
+                
+                --Calcul du montant à donner
+                local fillLoss = self.viscousRate * self.fillingRate / 100
+                local liquidNotspread = 0
+                
+                --Donne du liquide à gauche
+                liquidNotspread = liquidNotspread + self:spread(3, canFlow[3] - 1, fillLoss/2)
+                
+                --Donne du liquide à droite
+                liquidNotspread = liquidNotspread + self:spread(4, canFlow[4] - 1, fillLoss/2)
+                
+                --Vide son liquide
+                self.fillingRate = self.fillingRate - fillLoss + liquidNotspread
+            end
+        
+        --Coule vers la gauche
+        elseif canFlow[3] ~= 0 then
+            --Si le bloc a assez de liquide, il le déverse
+            if self.fillingRate > self.viscousRate then
+                
+                --Calcul du montant à donner
+                local fillLoss = self.viscousRate * self.fillingRate / 100
+                local liquidNotspread = 0
+                
+                --Donne du liquide à gauche
+                liquidNotspread = liquidNotspread + self:spread(3, canFlow[3] - 1, fillLoss)
+                
+                --Vide son liquide
+                self.fillingRate = self.fillingRate - fillLoss + liquidNotspread
+            end
+            
+        --Coule vers la droite
+        elseif canFlow[4] ~= 0 then
+            --Si le bloc a assez de liquide, il le déverse
+            if self.fillingRate > self.viscousRate then
+                
+                --Calcul du montant à donner
+                local fillLoss = self.viscousRate * self.fillingRate / 100
+                local liquidNotspread = 0
+                
+                --Donne du liquide à droite
+                liquidNotspread = liquidNotspread + self:spread(4, canFlow[4] - 1, fillLoss)
+                
+                --Vide son liquide
+                self.fillingRate = self.fillingRate - fillLoss + liquidNotspread
+            end
         end
+        
+        --Si le bloc n'a plus de liquide, il disparaît
+        if self.fillingRate <= 0 then blocs.pop(self.x, self.y) end
     end,
     
     onScreen = function(self)
@@ -197,8 +368,8 @@ bloc = {
         ttl = 1000,
         rawOnTtlReached = function(self)
             print("\nRemplacement x :"..self.x.." y :"..self.y)
-            room.popBloc(self.x, self.y)
-            room.pushBloc(bloc[3]:new({x = self.x, y = self.y}))
+            blocs.pop(self.x, self.y)
+            blocs.push(bloc[3]:new({x = self.x, y = self.y}))
         end,
         rawOnTouch = function(self, direction) if direction == 1 then self.isTimely = true end end
     }),
@@ -214,9 +385,9 @@ bloc = {
         rawOnTtlReached = function(self)
             --Test si le bloc n'est pas en collision avec le joueur
             x, y = blocs.getPos(self.x, self.y)
-            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, x, y, room.blocSize, room.blocSize) == 0 then
-                room.popBloc(self.x, self.y)
-                room.pushBloc(bloc[2]:new({x = self.x, y = self.y}))
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, x, y, blocs.size, blocs.size) == 0 then
+                blocs.pop(self.x, self.y)
+                blocs.push(bloc[2]:new({x = self.x, y = self.y}))
             end
         end
     }),
@@ -232,8 +403,8 @@ bloc = {
     bloc_class:new({
         id = 5,
         name = "water",
+        viscousRate = 10,
         colors = {51, 153, 255, 150},
-        refreshRate = 1,
         isLiquid = true,
         fillingRate = 100,
     }),
@@ -241,8 +412,8 @@ bloc = {
     bloc_class:new({
         id = 6,
         name = "sand",
+        viscousRate = 30,
         colors = {228, 206, 64, 255},
-        refreshRate = .2,
         isLiquid = true,
         fillingRate = 100,
     }),

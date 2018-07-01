@@ -5,6 +5,7 @@ mouse.firstX = 0
 mouse.firstY = 0
 mouse.secondX = 0
 mouse.secondY = 0
+mouse.visible = true
 selectedEntity = 3
 selectedBloc = 1
 inputs = {}
@@ -95,7 +96,7 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     --Supprime le dernier bloc et recalcul les cardinalités
     if key == "backspace" then
         room.blocs[#room.blocs] = blocs.calculateCardinality(room.blocs[#room.blocs], true)
-        table.remove(room.blocs, #room.blocs)
+        blocs.pop(room.blocs[#room.blocs].x, room.blocs[#room.blocs].y)
     end
 end
 

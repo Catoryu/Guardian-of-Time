@@ -7,6 +7,14 @@ blocs = {}
 --Taille des blocs
 blocs.size = 50
 
+--Contient tous les blocs qui doivent être supprimé (à la fin de l'update)
+blocs.toDelete = {}
+
+--Synchronise l'actualisation des liquides
+blocs.liquid = {}
+blocs.liquid.water = {frame = 0, refreshRate = 0.01, active = false}
+blocs.liquid.sand = {frame = 0, refreshRate = 0.1, active = false}
+
 blocs.exists = function(x, y)--Test si un bloc existe dans une certaine coordonné
     for i, b in pairs(room.blocs) do
         if b.x == x and b.y == y then
@@ -74,15 +82,21 @@ end
 
 blocs.push = function(...)--Permet de créer un bloc (coordonnés sur la grille)
     for _, blocValues in pairs({...}) do
-        --Modifie les images si un blocs est a coté
-        if blocValues.imgLink then
-            blocValues.imgCardinality = {0, 0, 0, 0}
-            blocValues = blocs.calculateCardinality(blocValues)
+        
+        --Si il y a déjà un bloc à cette position, annule l'ajout de ce bloc
+        if not blocs.exists(blocValues.x, blocValues.y) then
+            --Modifie les images si un blocs est a coté
+            if blocValues.imgLink then
+                blocValues.imgCardinality = {0, 0, 0, 0}
+                blocValues = blocs.calculateCardinality(blocValues)
+            end
+            
+            blocValues.frame = time + blocValues.refreshRate
+            
+            table.insert(room.blocs, blocValues)
+        else
+            print("Vous ne pouvez pas ajouter de bloc, il y en a deja un ici")
         end
-        
-        blocValues.frame = time + blocValues.refreshRate
-        
-        table.insert(room.blocs, blocValues)
     end
 end
 
@@ -91,8 +105,10 @@ blocs.flush = function()--Permet de supprimer tous les blocs
 end
 
 blocs.pop = function (x, y)--Permet de supprimer un bloc (coordonnés sur la grille)
-    for i, v in ipairs(room.blocs) do
-        if v.x == x and v.y == y then room.blocs[i] = nil end
+    for i, v in pairs(room.blocs) do
+        if v.x == x and v.y == y then
+            table.insert(blocs.toDelete, i)
+        end
     end
 end
 
@@ -111,20 +127,18 @@ blocs.getPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
 end
 
 blocs.update = function(dt)--Vérification des événements des blocs
+    --Gère les frames synchronisé des liquides
+    for i, v in pairs(blocs.liquid) do
+        v.active = false
+        
+        if time > v.frame then
+            v.frame = v.frame + v.refreshRate
+            v.active = true
+        end
+    end
+    
     --Itère à travers tous les blocs dans l'ordre décroissant de remplissage
     for i, b in spairs(room.blocs, function(t, a, b) return t[b].fillingRate < t[a].fillingRate end) do
-        
-        if time > b.frame then
-            b.frame = b.frame + b.refreshRate
-            
-            if b.isGravityAffected then
-                b:moveY(1)
-            end
-            
-            if b.isLiquid then
-                b:flow()
-            end
-        end
         
         --Si le bloc est déclenché au bout d'un moment
         if b.isTimely then
@@ -140,7 +154,33 @@ blocs.update = function(dt)--Vérification des événements des blocs
                 end
             end
         end
+        
+        if b.isLiquid then
+            --Si le lquide en question peut couler
+            if blocs.liquid[b.name].active then
+                b:flow()
+            end
+        elseif time > b.frame then
+            b.frame = b.frame + b.refreshRate
+            
+            if b.isGravityAffected then
+                b:moveY(1)
+            end
+        end
+        
+        if type(b) == "number" then print("WHAOU") end
     end
+    
+    --Trie les blocs à supprimer
+    table.sort(blocs.toDelete, function(a,b) return b < a end)
+    
+    --Itère à travers tous les blocs
+    for i, b in pairs(blocs.toDelete) do
+        --Supprime les blocs qui doivent être supprimé
+        table.remove(room.blocs, b)
+    end
+    
+    blocs.toDelete = {}
 end
 
 
@@ -175,7 +215,6 @@ blocs.draw = function()--Dessine les blocs
                 --lg.rectangle("line", x, y, blocs.size, blocs.size)
                 lg.print("x" .. b.x .. " y" .. b.y , x, y)
                 lg.print("id:"..b.id, x, y + 10)
---                lg.print(string.format("%d frame/s", b.frame), x, y + 20)
                 if b.isTimely then
                     lg.print(string.format("%d ms", b.ttl), x, y + 20)
                 end
@@ -183,7 +222,7 @@ blocs.draw = function()--Dessine les blocs
                     lg.print(table.concat(b.imgCardinality), x, y + 30)
                 end
                 if b.isLiquid then
-                    lg.print(b.fillingRate, x, y + 40)
+                    lg.print(string.format("%.2f", b.fillingRate), x, y + 40)
                 end
             end
         end
