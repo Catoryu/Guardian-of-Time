@@ -58,8 +58,9 @@ debug = {}
 debug.visible = true
 debug.font = src.font.consola
 debug.color = {0, 200, 0}
-debug.helpText = lg.newCanvas(300, 220)
-lg.setCanvas(debug.helpText)
+debug.mouseHelpText = lg.newCanvas(300, 220)
+debug.gamepadHelpText = lg.newCanvas(300, 140)
+lg.setCanvas(debug.mouseHelpText)
     love.graphics.clear()
     lg.setFont(debug.font)
     lg.setColor(180, 180, 180, 200)
@@ -76,3 +77,22 @@ lg.setCanvas(debug.helpText)
     lg.print("[Backspace] Supprime le dernier bloc", 10, 170)
     lg.print("[ESC] Quitte le programme", 10, 190)
 lg.setCanvas()
+
+lg.setCanvas(debug.gamepadHelpText)
+    love.graphics.clear()
+    lg.setFont(debug.font)
+    lg.setColor(180, 180, 180, 200)
+    lg.rectangle("fill", 0, 0, 300, 140)
+    lg.setColor(0, 0, 0)
+    lg.print("Controls : ", 10, 10)
+    lg.print("[BACK] Permet d'afficher/cacher les menus", 10, 30)
+    lg.print("[X] Permet d'afficher/cacher la grille", 10, 50)
+    lg.print("[LB] Supprime la dernière entité", 10, 70)
+    lg.print("[RB] Supprime le dernier bloc", 10, 90)
+    lg.print("[START] Quitte le programme", 10, 110)
+lg.setCanvas()
+
+--Valeurs utile à la manette
+gamepad = {}
+gamepad.joystick = love.joystick.getJoysticks()[1]
+gamepad.offset = 0.4

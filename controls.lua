@@ -1,3 +1,20 @@
+--[[Liste des contrôles
+[W][A] Saute
+[S][LS vers le bas] Se baisse (pas encore implémenté)
+[A][LS vers le bas] Va à gauche
+[D][LS vers le bas] Va a droite
+
+[TAB][BACK] Permet d'afficher/cacher les menus
+[G][X] Permet d'afficher/cacher la grille
+[clic gauche] Permet de créer une entité
+[clic droit] Permet de créer un bloc
+[molette] Change l'entité créé
+[shift + molette] Change le bloc créé
+[DELETE][LB] Supprime la dernière entité
+[Backspace][RB] Supprime le dernier bloc
+[ESC][START] Quitte le programme
+]]--
+
 mouse = {}
 mouse.x = 0
 mouse.y = 0
@@ -10,32 +27,94 @@ selectedEntity = 3
 selectedBloc = 1
 inputs = {}
 
---[[Liste des contrôles
-[W] Saute
-[S] Se baisse (pas encore implémenté)
-[A] Va à gauche
-[D] Va a droite
+--Définit quel périphérique est utilisé (clavier/souris[0] ou manette[1])
+currentInput = 0
 
-[TAB] Permet d'afficher/cacher les menus
-[G] Permet d'afficher/cacher la grille
-[clic gauche] Permet de créer une entité
-[clic droit] Permet de créer un bloc
-[molette] Change l'entité créé
-[shift + molette] Change le bloc créé
-[DELETE] Supprime la dernière entité
-[Backspace] Supprime le dernier bloc
-[ESC] Quitte le programme
-]]--
+--Table contenant toutes les fonctions liés aux contrôles
+controls = {}
 
-function controls(dt)--Une touche du clavier est enfoncé
+controls.update = function(dt)--Une touche est enfoncée
+    --Clavier souris--
+    
     --Permet de bouger toutes les entités [Temporaire]
     if keyDown("left") then entities.moveX(-220*dt) end
     if keyDown("right") then entities.moveX(220*dt) end
     if keyDown("up") then entities.moveY(-220*dt) end
     if keyDown("down") then entities.moveY(220*dt) end
+    
+    --Manette--
+    local x = gamepad.joystick:getGamepadAxis("leftx")
+    local y = gamepad.joystick:getGamepadAxis("lefty")
+    
+    --Se baisse
+    if y > gamepad.offset then
+        currentInput = 1
+        table.insert(inputs, 2)
+    else
+        for i, v in pairs(inputs) do if v == 2 then table.remove(inputs, i) end end
+    end
+    
+    --Va à gauche
+    if x < -gamepad.offset then
+        currentInput = 1
+        player.moveX( - player.moveSpd * dt)
+    end
+    
+    --Va à droite
+    if x > gamepad.offset then
+        currentInput = 1
+        player.moveX(player.moveSpd * dt)
+    end
 end
 
+--[[Manette]]--
+
+function love.gamepadpressed(joy, button)
+    --Actualise le dernier périphérique utilisé
+    currentInput = 1
+    
+    --Saute
+    if button == "a" then
+        player.jumpKeyDownTime = 0
+        player.jumpKeyDown = true
+        player.jump()
+    end
+    
+    --Affiche/cache la grille
+    if button == "x" then player.showGrid = not player.showGrid end
+    
+    --Quitte le programme
+    if button == "start" then love.event.quit() end
+    
+    --Affiche/cache les informations de déboguage
+    if button == "back" then debug.visible = not debug.visible end
+    
+    --Supprime la dernière entité
+    if button == "leftshoulder" then table.remove(room.entities, #room.entities)end
+    
+    --Supprime le dernier bloc et recalcul les cardinalités
+    if button == "rightshoulder" and #room.blocs > 0 then
+        room.blocs[#room.blocs] = blocs.calculateCardinality(room.blocs[#room.blocs], true)
+        blocs.pop(room.blocs[#room.blocs].x, room.blocs[#room.blocs].y)
+    end
+end
+
+function love.gamepadreleased(joy, button)
+    --Actualise le dernier périphérique utilisé
+    currentInput = 1
+    
+    --Saute
+    if button == "a" then
+        player.jumpKeyDown = false
+    end
+end
+
+--[[Clavier souris]]--
+
 function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
+    --Actualise le dernier périphérique utilisé
+    currentInput = 0
+    
     --Saute
     if key == "w" or key == "space" then
         player.jumpKeyDownTime = 0
@@ -94,7 +173,7 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     if key == "delete" then table.remove(room.entities, #room.entities)end
     
     --Supprime le dernier bloc et recalcul les cardinalités
-    if key == "backspace" then
+    if key == "backspace" and #room.blocs > 0 then
         room.blocs[#room.blocs] = blocs.calculateCardinality(room.blocs[#room.blocs], true)
         blocs.pop(room.blocs[#room.blocs].x, room.blocs[#room.blocs].y)
     end
@@ -123,6 +202,9 @@ function love.keyreleased(key)--Une touche du clavier viens d'être relachée
 end
 
 function love.mousepressed(x, y, button)--Un bouton de la souris viens d'être enfoncé
+    --Actualise le dernier périphérique utilisé
+    currentInput = 0
+    
     --Clic gauche (créé une entité)
     if button == 1 then
         mouse.firstX, mouse.firstY = love.mouse.getPosition()
@@ -133,6 +215,9 @@ function love.mousepressed(x, y, button)--Un bouton de la souris viens d'être e
 end
 
 function love.mousereleased(_, _, button)--Un bouton de la souris viens d'être relaché
+    --Actualise le dernier périphérique utilisé
+    currentInput = 0
+    
     --Création d'une entité lorsqu'on relâche le clic de la souris
     mouse.secondX, mouse.secondY = love.mouse.getPosition()
 
@@ -151,6 +236,9 @@ function love.mousereleased(_, _, button)--Un bouton de la souris viens d'être 
 end
 
 function love.wheelmoved(_, y)--La molette de la souris est bougée
+    --Actualise le dernier périphérique utilisé
+    currentInput = 0
+    
     --Si la touche "shift" est enfoncée
     if keyDown("lshift") or keyDown("rshift") then
         --Selon la direction de la molette, change le bloc séléctionné

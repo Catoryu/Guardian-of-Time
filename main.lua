@@ -45,7 +45,7 @@ function love.update(dt)--Actualisation du jeu
     if dt < 0.2 then
         player.update(dt)
         rooms.update(dt)
-        controls(dt)
+        controls.update(dt)
     else
         --Permet de ne pas faire avancer le joueur dans le vide après avoir bouger la fenêtre
         inputs = {}
@@ -67,7 +67,11 @@ function love.draw()--Affichage du jeu
     if debug.visible then
         love.graphics.setBlendMode("alpha", "premultiplied")
         lg.setColor(255, 255, 255, 255)
-        lg.draw(debug.helpText, 10, 400)
+        if currentInput == 0 then
+            lg.draw(debug.mouseHelpText, 10, 400)
+        else
+            lg.draw(debug.gamepadHelpText, 10, 400)
+        end
         love.graphics.setBlendMode("alpha")
         
         lg.setFont(debug.font)
