@@ -25,28 +25,13 @@ rooms.draw = function()--Dessine tous les objets de la salle
     events.draw()
 end
 
-rooms.moveCameraX = function(moveSpeed)--Mouvement horizontal de la caméra
-    local deltaX = 0
-
-    --Marge d'erreur mouvement de la salle
-    if room.x + moveSpeed > 0 then
-        deltaX = room.x
-        room.x = room.x - deltaX
-        for i, e in pairs(room.entities) do
-            e.x = e.x - deltaX
-        end
-        player.x = player.x - deltaX
-        return
-    elseif room.x + room.wth + moveSpeed < wdow.wth then
-        deltaX = room.x + room.wth - wdow.wth
-        room.x = room.x - deltaX
-        for i, e in pairs(room.entities) do
-            e.x = e.x - deltaX
-        end
-        player.x = player.x - deltaX
-        return
-    end
-
+local moveAllX = function(moveSpeed)--Déplace tous les objets de la salle (horizontalement)
+    --Bouge la salle (donc les blocs avec)
+    room.x = room.x + moveSpeed
+    
+    --Bouge le joueur
+    player.x = player.x + moveSpeed
+    
     --Bouge les entités
     for i, e in pairs(room.entities) do
         e.x = e.x + moveSpeed
@@ -61,33 +46,15 @@ rooms.moveCameraX = function(moveSpeed)--Mouvement horizontal de la caméra
     for i, v in pairs(weathers.drops) do
         v.x = v.x + moveSpeed
     end
-    
-    --Bouge la salle (donc les blocs avec)
-    room.x = room.x + moveSpeed
 end
 
-rooms.moveCameraY = function(moveSpeed)--Mouvement vertical de la caméra
-    local deltaY = 0
-
-    --Marge d'erreur mouvement de la salle
-    if room.y + moveSpeed > 0 then
-        deltaY = room.y
-        room.y = room.y - deltaY
-        for i, c in pairs(room.entities) do
-            c.y = c.y - deltaY
-        end
-        player.y = player.y - deltaY
-        return
-    elseif room.y + room.hgt + moveSpeed < wdow.hgt then
-        deltaY = room.y + room.hgt - wdow.hgt
-        room.y = room.y - deltaY
-        for i, c in pairs(room.entities) do
-            c.y = c.y - deltaY
-        end
-        player.y = player.y - deltaY
-        return
-    end
-
+local moveAllY = function(moveSpeed)--Déplace tous les objets de la salle (verticalement)
+    --Bouge la salle (donc les blocs avec)
+    room.y = room.y + moveSpeed
+    
+    --Bouge le joueur
+    player.y = player.y + moveSpeed
+    
     --Bouge les entités
     for i, e in pairs(room.entities) do
         e.y = e.y + moveSpeed
@@ -102,7 +69,26 @@ rooms.moveCameraY = function(moveSpeed)--Mouvement vertical de la caméra
     for i, v in pairs(weathers.drops) do
         v.y = v.y + moveSpeed
     end
+end
 
-    --Bouge la salle (donc les blocs avec)
-    room.y = room.y + moveSpeed
+--Recentre le centre de la fenêtre vers la coordoné donné en paramètre
+rooms.refreshCamera = function(x, y)
+    
+    --Calcul la différence entre le point choisi et l'ancien
+    local dx = wdow.wth/2 - x
+    local dy = wdow.hgt/2 - y
+    
+    --Vérifie si les coordonés sont dans la salle
+    if (x < room.x + wdow.wth/2 or x > room.x + room.wth - wdow.wth/2) then
+        dx = 0
+    end
+    
+    --Vérifie si les coordonés sont dans la salle
+    if (y < room.y + wdow.hgt/2 or y > room.y + room.hgt - wdow.hgt/2) then
+        dy = 0
+    end
+    
+    --Bouge tous les éléments de la salle
+    moveAllX(dx)
+    moveAllY(dy)
 end

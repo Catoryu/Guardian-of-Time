@@ -193,6 +193,9 @@ bloc_class = {
             elseif direction == 2 then--Bas
                 self.y = self.y + 1
             elseif direction == 3 then--Gauche
+                --Test si le joueur est en contact
+                
+                --Crée le liquide
                 blocs.push(bloc[self.id]:new({x = self.x - 1, y = self.y, fillingRate = quantity}))
                 quantity = 0
             elseif direction == 4 then--Droit
@@ -415,6 +418,7 @@ bloc = {
         viscousRate = 30,
         colors = {228, 206, 64, 255},
         isLiquid = true,
+        isSolid = true,
         fillingRate = 100,
     }),
 

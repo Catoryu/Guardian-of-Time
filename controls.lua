@@ -37,10 +37,28 @@ controls.update = function(dt)--Une touche est enfoncée
     --Clavier souris--
     
     --Permet de bouger toutes les entités [Temporaire]
-    if keyDown("left") then entities.moveX(-220*dt) end
-    if keyDown("right") then entities.moveX(220*dt) end
-    if keyDown("up") then entities.moveY(-220*dt) end
-    if keyDown("down") then entities.moveY(220*dt) end
+    if keyDown("left") then
+        for i, v in pairs(room.entities) do
+            v:moveX(-220*dt)
+        end
+    end
+    if keyDown("right") then
+        for i, v in pairs(room.entities) do
+            v:moveX(220*dt)
+        end
+    end
+    
+    if keyDown("up") then
+        for i, v in pairs(room.entities) do
+            v:moveY(-220*dt)
+        end
+    end
+    
+    if keyDown("down") then
+        for i, v in pairs(room.entities) do
+            v:moveY(220*dt)
+        end
+    end
     
     --Manette--
     local x = gamepad.joystick:getGamepadAxis("leftx")

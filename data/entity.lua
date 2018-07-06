@@ -7,7 +7,104 @@ entity_class = {
     canSwim = false,
     colors = {255, 255, 255, 255},
     ttl = nil, --valeur en ms
-    solidResistance = 100 --pourcentage de ralentissement lorsqu'on traverse l'entité (100 = solide)
+    solidResistance = 100, --pourcentage de ralentissement lorsqu'on traverse l'entité (100 = solide)
+    
+    moveX = function (self, moveSpeed)--Gère le mouvement horizontal des entités
+        if self.solidResistance == 100 then
+            local canMove = false
+            
+            if moveSpeed < 0 then
+                --Collision coté gauche entités
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt - 1, self.x + moveSpeed, self.y, self.wth, self.hgt) == 3 then
+                    if player.moveX(self.x + moveSpeed - (player.x + player.wth)) then canMove = true end
+                else
+                    canMove = true
+                end
+            elseif moveSpeed > 0 then
+                --Collision coté droit entités
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt - 1, self.x + moveSpeed, self.y, self.wth, self.hgt) == 4 then
+                    if player.moveX((self.x + moveSpeed + self.wth) - player.x) then canMove = true end
+                else
+                    canMove = true
+                end
+            end
+            
+            if canMove then
+                self.x = self.x + moveSpeed
+                
+                --Test si le joueur est sur l'entité lorsqu'elle se déplace
+                if (player.y + player.hgt == self.y) and (player.x < self.x - moveSpeed + self.wth and player.x + player.wth > self.x) then
+                    player.moveX(moveSpeed)
+                end
+            else
+                --Affiche un message
+                print("Le joueur est ecrase par une entite avec une vitesse de "..moveSpeed.." x !!")
+                
+                --Replace l'entité
+                if self.x > player.x + player.wth then
+                    self.x = player.x + player.wth
+                elseif self.x + self.wth < player.x then
+                    self.x = player.x - self.wth
+                end
+            end
+        else
+            self.x = self.x + moveSpeed
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, self.x, self.y, self.wth, self.hgt) ~= 0 then
+                player.moveX(moveSpeed * self.solidResistance / 100, true)
+            end
+        end
+    end,
+    
+    moveY = function(self, moveSpeed)--Gère le mouvement vertical des entités
+        if self.solidResistance == 100 then
+            local canMove = false
+            
+            --L'entité monte
+            if moveSpeed < 0 then
+                --Collisions coté haut des entités
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, self.x, self.y + moveSpeed, self.wth, self.hgt) == 1 then
+                    if player.moveY(moveSpeed) then canMove = true end
+                else
+                    canMove = true
+                end
+                
+            --L'entité déscend
+            elseif moveSpeed > 0 then
+                --Collisions coté bas des entités
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, self.x, self.y + moveSpeed, self.wth, self.hgt) == 2 then
+                    if player.moveY(moveSpeed) then canMove = true end
+                else
+                    canMove = true
+                end
+            end
+            
+            if canMove then
+                --Déplace l'entité
+                self.y = self.y + moveSpeed
+                
+                --Test si le joueur est sur l'entité lorsqu'elle se déplace
+                if (player.y + player.hgt == self.y - moveSpeed) and (player.x < self.x + self.wth and player.x + player.wth > self.x) then
+                    player.moveY(moveSpeed)
+                end
+            else
+                --Affiche un message
+                print("Le joueur est ecrase par une entite avec une vitesse de "..moveSpeed.." y !!")
+                
+                --Replace l'entité
+                if self.y > player.y + player.hgt then
+                    self.y = player.y + player.hgt
+                elseif self.y + self.hgt < player.y then
+                    self.y = player.y - self.hgt
+                end
+            end
+            
+        else
+            self.y = self.y + moveSpeed
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, self.x, self.y, self.wth, self.hgt) ~= 0 then
+                player.moveY(moveSpeed * self.solidResistance / 100, true)
+            end
+        end
+    end
 }
 
 --Un peu de magie dans ce monde de brutes
