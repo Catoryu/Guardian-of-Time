@@ -203,7 +203,7 @@ blocs.draw = function()--Dessine les blocs
             else
                 lg.setColor(255, 255, 255)
                 if b.imgLink then
-                    lg.draw(src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x, y)
+                    lg.draw(src.img.bloc[b.img], src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x, y)
                 else
                     lg.draw(src.img.bloc[b.img], x, y)
                 end
