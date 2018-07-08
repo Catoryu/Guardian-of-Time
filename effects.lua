@@ -9,10 +9,18 @@ effects.list = {"boxblur", "chromasep", "colorgradesimple", "crt", "desaturate",
 "filmgrain", "gaussianblur", "glow", "godsray", "pixelate", "posterize", "scanlines", "sketch", "vignette"}
 
 effects.trigger = function(effectId, duration)--Déclenche un effet pendant une certaine période
-    effects.current = {raw = effect[effectId].raw, fade = effect[effectId].fade, duration = duration, durationBase = duration}
+    effects.current = effect[effectId]:new({
+        duration = duration,
+        durationBase = duration
+    })
     
-    --Active tous les effets
-    effects.current.raw.enable(unpack(effects.list))
+    --Initialise l'effet
+    effects.initialize(effects.current)
+end
+
+effects.initialize = function(effect)
+    effect.raw.enable(unpack(effects.list))
+    effect.raw.parameters = effect.parameters
 end
 
 effects.update = function(dt)

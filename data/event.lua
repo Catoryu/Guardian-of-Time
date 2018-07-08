@@ -7,10 +7,21 @@ event_class = {
     hgt = 0,
     ttl = 0, --Durée de vie de l'event (valeur en ms)
     room = 0,
-    ttlReach = false,--Définit si l'événement est déclenché par le temps
-    touch = false,--Définit si l'événement est déclenché par le contact avec le joueur
-    onTtlReach = false,--Définit les instructions si l'événement est déclenché par le temps
-    onTouch = false--Définit les instructions si l'événement est déclenché par un contact avec le joueur
+    isRoomReseted = false, --Définit si l'événement est réinitialisé si on change de salle
+    isPlayerIn = false, --Définit si le joueur se situe dans l'événement
+    
+    --Définit quel fonction sont activé
+    activeEvent = {
+        ttlReach = false,
+        touch = false,
+        enter = false,
+        leave = false
+    },
+    
+    onTtlReach = false, --Définit les instructions si l'événement est déclenché par le temps
+    onTouch = false, --Définit les instructions si l'événement est déclenché par un contact avec le joueur
+    onEnter = false, --Définit les instructions si l'événement est déclenché par l'entrée en contact avec le joueur
+    onLeave = false --Définit les instructions si l'événement est déclenché par la sortie du contact avec le joueur
 }
 
 --Un peu de magie dans ce monde de brutes
@@ -25,37 +36,41 @@ function event_class:new (t)
 end
 
 event = {
-    --Active la pluie
+    --Inverse la pluie (normal <---> forte)
     event_class:new({
         id = 1,
-        touch = true,
-        onTouch = function(self)
-            print(string.format("Evenement 1 declenche a %.2f s", time))
-            weathers.id = 2
+        isRoomReseted = true,
+        activeEvent = {
+            enter = true
+        },
+        onEnter = function(self)
+            print(("Evenement 1 declenche a %.2f s"):format(time))
+            weathers.id = (weathers.id == 1) and 2 or 1
             weathers.load()
-            self.touch = false
         end,
     }),
 
     --Active l'effet "flashbang"
     event_class:new({
         id = 2,
-        touch = true,
-        onTouch = function(self)
-            print(string.format("Evenement 2 declenche a %.2f s", time))
+        activeEvent = {
+            enter = true
+        },
+        onEnter = function(self)
+            print(("Evenement 2 declenche a %.2f s"):format(time))
             effects.trigger(1, 1300)
-            self.touch = false
         end,
     }),
 
     --Active l'effet de brulure
     event_class:new({
         id = 3,
-        touch = true,
-        onTouch = function(self)
-            print(string.format("Evenement 3 declenche a %.2f s", time))
+        activeEvent = {
+            enter = true
+        },
+        onEnter = function(self)
+            print(("Evenement 3 declenche a %.2f s"):format(time))
             effects.trigger(2, 3000)
-            self.touch = false
         end,
     })
 }

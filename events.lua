@@ -8,18 +8,35 @@ events.update = function(dt)--Vérification du déclenchement des événements
         --Si l'événement est dans la même salle du joueur
         if v.room == chapter.roomNumber then
             
-            --Si l'événement est déclenché par un contact par le joueur
-            if v.touch then
+            --Test si le joueur touche l'événement
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
                 
-                --Test si le joueur touche l'événement
-                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-                    --Déclenche l'événement
+                if not v.isPlayerIn then
+                    --Déclenche l'événement correspondant
+                    if v.activeEvent.enter then
+                        v:onEnter()
+                    end
+                    
+                    v.isPlayerIn = true
+                end
+                
+                --Déclenche l'événement correspondant
+                if v.activeEvent.touch then
                     v:onTouch()
+                end
+            else
+                if v.isPlayerIn then
+                    --Déclenche l'événement correspondant
+                    if v.activeEvent.leave then
+                        v:onLeave()
+                    end
+                    
+                    v.isPlayerIn = false
                 end
             end
             
             --Si l'événement est déclenché au bout d'un moment
-            if v.ttlReach then
+            if v.activeEvent.ttlReach then
                 
                 --Diminue la durée avant que l'événement commence
                 v.ttl = v.ttl - dt
@@ -41,6 +58,7 @@ events.draw = function()--Debug, ne sera pas la dans la version finale
     for i, v in pairs(chapter.events) do
         if v.room == chapter.roomNumber then
             lg.rectangle("line", v.x, v.y, v.wth, v.hgt)
+            lg.print(tostring(v.isPlayerIn), v.x, v.y)
         end
     end
 end
