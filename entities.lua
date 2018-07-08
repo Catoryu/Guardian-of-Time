@@ -24,6 +24,7 @@ end
 entities.draw = function()--Dessine les entités
     for i, v in pairs(room.entities) do
         lg.setColor(unpack(v.colors))
+        
         lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)
         
         lg.setFont(debug.font)

@@ -4,10 +4,10 @@ function love.load()--Chargement du jeu
     keyDown = love.keyboard.isDown
     
     --[[Appel des autres fichiers]]--
+    dofile("assets/lobj.lua")
     dofile("functions.lua")
     dofile("load.lua")
     dofile("conf.lua")
-    dofile("assets/lobj.lua")
     dofile("controls.lua")
     dofile("rooms.lua")
     dofile("blocs.lua")
@@ -15,6 +15,7 @@ function love.load()--Chargement du jeu
     dofile("entities.lua")
     dofile("events.lua")
     dofile("weathers.lua")
+    dofile("effects.lua")
     
     --[[Variable global]]--
     gravity = 4000
@@ -46,6 +47,7 @@ function love.update(dt)--Actualisation du jeu
         player.update(dt)
         rooms.update(dt)
         controls.update(dt)
+        effects.update(dt)
     else
         --Permet de ne pas faire avancer le joueur dans le vide après avoir bouger la fenêtre
         inputs = {}
@@ -54,14 +56,16 @@ end
 
 function love.draw()--Affichage du jeu
     
-    --Dessine la salle
-    rooms.draw()
-    
-    --Dessine le joueur
-    player.draw()
-    
-    --Dessine la météo
-    weathers.draw()
+    effects.current.raw.draw(function()
+        --Dessine la salle
+        rooms.draw()
+        
+        --Dessine le joueur
+        player.draw()
+        
+        --Dessine la météo
+        weathers.draw()
+    end)
 
     --[[Debug]]--
     if debug.visible then

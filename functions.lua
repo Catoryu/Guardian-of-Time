@@ -134,3 +134,21 @@ spairs = function(t, order)--Permet de trier les valeurs d'une table
         end
     end
 end
+
+mergeColors = function(color1, color2)--Combine deux couleurs
+    color = {0, 0, 0, 0}
+    
+    --Si une valeur n'est pas défini, passe à 255
+    for i = 1, 4 do
+        if not color1[i] then color1[i] = 255 end
+        if not color2[i] then color2[i] = 255 end
+    end
+    
+    --Rouge, vert, bleu, alpha
+    color[1] = (color1[1] + color2[1]) / 2
+    color[2] = (color1[2] + color2[2]) / 2
+    color[3] = (color1[3] + color2[3]) / 2
+    color[4] = (color1[4] + color2[4]) / 2
+    
+    return color
+end

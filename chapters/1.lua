@@ -6,7 +6,9 @@ chapter.rooms = {}
 chapter.events = {}
 
 --Events
-table.insert(chapter.events, event[1]:new({x = 200, y = 200, wth = 100, hgt = 100, room = 1}))
+table.insert(chapter.events, event[1]:new({x = 600, y = 400, wth = 100, hgt = 100, room = 1}))
+table.insert(chapter.events, event[2]:new({x = 500, y = 600, wth = 100, hgt = 100, room = 1}))
+table.insert(chapter.events, event[3]:new({x = 700, y = 600, wth = 100, hgt = 100, room = 1}))
 
 --[[Room 1]]--
 chapter.rooms[1] = function()
@@ -18,7 +20,7 @@ chapter.rooms[1] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {3, 0, 0, 2}
-    room.filter = {255, 255, 255, 255}
+    room.colors = {255, 255, 255, 0}
     room.blocs = {}
     room.entities = {}
     weathers.id = 1
@@ -37,7 +39,7 @@ chapter.rooms[2] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {4, 0, 1, 0}
-    room.filter = {255, 200, 200, 150}
+    room.colors = {50, 20, 20, 100}
     room.blocs = {}
     room.entities = {}
     weathers.id = 2
@@ -53,7 +55,7 @@ chapter.rooms[3] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {0, 1, 0, 4}
-    room.filter = {255, 255, 255, 255}
+    room.colors = {255, 255, 255, 0}
     room.blocs = {}
     room.entities = {}
     room.events = {}
@@ -70,7 +72,7 @@ chapter.rooms[4] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {0, 2, 3, 0}
-    room.filter = {255, 255, 255, 255}
+    room.colors = {255, 255, 255, 0}
     room.blocs = {}
     room.entities = {}
     room.events = {}

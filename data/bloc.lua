@@ -10,6 +10,7 @@ bloc_class = {
     isDestructible = false,
     isGravityAffected = false,
     fillingRate = 0,
+    fillingRateMin = 0, --Minimum de % de remplissage pour pouvoir déverser
     refreshRate = 0.05,
     viscousRate = 25,
     frame = 0,
@@ -275,7 +276,7 @@ bloc_class = {
         --Coule vers la gauche et la droite libre
         elseif canFlow[3] ~= 0 and canFlow[4] ~= 0 then
             --Si le bloc a assez de liquide, il le déverse
-            if self.fillingRate > self.viscousRate then
+            if self.fillingRate > self.fillingRateMin then
                 
                 --Calcul du montant à donner
                 local fillLoss = self.viscousRate * self.fillingRate / 100
@@ -294,7 +295,7 @@ bloc_class = {
         --Coule vers la gauche
         elseif canFlow[3] ~= 0 then
             --Si le bloc a assez de liquide, il le déverse
-            if self.fillingRate > self.viscousRate then
+            if self.fillingRate > self.fillingRateMin then
                 
                 --Calcul du montant à donner
                 local fillLoss = self.viscousRate * self.fillingRate / 100
@@ -310,7 +311,7 @@ bloc_class = {
         --Coule vers la droite
         elseif canFlow[4] ~= 0 then
             --Si le bloc a assez de liquide, il le déverse
-            if self.fillingRate > self.viscousRate then
+            if self.fillingRate > self.fillingRateMin then
                 
                 --Calcul du montant à donner
                 local fillLoss = self.viscousRate * self.fillingRate / 100
@@ -407,6 +408,7 @@ bloc = {
         id = 5,
         name = "water",
         viscousRate = 10,
+        fillingRateMin = 5,
         colors = {51, 153, 255, 150},
         isLiquid = true,
         fillingRate = 100,
@@ -415,7 +417,8 @@ bloc = {
     bloc_class:new({
         id = 6,
         name = "sand",
-        viscousRate = 30,
+        viscousRate = 10,
+        fillingRateMin = 40,
         colors = {228, 206, 64, 255},
         isLiquid = true,
         isSolid = true,

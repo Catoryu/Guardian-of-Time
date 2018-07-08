@@ -13,7 +13,7 @@ blocs.toDelete = {}
 --Synchronise l'actualisation des liquides
 blocs.liquid = {}
 blocs.liquid.water = {frame = 0, refreshRate = 0.01, active = false}
-blocs.liquid.sand = {frame = 0, refreshRate = 0.1, active = false}
+blocs.liquid.sand = {frame = 0, refreshRate = 0.05, active = false}
 
 blocs.exists = function(x, y)--Test si un bloc existe dans une certaine coordonné
     for i, b in pairs(room.blocs) do
@@ -185,8 +185,6 @@ end
 
 
 blocs.draw = function()--Dessine les blocs
-    lg.setColor(255, 255, 255)
-
     for i, b in pairs(room.blocs) do
         --Récupère les coordonnées du bloc
         local x, y = blocs.getPos(b.x, b.y)
@@ -198,10 +196,13 @@ blocs.draw = function()--Dessine les blocs
             --Si le bloc est un liquide
             if b.isLiquid then
                 lg.setColor(unpack(b.colors))
+                
                 lg.rectangle("fill", x, y + (100-(b.fillingRate*blocs.size/100) - blocs.size), blocs.size, (b.fillingRate*blocs.size/100))
+            
             --Si le bloc n'est pas liquide
             else
-                lg.setColor(255, 255, 255)
+                lg.setColor(255, 255, 255, 255)
+                
                 if b.imgLink then
                     lg.draw(src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x, y)
                 else

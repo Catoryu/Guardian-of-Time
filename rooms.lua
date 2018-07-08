@@ -9,9 +9,6 @@ rooms.update = function(dt)--Actualisation de la salle
 end
 
 rooms.draw = function()--Dessine tous les objets de la salle
-    --Affiche le filtre de la salle
-    lg.setColor(unpack(room.filter))
-    
     --Affiche l'image de fond
     lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x, room.y)
     
@@ -23,6 +20,10 @@ rooms.draw = function()--Dessine tous les objets de la salle
     
     --Affiche les événements (Debug)
     events.draw()
+    
+    --Affiche un filtre de couleur à la salle
+    lg.setColor(unpack(room.colors))
+    lg.rectangle("fill", 0, 0, wdow.wth, wdow.hgt)
 end
 
 local moveAllX = function(moveSpeed)--Déplace tous les objets de la salle (horizontalement)

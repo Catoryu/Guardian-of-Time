@@ -89,8 +89,9 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         if player.x + moveSpeed < 0 then
             if room.cardinality[3] == 0 then
                 --Se bloque à la sortie de l'écran
-                player.x = 0
-                return false
+                if player.x < dx then
+                    dx = player.x
+                end
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[3]
@@ -171,8 +172,9 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         if player.x + moveSpeed + player.wth > wdow.wth then
             if room.cardinality[4] == 0 then
                 --Se bloque à la sortie de l'écran
-                player.x = wdow.wth - player.wth
-                return false
+                if wdow.wth - (player.x + player.wth) < dx then
+                    dx = wdow.wth - (player.x + player.wth)
+                end
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[4]
@@ -270,9 +272,9 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         if player.y + moveSpeed < 0 then
             if room.cardinality[1] == 0 then
                 --Se bloque à la sortie de l'écran
-                player.y = 0
-                player.ySpd = 0
-                return false
+                if player.y < dy then
+                    dy = player.y
+                end
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[1]
@@ -353,9 +355,9 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         if player.y + moveSpeed + player.hgt > wdow.hgt then
             if room.cardinality[2] == 0 then
                 --Se bloque à la sortie de l'écran
-                player.y = wdow.hgt - player.hgt
-                player.touchGround()
-                return false
+                if wdow.hgt - (player.y + player.hgt) < dy then
+                    dy = wdow.hgt - (player.y + player.hgt)
+                end
             else
                 --Change de salle
                 loadRoom(room.cardinality[2])
