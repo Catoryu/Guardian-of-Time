@@ -6,9 +6,11 @@ chapter.rooms = {}
 chapter.events = {}
 
 --Events
-table.insert(chapter.events, event[1]:new({x = 600, y = 400, wth = 100, hgt = 100, room = 1}))
-table.insert(chapter.events, event[2]:new({x = 500, y = 600, wth = 100, hgt = 100, room = 1}))
-table.insert(chapter.events, event[3]:new({x = 700, y = 600, wth = 100, hgt = 100, room = 1}))
+events.push(
+    event[1]:new({x = 600, y = 400, wth = 100, hgt = 100, room = 1}),
+    event[2]:new({x = 500, y = 400, wth = 100, hgt = 100, room = 1}),
+    event[3]:new({x = 700, y = 400, wth = 100, hgt = 100, room = 1})
+)
 
 --[[Room 1]]--
 chapter.rooms[1] = function()

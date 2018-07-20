@@ -13,6 +13,7 @@ bloc_class = {
     fillingRateMin = 0, --Minimum de % de remplissage pour pouvoir déverser
     refreshRate = 0.05,
     viscousRate = 25,
+    density = 0,
     frame = 0,
     hp = 0,
     img = "",
@@ -58,7 +59,7 @@ bloc_class = {
         self = nil
     end,
 
-    --reset les valeurs du bloc
+    --Reset les valeurs du bloc
     reset = function(self)
         self.ttl = 0
         self.isVisible = true
@@ -107,13 +108,20 @@ bloc_class = {
     end,
     
     moveY = function(self, moveSpeed)--Bouge le bloc verticalement
-        local canMove = false
+        local canMove = true
         
-        if self.y + moveSpeed <= room.rows and not blocs.exists(self.x, self.y + moveSpeed) then
-            canMove = true
+        
+        for i, b in pairs(room.blocs) do
+            if b.x == self.x and b.y == self.y + moveSpeed then
+                if b.density < self.density then
+                    b.y = b.y - moveSpeed
+                else
+                    canMove = false
+                end
+            end
         end
         
-        if canMove then
+        if canMove and self.y + moveSpeed <= room.rows then
             x, y = blocs.getPos(self.x, self.y + moveSpeed)
             
             --Test si le bloc touche le joueur
@@ -133,8 +141,79 @@ bloc_class = {
         end
     end,
     
+    forceflow = function(self)
+        --Haut, Bas, Gauche, Droite
+        --0 : Bloqué
+        --1 : Vide
+        --2 : Liquide
+        local canFlow = {0, 1, 1, 1}
+        
+        --Test où est-ce que le liquide peut couler--
+        for i, v in pairs(room.blocs) do
+            --Test si le bloc peut couler en bas
+            if self.x == v.x and self.y + 1 == v.y then
+                --Si c'est un liquide
+                if v.isLiquid and v.fillingRate ~= 100 and v.density <= self.density then
+                    canFlow[2] = 2
+                else
+                    canFlow[2] = 0
+                end
+            end
+            
+            --Test si le bloc peut couler à gauche
+            if self.x - 1 == v.x and self.y == v.y then
+                --Si c'est un liquide
+                if v.isLiquid and v.fillingRate ~= 100 and v.density <= self.density then
+                    canFlow[3] = 2
+                else
+                    canFlow[3] = 0
+                end
+            end
+            
+            --Test si le bloc peut couler à droite
+            if self.x + 1 == v.x and self.y == v.y then
+                --Si c'est un liquide
+                if v.isLiquid and v.fillingRate ~= 100 and v.density <= self.density then
+                    canFlow[4] = 2
+                else
+                    canFlow[4] = 0
+                end
+            end
+        end
+        
+        --Vérifie que le liquide ne coule pas dans les bord de la salle
+        if self.y + 1 > room.rows then canFlow[2] = 0 end--En bas
+        
+        if self.x - 1 < 1 then canFlow[3] = 0 end--A gauche
+        
+        if self.x + 1 > room.cols then canFlow[4] = 0 end--A droite
+        
+        --Fait couler le liquide--
+        
+        --Coule vers le bas libre
+        if canFlow[2] ~= 0 then
+            --Donne du liquide en bas
+            self:spread(2, canFlow[2] - 1, self.fillingRate)
+            
+        elseif canFlow[3] ~= 0 and canFlow[4] ~= 0 then
+            --Donne du liquide à gauche
+            self:spread(3, canFlow[3] - 1, self.fillingRate/2, true)
+            --Donne du liquide à droite
+            self:spread(4, canFlow[4] - 1, self.fillingRate/2, true)
+            
+        --Coule vers la gauche
+        elseif canFlow[3] ~= 0 then
+            --Donne du liquide à gauche
+            self:spread(3, canFlow[3] - 1, self.fillingRate, true)
+            
+        --Coule vers la droite
+        elseif canFlow[4] ~= 0 then
+            --Donne du liquide à droite
+            self:spread(4, canFlow[4] - 1, self.fillingRate, true)
+        end
+    end,
     
-    spread = function(self, direction, hasAlreadyBloc, quantity)
+    spread = function(self, direction, hasAlreadyBloc, quantity, forced)
         --hasAlreadyBloc :
         --0 : no
         --1 : yes
@@ -145,45 +224,107 @@ bloc_class = {
             elseif direction == 2 then--Bas
                 for i, b in pairs(room.blocs) do
                     if b.x == self.x and b.y == self.y + 1 then
-                        b.fillingRate = b.fillingRate + quantity
-                        
-                        if b.fillingRate > 100 then
-                            quantity = b.fillingRate - 100
-                            b.fillingRate = 100
+                        --Si c'est le même liquide
+                        if self.id == b.id then
+                            b.fillingRate = b.fillingRate + quantity
+                            
+                            if b.fillingRate > 100 then
+                                quantity = b.fillingRate - 100
+                                b.fillingRate = 100
+                            else
+                                quantity = 0
+                            end
+                            
+                        --Sinon détermine le liquide le plus lourd
                         else
-                            quantity = 0
+                            if self.density > b.density then
+                                --Fait couler le liquide avec la plus petite densité
+                                b:forceflow()
+                                
+                                --Déplace le bloc à supprimer dans un endroit invisible
+                                b.x = -1
+                                b.y = -1
+                                
+                                --Ajoute la position -1 -1 dans la table des blocs à supprimer
+                                table.insert(blocs.toDelete, i)
+                                
+                                --Déplace le bloc liquide
+                                self.y = self.y + 1
+                            end
                         end
                     end
                 end
             elseif direction == 3 then--Gauche
                 for i, b in pairs(room.blocs) do
                     if b.x == self.x - 1 and b.y == self.y then
-                        --Si le liquide essaye de se verser dans un bloc qui a plus de liquide, annulle le déversement
-                        if b.fillingRate > self.fillingRate then return quantity end
-                        
-                        b.fillingRate = b.fillingRate + quantity
-                        
-                        if b.fillingRate > 100 then
-                            quantity = b.fillingRate - 100
-                            b.fillingRate = 100
+                        --Si c'est le même liquide
+                        if self.id == b.id then
+                            
+                            --Si le liquide essaye de se verser dans un bloc qui a plus de liquide, annulle le déversement
+                            if not forced and b.fillingRate > self.fillingRate then return quantity end
+                            
+                            b.fillingRate = b.fillingRate + quantity
+                            
+                            if b.fillingRate > 100 then
+                                quantity = b.fillingRate - 100
+                                b.fillingRate = 100
+                            else
+                                quantity = 0
+                            end
+                            
+                        --Sinon détermine le liquide le plus lourd
                         else
-                            quantity = 0
+                            if self.density > b.density then
+                                --Fait couler le liquide avec la plus petite densité
+                                b:forceflow()
+                                
+                                --Déplace le bloc à supprimer dans un endroit invisible
+                                b.x = -1
+                                b.y = -1
+                                
+                                --Ajoute la position -1 -1 dans la table des blocs à supprimer
+                                table.insert(blocs.toDelete, i)
+                                
+                                --Crée un bloc liquide à la nou
+                                blocs.push(bloc[self.id]:new({x = self.x - 1, y = self.y, fillingRate = quantity}))
+                            end
                         end
                     end
                 end
             elseif direction == 4 then--Droit
                 for i, b in pairs(room.blocs) do
                     if b.x == self.x + 1 and b.y == self.y then
-                        --Si le liquide essaye de se verser dans un bloc qui a plus de liquide, annulle le déversement
-                        if b.fillingRate > self.fillingRate then return quantity end
-                        
-                        b.fillingRate = b.fillingRate + quantity
-                        
-                        if b.fillingRate > 100 then
-                            quantity = b.fillingRate - 100
-                            b.fillingRate = 100
+                        --Si c'est le même liquide
+                        if self.id == b.id then
+                            
+                            --Si le liquide essaye de se verser dans un bloc qui a plus de liquide, annulle le déversement
+                            if not forced and b.fillingRate > self.fillingRate then return quantity end
+                            
+                            b.fillingRate = b.fillingRate + quantity
+                            
+                            if b.fillingRate > 100 then
+                                quantity = b.fillingRate - 100
+                                b.fillingRate = 100
+                            else
+                                quantity = 0
+                            end
+                            
+                        --Sinon détermine le liquide le plus lourd
                         else
-                            quantity = 0
+                            if self.density > b.density then
+                                --Fait couler le liquide avec la plus petite densité
+                                b:forceflow()
+                                
+                                --Déplace le bloc à supprimer dans un endroit invisible
+                                b.x = -1
+                                b.y = -1
+                                
+                                --Ajoute la position -1 -1 dans la table des blocs à supprimer
+                                table.insert(blocs.toDelete, i)
+                                
+                                --Crée un bloc liquide à la nou
+                                blocs.push(bloc[self.id]:new({x = self.x + 1, y = self.y, fillingRate = quantity}))
+                            end
                         end
                     end
                 end
@@ -213,15 +354,15 @@ bloc_class = {
         --Haut, Bas, Gauche, Droite
         --0 : Bloqué
         --1 : Vide
-        --2 : Même liquide
+        --2 : Liquide
         local canFlow = {0, 1, 1, 1}
         
         --Test où est-ce que le liquide peut couler--
         for i, v in pairs(room.blocs) do
             --Test si le bloc peut couler en bas
             if self.x == v.x and self.y + 1 == v.y then
-                --Si c'est le même liquide
-                if self.id == v.id then
+                --Si c'est un liquide
+                if v.isLiquid and v.fillingRate ~= 100 and v.density <= self.density then
                     canFlow[2] = 2
                 else
                     canFlow[2] = 0
@@ -230,8 +371,8 @@ bloc_class = {
             
             --Test si le bloc peut couler à gauche
             if self.x - 1 == v.x and self.y == v.y then
-                --Si c'est le même liquide
-                if self.id == v.id then
+                --Si c'est un liquide
+                if v.isLiquid and v.fillingRate ~= 100 and v.density <= self.density then
                     canFlow[3] = 2
                 else
                     canFlow[3] = 0
@@ -240,15 +381,14 @@ bloc_class = {
             
             --Test si le bloc peut couler à droite
             if self.x + 1 == v.x and self.y == v.y then
-                --Si c'est le même liquide
-                if self.id == v.id then
+                --Si c'est un liquide
+                if v.isLiquid and v.fillingRate ~= 100 and v.density <= self.density then
                     canFlow[4] = 2
                 else
                     canFlow[4] = 0
                 end
             end
         end
-        
         
         --Vérifie que le liquide ne coule pas dans les bord de la salle
         if self.y + 1 > room.rows then canFlow[2] = 0 end--En bas
@@ -257,11 +397,11 @@ bloc_class = {
         
         if self.x + 1 > room.cols then canFlow[4] = 0 end--A droite
         
-        
         --Fait couler le liquide--
         
         --Coule vers le bas libre
         if canFlow[2] ~= 0 then
+            
             --Calcul du montant à donner
             local fillLoss = self.fillingRate
             local liquidNotspread = 0
@@ -271,10 +411,9 @@ bloc_class = {
             
             --Vide son liquide
             self.fillingRate = self.fillingRate - fillLoss + liquidNotspread
---            self.fillingRate = self.fillingRate - fillLoss
             
-        --Coule vers la gauche et la droite libre
         elseif canFlow[3] ~= 0 and canFlow[4] ~= 0 then
+            
             --Si le bloc a assez de liquide, il le déverse
             if self.fillingRate > self.fillingRateMin then
                 
@@ -291,7 +430,7 @@ bloc_class = {
                 --Vide son liquide
                 self.fillingRate = self.fillingRate - fillLoss + liquidNotspread
             end
-        
+            
         --Coule vers la gauche
         elseif canFlow[3] ~= 0 then
             --Si le bloc a assez de liquide, il le déverse
@@ -329,7 +468,7 @@ bloc_class = {
         if self.fillingRate <= 0 then blocs.pop(self.x, self.y) end
     end,
     
-    onScreen = function(self)
+    onScreen = function(self)--Test si le bloc est visible a l'écran
         local x, y = blocs.getPos(self.x, self.y)
         
         if (x + blocs.size > 0 and x - blocs.size < wdow.wth) and
@@ -359,7 +498,8 @@ bloc = {
         name = "solid",
         img = "stone",
         imgLink = true,
-        isSolid = true
+        isSolid = true,
+        density = 100
     }),
 
     --Bloc qui se détruit au toucher (dessus)
@@ -375,7 +515,8 @@ bloc = {
             blocs.pop(self.x, self.y)
             blocs.push(bloc[3]:new({x = self.x, y = self.y}))
         end,
-        rawOnTouch = function(self, direction) if direction == 1 then self.isTimely = true end end
+        rawOnTouch = function(self, direction) if direction == 1 then self.isTimely = true end end,
+        density = 100
     }),
 
     --Bloc qui apparait au bout d'un certain temps
@@ -393,7 +534,8 @@ bloc = {
                 blocs.pop(self.x, self.y)
                 blocs.push(bloc[2]:new({x = self.x, y = self.y}))
             end
-        end
+        end,
+        density = 100
     }),
 
     --WIP
@@ -401,7 +543,8 @@ bloc = {
     bloc_class:new({
         id = 4,
         name = "platform",
-        img = "woodPlatform"
+        img = "woodPlatform",
+        density = 100
     }),
 
     bloc_class:new({
@@ -412,6 +555,7 @@ bloc = {
         colors = {51, 153, 255, 150},
         isLiquid = true,
         fillingRate = 100,
+        density = 10
     }),
 
     bloc_class:new({
@@ -423,6 +567,7 @@ bloc = {
         isLiquid = true,
         isSolid = true,
         fillingRate = 100,
+        density = 20
     }),
 
     bloc_class:new({
@@ -431,6 +576,7 @@ bloc = {
         img = "sand",
         isGravityAffected = true,
         imgLink = true,
-        isSolid = true
+        isSolid = true,
+        density = 30
     })
 }

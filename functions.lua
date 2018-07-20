@@ -109,6 +109,13 @@ loadRoom = function(roomNumber)--Charge un salle
     
     --Chargement de la météo
     weathers.load()
+    
+    --Réinitialisation des événements
+    for i, v in pairs(chapter.events) do
+        if v.isRoomReseted and v.room == roomNumber then
+            chapter.events[i] = event[v.id]:new({x = v.x, y = v.y, wth = v.wth, hgt = v.hgt, room = v.room})
+        end
+    end
 end
 
 spairs = function(t, order)--Permet de trier les valeurs d'une table

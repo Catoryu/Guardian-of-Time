@@ -406,7 +406,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
                     if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) == 1 then
                         b:onTouch(1)
                         if b.isSolid then
-                            if y + (blocs.size - liquidHeight) - (player.y + player.hgt) < dy then
+                            if (y + (blocs.size - liquidHeight)) - (player.y + player.hgt) < dy then
                                 dy = (y + (blocs.size - liquidHeight)) - (player.y + player.hgt)
                             end
                         end

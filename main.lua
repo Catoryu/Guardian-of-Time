@@ -36,20 +36,20 @@ function love.load()--Chargement du jeu
 end
 
 function love.update(dt)--Actualisation du jeu
-    --Incrémente le temps
-    time = time + dt
-    
     --Actualise l'affichage de la souris
     mouse.x, mouse.y = love.mouse.getPosition()
     
     --Fait tourner le jeu uniquement lorsque l'utilisateur ne bouge pas la fenêtre
     if dt < 0.2 then
+        --Incrémente le temps
+        time = time + dt
+        
         player.update(dt)
         rooms.update(dt)
         controls.update(dt)
         effects.update(dt)
     else
-        --Permet de ne pas faire avancer le joueur dans le vide après avoir bouger la fenêtre
+        --Permet de ne pas faire avancer le joueur dans le vide après avoir bougé la fenêtre
         inputs = {}
     end
 end

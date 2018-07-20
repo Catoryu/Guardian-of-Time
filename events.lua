@@ -3,6 +3,12 @@ dofile("data/event.lua")
 --Table qui contient tous les fonctions concernant les événements
 events = {}
 
+events.push = function(...)
+    for _, eventValues in pairs({...}) do
+        table.insert(chapter.events, eventValues)
+    end
+end
+
 events.update = function(dt)--Vérification du déclenchement des événements
     for i, v in pairs(chapter.events) do
         --Si l'événement est dans la même salle du joueur
@@ -13,7 +19,7 @@ events.update = function(dt)--Vérification du déclenchement des événements
                 
                 if not v.isPlayerIn then
                     --Déclenche l'événement correspondant
-                    if v.activeEvent.enter then
+                    if v.enter then
                         v:onEnter()
                     end
                     
@@ -21,13 +27,13 @@ events.update = function(dt)--Vérification du déclenchement des événements
                 end
                 
                 --Déclenche l'événement correspondant
-                if v.activeEvent.touch then
+                if v.touch then
                     v:onTouch()
                 end
             else
                 if v.isPlayerIn then
                     --Déclenche l'événement correspondant
-                    if v.activeEvent.leave then
+                    if v.leave then
                         v:onLeave()
                     end
                     
@@ -36,7 +42,7 @@ events.update = function(dt)--Vérification du déclenchement des événements
             end
             
             --Si l'événement est déclenché au bout d'un moment
-            if v.activeEvent.ttlReach then
+            if v.ttlReach then
                 
                 --Diminue la durée avant que l'événement commence
                 v.ttl = v.ttl - dt

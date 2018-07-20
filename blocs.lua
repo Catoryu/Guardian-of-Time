@@ -104,6 +104,16 @@ blocs.flush = function()--Permet de supprimer tous les blocs
     room.blocs = {}
 end
 
+blocs.get = function(x, y)--Permet de récupérer un bloc selon ses coordonnés
+    for i, b in pairs(room.blocs) do
+        if b.x == x and b.y == y then
+            return b
+        end
+    end
+    
+    return false
+end
+
 blocs.pop = function (x, y)--Permet de supprimer un bloc (coordonnés sur la grille)
     for i, v in pairs(room.blocs) do
         if v.x == x and v.y == y then

@@ -11,12 +11,10 @@ event_class = {
     isPlayerIn = false, --Définit si le joueur se situe dans l'événement
     
     --Définit quel fonction sont activé
-    activeEvent = {
-        ttlReach = false,
-        touch = false,
-        enter = false,
-        leave = false
-    },
+    ttlReach = false,
+    touch = false,
+    enter = false,
+    leave = false,
     
     onTtlReach = false, --Définit les instructions si l'événement est déclenché par le temps
     onTouch = false, --Définit les instructions si l'événement est déclenché par un contact avec le joueur
@@ -40,22 +38,19 @@ event = {
     event_class:new({
         id = 1,
         isRoomReseted = true,
-        activeEvent = {
-            enter = true
-        },
+        enter = true,
         onEnter = function(self)
             print(("Evenement 1 declenche a %.2f s"):format(time))
             weathers.id = (weathers.id == 1) and 2 or 1
             weathers.load()
+            self.enter = false
         end,
     }),
 
     --Active l'effet "flashbang"
     event_class:new({
         id = 2,
-        activeEvent = {
-            enter = true
-        },
+        enter = true,
         onEnter = function(self)
             print(("Evenement 2 declenche a %.2f s"):format(time))
             effects.trigger(1, 1300)
@@ -65,9 +60,7 @@ event = {
     --Active l'effet de brulure
     event_class:new({
         id = 3,
-        activeEvent = {
-            enter = true
-        },
+        enter = true,
         onEnter = function(self)
             print(("Evenement 3 declenche a %.2f s"):format(time))
             effects.trigger(2, 3000)
