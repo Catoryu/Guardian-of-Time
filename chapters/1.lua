@@ -28,7 +28,7 @@ chapter.rooms[1] = function()
     weathers.id = 1
     
     --Blocs
-    blocs.push(bloc[1]:new({x = 10, y = 10}), bloc[1]:new({x = 9, y = 10}), bloc[1]:new({x = 10, y = 9}))
+    blocs.push(bloc[1]:new({x = 21, y = 18}),bloc[1]:new({x = 22, y = 17}),bloc[1]:new({x = 21, y = 16}),bloc[1]:new({x = 23, y = 16}),bloc[1]:new({x = 23, y = 18}),bloc[1]:new({x = 25, y = 17}),bloc[1]:new({x = 26, y = 17}),bloc[1]:new({x = 27, y = 17}),bloc[1]:new({x = 26, y = 16}),bloc[1]:new({x = 26, y = 18}),bloc[1]:new({x = 29, y = 18}),bloc[1]:new({x = 29, y = 17}),bloc[1]:new({x = 29, y = 16}),bloc[1]:new({x = 30, y = 16}),bloc[1]:new({x = 31, y = 16}),bloc[1]:new({x = 31, y = 17}),bloc[1]:new({x = 31, y = 18}),bloc[1]:new({x = 30, y = 18}),bloc[1]:new({x = 33, y = 17}),bloc[1]:new({x = 35, y = 18}),bloc[1]:new({x = 35, y = 17}),bloc[1]:new({x = 35, y = 16}),bloc[1]:new({x = 36, y = 16}),bloc[1]:new({x = 37, y = 16}),bloc[1]:new({x = 37, y = 17}),bloc[1]:new({x = 37, y = 18}),bloc[1]:new({x = 36, y = 18}),bloc[1]:new({x = 36, y = 17}))
 end
 
 --[[Room 2]]--

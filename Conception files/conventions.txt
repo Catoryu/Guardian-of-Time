@@ -5,6 +5,17 @@ On appelle les éléments dans la grille des blocs, pas des cellules
 3 : Gauche
 4 : Droite
 
-Dans le dossier resource/backgrounds
+Dans le dossier resource/backgrounds :
 après le c : numéro de chapitre
 après le r : numéro de room (salle)
+
+Dans le dossier resource/blocs :
+Si le nom de l'image contient un "_" après le nom de l'image,
+alors c'est une spritesheet
+
+Pour les spritesheet (les lettres doivent être dasn le bon ordre):
+f : nombre d'images
+s : taille de chaque image (en pixel)
+c : nombre de colonnes
+r : nombre de lignes
+(exemple : stone_f6s16c4r2)

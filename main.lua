@@ -31,6 +31,9 @@ function love.load()--Chargement du jeu
     --Réactualiser l'aléatoire
     math.randomseed(os.time())
     
+    --Filtre pour rendre le pixelart plus net
+    lg.setDefaultFilter("nearest", "nearest")
+    
     --Chargement du chapitre
     loadChapter(chapterNumber)
 end
