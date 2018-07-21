@@ -115,83 +115,30 @@ loadSrc = function(dir, srcType)--Chargement d'une resource
                 frames = string.sub(spritesheetValues, frames + 1, size - 1)
                 size = string.sub(spritesheetValues, size + 1, cols - 1)
                 cols = string.sub(spritesheetValues, cols + 1, rows - 1)
-                rows = string.sub(spritesheetValues, rows + 1, #spritesheetValues)
+                rows = string.sub(spritesheetValues, rows + 1, #spritesheetValues - 4)
                 
+                --Crée l'image qui contient tous les sprites
                 value[textureName] = lg.newImage(dir.."/"..v)
                 
                 --Itère à travers chaque sprite
-                for i = 0, frames - 1 do
+                for i = 1, frames do
                     --Trouve la ligne actuel
-                    local row = math.floor(i / (cols - 1))
+                    local row = math.floor(i / (cols))
                     
                     --Détecte si la frame actuel est en bout de ligne
                     if i % cols == 0 then row = row - 1 end
                     
+                    if row == -1 then row = 0 end
+                    
                     --Trouve la colonne actuel
-                    local col = i % cols
+                    local col = (i-1) % cols
                     
                     --Trouve le point x et y de chaque frame par rapport à la colonne et la ligne
-                    local frameX = (size * col) + (1 * col) + 1
-                    local frameY = (size * row) + (1 * row) + 1
+                    local frameX = 1 + col * 2 + col * size
+                    local frameY = 1 + row * 2 + row * size
                     
-                    if frameY == -size then frameY = 1 end
-                    
-                    print(i)
-                    print(frameX)
-                    print(frameY)
-                    print()
-                    
-                    value[textureName.."_"..table.concat(toBits(i, 4))] = lg.newQuad(frameX + 1, frameY + 1, size, size, value[textureName]:getDimensions())
+                    value[textureName.."_"..table.concat(toBits(i-1, 4))] = lg.newQuad(frameX, frameY, size, size, value[textureName]:getDimensions())
                 end
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                --[[
-                update = function(self, dt)
-                    --Si l'animation est activé
-                    if self.event then
-                        
-                        ---si la frame actuel est la dernière, 
-                        --alors elle passe à 0 sinon elle s'incrémente
-                        self.frame = (self.frame == self.num_frames - 1) and 0 or self.frame + 1
-                        
-                        --Trouve la ligne actuel
-                        local row = math.floor(self.frame / (self.cols + 1))
-                        
-                        --Détecte si la frame actuel est sur la première ligne
-                        if self.frame == self.cols then row = 0 end
-                        
-                        --Trouve la colonne actuel
-                        local col = self.frame - ((self.cols + 1) * row - 1) - 1
-                        
-                        --Trouve le point x et y de chaque frame par rapport à la colonne et la ligne
-                        self.frameX = (self.frameWth * col) + (self.offset * col) + self.offset
-                        self.frameY = (self.frameHgt * row) + (self.offset * row) + self.offset
-                        
-                        --Définit la frame actuelle
-                        self.quad:setViewport(self.frameX, self.frameY, self.frameWth, self.frameHgt)
-                    end
-                end
-                ]]
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                print("frames : "..frames)
-                print("size : "..size)
-                print("cols : "..cols)
-                print("rows : "..rows)
             else
                 --Crée une variable qui porte le nom de la texture
                 value[fileName] = lg.newImage(dir.."/"..v)
