@@ -1,34 +1,41 @@
 collision_rectToRect = function (x, y, wth, hgt, x2, y2, wth2, hgt2)--Collision rectange à rectangle
-    local w = 0.5 * (wth + wth2)
-    local h = 0.5 * (hgt + hgt2)
-    local dx = (x + wth/2) - (x2 + wth2/2)
-    local dy = (y + hgt/2) - (y2 + hgt2/2)
-    
-    if math.abs(dx) <= w and math.abs(dy) <= h then
-        wy = w * dy
-        hx = h * dx
-        
-        if (wy > hx) then
-            if (wy > -hx) then
-                --En bas
-                return 2
-            else
-                --A gauche
-                return 3
-            end
-        else
-            if (wy > -hx) then
-                --A droite
-                return 4
-            else
-                --En haut
-                return 1
-            end
-        end
+    if (x + wth > x2 and x < x2 + wth2) and
+    (y + hgt > y2 and y < y2 + hgt2) then
+        return true
     else
-        --Aucune collision
-        return 0
+        return false
     end
+
+--    local w = 0.5 * (wth + wth2)
+--    local h = 0.5 * (hgt + hgt2)
+--    local dx = (x + wth/2) - (x2 + wth2/2)
+--    local dy = (y + hgt/2) - (y2 + hgt2/2)
+    
+--    if math.abs(dx) <= w and math.abs(dy) <= h then
+--        wy = w * dy
+--        hx = h * dx
+        
+--        if (wy > hx) then
+--            if (wy > -hx) then
+--                --En bas
+--                return 2
+--            else
+--                --A gauche
+--                return 3
+--            end
+--        else
+--            if (wy > -hx) then
+--                --A droite
+--                return 4
+--            else
+--                --En haut
+--                return 1
+--            end
+--        end
+--    else
+--        --Aucune collision
+--        return false
+--    end
 end
 
 collision_rectToCircle = function(rectX, rectY, rectWth, rectHgt, circleX, circleY, circleRad)--Collision rectangle à cercle
@@ -165,6 +172,8 @@ loadChapter = function(chapterNumber)--Charge un chapitre
 end
 
 loadRoom = function(roomNumber)--Charge un salle
+    local start = love.timer.getTime()
+    
     --Actualise la variable qui définit la salle actuelle
     chapter.roomNumber = roomNumber
     
@@ -180,6 +189,8 @@ loadRoom = function(roomNumber)--Charge un salle
             chapter.events[i] = event[v.id]:new({x = v.x, y = v.y, wth = v.wth, hgt = v.hgt, room = v.room})
         end
     end
+    
+    print((love.timer.getTime() - start) * 1000 .." ms pour le chargement de la salle")
 end
 
 spairs = function(t, order)--Permet de trier les valeurs d'une table

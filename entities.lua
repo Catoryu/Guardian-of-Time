@@ -32,5 +32,7 @@ entities.draw = function()--Dessine les entités
         lg.rectangle("fill", v.x, v.y, debug.font:getWidth(v.id), debug.font:getHeight(v.id))
         lg.setColor(0, 0, 0)
         lg.print(v.id, v.x, v.y)
+        lg.print("y : "..v.y, v.x, v.y + 15)
+        lg.print("wth : "..v.wth, v.x, v.y + 30)
     end
 end

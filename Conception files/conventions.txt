@@ -1,4 +1,4 @@
-On appelle les éléments dans la grille des blocs, pas des cellules
+On appelle les ï¿½lï¿½ments dans la grille des blocs, pas des cellules
 
 1 : Haut
 2 : Bas
@@ -6,14 +6,14 @@ On appelle les éléments dans la grille des blocs, pas des cellules
 4 : Droite
 
 Dans le dossier resource/backgrounds :
-après le c : numéro de chapitre
-après le r : numéro de room (salle)
+aprï¿½s le c : numï¿½ro de chapitre
+aprï¿½s le r : numï¿½ro de room (salle)
 
 Dans le dossier resource/blocs :
-Si le nom de l'image contient un "_" après le nom de l'image,
+Si le nom de l'image contient un "_" aprï¿½s le nom de l'image,
 alors c'est une spritesheet
 
-Pour les spritesheet (les lettres doivent être dasn le bon ordre):
+Pour les spritesheet (les lettres doivent ï¿½tre dasn le bon ordre):
 f : nombre d'images
 s : taille de chaque image (en pixel)
 c : nombre de colonnes

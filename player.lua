@@ -47,6 +47,10 @@ player.attacks = {--cc Rui
     special_attack = 0
 }
 
+player.getXYWH = function(self)--Récupère la position du joueur et sa taille (raccourci)
+    return self.x, self.y, self.wth, self.hgt
+end
+
 player.jump = function()--Fait sauter du joueur
     if not player.isJumping then
         player.isJumping = true
@@ -72,11 +76,11 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
-        for i, v in pairs(room.entities) do
-            if v.solidResistance ~= 100 then
-                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-                    moveSpeed = moveSpeed * (100 -v.solidResistance) / 100
-                    player.xSpd = (100 -v.solidResistance) * player.xSpd / 100
+        for i, e in pairs(room.entities) do
+            if e.solidResistance ~= 100 then
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, e:getXYWH()) then
+                    moveSpeed = moveSpeed * (100 -e.solidResistance) / 100
+                    player.xSpd = (100 -e.solidResistance) * player.xSpd / 100
                 end
             end
         end
@@ -85,66 +89,60 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     if moveSpeed < 0 then
         local dx = math.huge
         
-        --Collision bord gauche de l'écran
-        if player.x + moveSpeed < 0 then
+        --Collision bords de la salle
+        if player.x + moveSpeed < room.x then
             if room.cardinality[3] == 0 then
-                --Se bloque à la sortie de l'écran
-                if player.x < dx then
-                    dx = player.x
+                --Se bloque contre le bord
+                if player.x - room.x < dx then
+                    dx = player.x - room.x
                 end
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[3]
                 loadRoom(chapter.roomNumber)
-                player.x = wdow.wth - player.wth
                 room.x = - room.wth + wdow.wth
+                player.x = room.x + room.wth - player.wth
                 return true
             end
         end
         
-        --Itère à travers toutes les entités
-        for i, v in pairs(room.entities) do
-            --Collisions coté droit des entités
-            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 4 then
-                if v.solidResistance == 100 then
-                    if player.x - (v.x + v.wth) < dx then
-                        dx = player.x - (v.x + v.wth)
+        --Collision entités
+        for i, e in pairs(room.entities) do
+            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if player.x - (e.x + e.wth) < dx then
+                        dx = player.x - (e.x + e.wth)
                     end
                 end
             end
         end
         
-        --Itère à travers tous les blocs
+        --Collision blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est visible à l'écran
-            if b:onScreen() then
-                if b.isSolid and not b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Collisions coté droit des blocs
-                    if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, blocs.size, blocs.size) == 4 then
-                        b:onTouch(4)
-                        if player.x - (x + blocs.size) < dx then
-                            dx = player.x - (x + blocs.size)
-                        end
+            if b.isSolid and not b.isLiquid then
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y, blocs.size, blocs.size) then
+                    b:onTouch(4)
+                    if player.x - (x + blocs.size) < dx then
+                        dx = player.x - (x + blocs.size)
                     end
                 end
+            end
+            
+            if b.isLiquid then
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
                 
-                if b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Calcul la hauteur du liquide
-                    local liquidHeight = b.fillingRate * blocs.size / 100
-                    
-                    --Collisions coté droit des liquides
-                    if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) == 4 then
-                        b:onTouch(4)
-                        if b.isSolid then
-                            if player.x - (x + blocs.size) < dx then
-                                dx = player.x - (x + blocs.size)
-                            end
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    b:onTouch(4)
+                    if b.isSolid then
+                        if player.x - (x + blocs.size) < dx then
+                            dx = player.x - (x + blocs.size)
                         end
                     end
                 end
@@ -168,66 +166,63 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     elseif moveSpeed > 0 then
         local dx = math.huge
         
-        --Collision bord droit de l'écran
-        if player.x + moveSpeed + player.wth > wdow.wth then
+        --Collision bords de la salle
+        if player.x + moveSpeed + player.wth > room.x + room.wth then
             if room.cardinality[4] == 0 then
-                --Se bloque à la sortie de l'écran
-                if wdow.wth - (player.x + player.wth) < dx then
-                    dx = wdow.wth - (player.x + player.wth)
+                --Se bloque contre le bord
+                if (room.x + room.wth) - (player.x + player.wth) < dx then
+                    dx = (room.x + room.wth) - (player.x + player.wth)
                 end
             else
                 --Change de salle
                 chapter.roomNumber = room.cardinality[4]
                 loadRoom(chapter.roomNumber)
-                player.x = 0
                 room.x = 0
+                player.x = room.x
                 return true
             end
         end
         
-        --Itère à travers toutes les entités
-        for i, v in pairs(room.entities) do
+        --Collision entités
+        for _, e in pairs(room.entities) do
             --Collisions coté gauche des entités
-            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, v.x, v.y, v.wth, v.hgt) == 3 then
-                if v.solidResistance == 100 then
-                    if v.x - (player.x + player.wth) < dx then
-                        dx = v.x - (player.x + player.wth)
+            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if e.x - (player.x + player.wth) < dx then
+                        dx = e.x - (player.x + player.wth)
                     end
                 end
             end
         end
         
-        --Itère à travers tous les blocs
+        --Collision blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide et visible à l'écran
-            if b:onScreen() then
-                if b.isSolid and not b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Collisions coté gauche des blocs
-                    if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y, blocs.size, blocs.size) == 3 then
-                        b:onTouch(3)
-                        if x - (player.x + player.wth) < dx then
-                            dx = x - (player.x + player.wth)
-                        end
+            if b.isSolid and not b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y, blocs.size, blocs.size) then
+                    b:onTouch(3)
+                    if x - (player.x + player.wth) < dx then
+                        dx = x - (player.x + player.wth)
                     end
                 end
+            end
+            
+            if b.isLiquid then
                 
-                if b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Calcul la hauteur du liquide
-                    local liquidHeight = b.fillingRate * blocs.size / 100
-                    
-                    --Collisions coté gauche des liquides
-                    if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - 1, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) == 3 then
-                        b:onTouch(3)
-                        if b.isSolid then
-                            if x - (player.x + player.wth) < dx then
-                                dx = x - (player.x + player.wth)
-                            end
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    b:onTouch(3)
+                    if b.isSolid then
+                        if x - (player.x + player.wth) < dx then
+                            dx = x - (player.x + player.wth)
                         end
                     end
                 end
@@ -255,23 +250,23 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
     
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
-        for i, v in pairs(room.entities) do
-            if v.solidResistance ~= 100 then
-                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
-                    moveSpeed = moveSpeed * (100 -v.solidResistance) / 100
-                    player.ySpd = (100 -v.solidResistance) * player.ySpd / 100
+        for _, e in pairs(room.entities) do
+            if e.solidResistance ~= 100 then
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, e:getXYWH()) then
+                    moveSpeed = moveSpeed * (100 -e.solidResistance) / 100
+                    player.ySpd = (100 -e.solidResistance) * player.ySpd / 100
                 end
             end
         end
     end
     
+    local dy = math.huge
+    
     if moveSpeed < 0 then
-        local dy = math.huge
-        
-        --Collision bord haut de l'écran
+        --Collision bords de la salle
         if player.y + moveSpeed < 0 then
             if room.cardinality[1] == 0 then
-                --Se bloque à la sortie de l'écran
+                --Se bloque au bord
                 if player.y < dy then
                     dy = player.y
                 end
@@ -285,49 +280,45 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             end
         end
         
-        --Itère à travers toutes les entités
-        for i, v in pairs(room.entities) do
-            --Collisions dessous des entités
-            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 2 then
-                if v.solidResistance == 100 then
-                    if player.y - (v.y + v.hgt) < dy then
-                        dy = player.y - (v.y + v.hgt)
+        --Collision entités
+        for _, e in pairs(room.entities) do
+            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if player.y - (e.y + e.hgt) < dy then
+                        dy = player.y - (e.y + e.hgt)
                     end
                 end
             end
         end
         
-        --Itère à travers tous les blocs
+        --Collision blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide et visible à l'écran
-            if b:onScreen() then
-                if b.isSolid and not b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Collisions dessous des blocs
-                    if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, blocs.size, blocs.size) == 2 then
-                        b:onTouch(2)
-                        if player.y - (y + blocs.size) < dy then
-                            dy = player.y - (y + blocs.size)
-                        end
+            if b.isSolid and not b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, blocs.size, blocs.size) then
+                    b:onTouch(2)
+                    if player.y - (y + blocs.size) < dy then
+                        dy = player.y - (y + blocs.size)
                     end
                 end
+            end
+            
+            if b.isLiquid then
                 
-                if b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Calcul la hauteur du liquide
-                    local liquidHeight = b.fillingRate * blocs.size / 100
-                    
-                    --Collisions dessous des liquides
-                    if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) == 2 then
-                        b:onTouch(2)
-                        if b.isSolid then
-                            if player.y - (y + blocs.size) < dy then
-                                dy = player.y - (y + blocs.size)
-                            end
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    b:onTouch(2)
+                    if b.isSolid then
+                        if player.y - (y + blocs.size) < dy then
+                            dy = player.y - (y + blocs.size)
                         end
                     end
                 end
@@ -349,14 +340,12 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         return true
     elseif moveSpeed > 0 then
-        local dy = math.huge
-        
-        --Collision bord bas de l'écran
-        if player.y + moveSpeed + player.hgt > wdow.hgt then
+        --Collision bords de la salle
+        if player.y + moveSpeed + player.hgt > room.y + room.hgt then
             if room.cardinality[2] == 0 then
-                --Se bloque à la sortie de l'écran
-                if wdow.hgt - (player.y + player.hgt) < dy then
-                    dy = wdow.hgt - (player.y + player.hgt)
+                --Se bloque au bord
+                if room.y + room.hgt - (player.y + player.hgt) < dy then
+                    dy = room.y + room.hgt - (player.y + player.hgt)
                 end
             else
                 --Change de salle
@@ -366,49 +355,45 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             end
         end
         
-        --Itère à travers toutes les entités
-        for i, v in pairs(room.entities) do
-            --Collisions dessus des entités
-            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) == 1 then
-                if v.solidResistance == 100 then
-                    if v.y - (player.y + player.hgt) < dy then
-                        dy = v.y - (player.y + player.hgt)
+        --Collision entités
+        for _, e in pairs(room.entities) do
+            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if e.y - (player.y + player.hgt) < dy then
+                        dy = e.y - (player.y + player.hgt)
                     end
                 end
             end
         end
         
-        --Itère à travers tous les blocs
+        --Collision blocs
         for i, b in pairs(room.blocs) do
-            --Si le bloc est solide et visible à l'écran
-            if b:onScreen() then
-                if b.isSolid and not b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Collisions dessus des blocs
-                    if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, blocs.size, blocs.size) == 1 then
-                        b:onTouch(1)
-                        if y - (player.y + player.hgt) < dy then
-                            dy = y - (player.y + player.hgt)
-                        end
+            if b.isSolid and not b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y, blocs.size, blocs.size) then
+                    b:onTouch(1)
+                    if y - (player.y + player.hgt) < dy then
+                        dy = y - (player.y + player.hgt)
                     end
                 end
+            end
+            
+            if b.isLiquid then
                 
-                if b.isLiquid then
-                    --Récupère les coordonnés du bloc
-                    local x, y = blocs.getPos(b.x, b.y)
-                    
-                    --Calcul la hauteur du liquide
-                    local liquidHeight = b.fillingRate * blocs.size / 100
-                    
-                    --Collisions dessus des liquides
-                    if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) == 1 then
-                        b:onTouch(1)
-                        if b.isSolid then
-                            if (y + (blocs.size - liquidHeight)) - (player.y + player.hgt) < dy then
-                                dy = (y + (blocs.size - liquidHeight)) - (player.y + player.hgt)
-                            end
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    b:onTouch(1)
+                    if b.isSolid then
+                        if (y + (blocs.size - liquidHeight)) - (player.y + player.hgt) < dy then
+                            dy = (y + (blocs.size - liquidHeight)) - (player.y + player.hgt)
                         end
                     end
                 end
@@ -434,6 +419,278 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             player.canJumpHigher = false
             
             --Affiche une petite animation de particules qui tombe
+        end
+        
+        return true
+    end
+end
+
+player.canMoveX = function(moveSpeed, isPushed)
+    if not isPushed then
+        --Test si il joueur dans une matière qui le ralenti
+        for i, e in pairs(room.entities) do
+            if e.solidResistance ~= 100 then
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, e:getXYWH()) then
+                    moveSpeed = moveSpeed * (100 -e.solidResistance) / 100
+                end
+            end
+        end
+    end
+    
+    local dx = math.huge
+    
+    if moveSpeed < 0 then
+        --Collision bords de la salle
+        if player.x + moveSpeed < room.x then
+            if room.cardinality[3] == 0 then
+                --Se bloque contre le bord
+                if player.x - room.x < dx then
+                    dx = player.x - room.x
+                end
+            end
+        end
+        
+        --Collision entités
+        for i, e in pairs(room.entities) do
+            if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if player.x - (e.x + e.wth) < dx then
+                        dx = player.x - (e.x + e.wth)
+                    end
+                end
+            end
+        end
+        
+        --Collision blocs
+        for i, b in pairs(room.blocs) do
+            if b.isSolid and not b.isLiquid then
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, x, y, blocs.size, blocs.size) then
+                    if player.x - (x + blocs.size) < dx then
+                        dx = player.x - (x + blocs.size)
+                    end
+                end
+            end
+            
+            if b.isLiquid then
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    if b.isSolid then
+                        if player.x - (x + blocs.size) < dx then
+                            dx = player.x - (x + blocs.size)
+                        end
+                    end
+                end
+            end
+        end
+        
+        if dx ~= math.huge then
+            return false
+        end
+        
+        return true
+        
+    elseif moveSpeed > 0 then
+        --Collision bords de la salle
+        if player.x + moveSpeed + player.wth > room.x + room.wth then
+            if room.cardinality[4] == 0 then
+                --Se bloque contre le bord
+                if (room.x + room.wth) - (player.x + player.wth) < dx then
+                    dx = (room.x + room.wth) - (player.x + player.wth)
+                end
+            end
+        end
+        
+        --Collision entités
+        for _, e in pairs(room.entities) do
+            --Collisions coté gauche des entités
+            if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if e.x - (player.x + player.wth) < dx then
+                        dx = e.x - (player.x + player.wth)
+                    end
+                end
+            end
+        end
+        
+        --Collision blocs
+        for i, b in pairs(room.blocs) do
+            if b.isSolid and not b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, x, y, blocs.size, blocs.size) then
+                    if x - (player.x + player.wth) < dx then
+                        dx = x - (player.x + player.wth)
+                    end
+                end
+            end
+            
+            if b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    if b.isSolid then
+                        if x - (player.x + player.wth) < dx then
+                            dx = x - (player.x + player.wth)
+                        end
+                    end
+                end
+            end
+        end
+        
+        if dx ~= math.huge then
+            return false
+        end
+        
+        return true
+    end
+end
+
+player.canMoveY = function(moveSpeed, isPushed)
+    
+    if not isPushed then
+        --Test si il joueur dans une matière qui le ralenti
+        for _, e in pairs(room.entities) do
+            if e.solidResistance ~= 100 then
+                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, e:getXYWH()) then
+                    moveSpeed = moveSpeed * (100 -e.solidResistance) / 100
+                end
+            end
+        end
+    end
+    
+    local dy = math.huge
+    
+    if moveSpeed < 0 then
+        --Collision bords de la salle
+        if player.y + moveSpeed < 0 then
+            if room.cardinality[1] == 0 then
+                --Se bloque au bord
+                if player.y < dy then
+                    dy = player.y
+                end
+            end
+        end
+        
+        --Collision entités
+        for _, e in pairs(room.entities) do
+            if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if player.y - (e.y + e.hgt) < dy then
+                        dy = player.y - (e.y + e.hgt)
+                    end
+                end
+            end
+        end
+        
+        --Collision blocs
+        for i, b in pairs(room.blocs) do
+            if b.isSolid and not b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, x, y, blocs.size, blocs.size) then
+                    if player.y - (y + blocs.size) < dy then
+                        dy = player.y - (y + blocs.size)
+                    end
+                end
+            end
+            
+            if b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    if b.isSolid then
+                        if player.y - (y + blocs.size) < dy then
+                            dy = player.y - (y + blocs.size)
+                        end
+                    end
+                end
+            end
+        end
+        
+        if dy ~= math.huge then
+            return false
+        end
+        
+        return true
+    elseif moveSpeed > 0 then
+        --Collision bords de la salle
+        if player.y + moveSpeed + player.hgt > room.y + room.hgt then
+            if room.cardinality[2] == 0 then
+                --Se bloque au bord
+                if room.y + room.hgt - (player.y + player.hgt) < dy then
+                    dy = room.y + room.hgt - (player.y + player.hgt)
+                end
+            end
+        end
+        
+        --Collision entités
+        for _, e in pairs(room.entities) do
+            if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, e:getXYWH()) then
+                if e.solidResistance == 100 then
+                    if e.y - (player.y + player.hgt) < dy then
+                        dy = e.y - (player.y + player.hgt)
+                    end
+                end
+            end
+        end
+        
+        --Collision blocs
+        for i, b in pairs(room.blocs) do
+            if b.isSolid and not b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, x, y, blocs.size, blocs.size) then
+                    if y - (player.y + player.hgt) < dy then
+                        dy = y - (player.y + player.hgt)
+                    end
+                end
+            end
+            
+            if b.isLiquid then
+                
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                    if b.isSolid then
+                        if (y + (blocs.size - liquidHeight)) - (player.y + player.hgt) < dy then
+                            dy = (y + (blocs.size - liquidHeight)) - (player.y + player.hgt)
+                        end
+                    end
+                end
+            end
+        end
+        
+        --Déplacement du joueur
+        if dy ~= math.huge then
+            return false
         end
         
         return true
@@ -491,8 +748,8 @@ player.update = function(dt)--Gère les mouvements joueur
     if player.xSpd ~= 0 then player.moveX(player.xSpd * dt) end
 
     --Test si le joueur est dans un objet où il peut nager [WIP]
---    for i, v in pairs(room.entities) do
---        if v.canSwim and collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
+--    for i, e in pairs(room.entities) do
+--        if e.canSwim and collision_rectToRect(player.x, player.y, player.wth, player.hgt, e.x, e.y, e.wth, e.hgt) then
 --            player.isJumping = false
 --        end
 --    end

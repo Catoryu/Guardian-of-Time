@@ -38,50 +38,52 @@ controls.update = function(dt)--Une touche est enfoncée
     
     --Permet de bouger toutes les entités [Temporaire]
     if keyDown("left") then
-        for i, v in pairs(room.entities) do
-            v:moveX(-220*dt)
+        for _, e in pairs(room.entities) do
+            e:moveX(-220*dt)
         end
     end
     if keyDown("right") then
-        for i, v in pairs(room.entities) do
-            v:moveX(220*dt)
+        for _, e in pairs(room.entities) do
+            e:moveX(220*dt)
         end
     end
     
     if keyDown("up") then
-        for i, v in pairs(room.entities) do
-            v:moveY(-220*dt)
+        for _, e in pairs(room.entities) do
+            e:moveY(-220*dt)
         end
     end
     
     if keyDown("down") then
-        for i, v in pairs(room.entities) do
-            v:moveY(220*dt)
+        for _, e in pairs(room.entities) do
+            e:moveY(220*dt)
         end
     end
     
     --Manette--
-    local x = gamepad.joystick:getGamepadAxis("leftx")
-    local y = gamepad.joystick:getGamepadAxis("lefty")
-    
-    --Se baisse
-    if y > gamepad.offset then
-        currentInput = 1
-        table.insert(inputs, 2)
-    else
-        for i, v in pairs(inputs) do if v == 2 then table.remove(inputs, i) end end
-    end
-    
-    --Va à gauche
-    if x < -gamepad.offset then
-        currentInput = 1
-        player.moveX( - player.moveSpd * dt)
-    end
-    
-    --Va à droite
-    if x > gamepad.offset then
-        currentInput = 1
-        player.moveX(player.moveSpd * dt)
+    if gamepad.joystick then
+        local x = gamepad.joystick:getGamepadAxis("leftx")
+        local y = gamepad.joystick:getGamepadAxis("lefty")
+        
+        --Se baisse
+        if y > gamepad.offset then
+            currentInput = 1
+            table.insert(inputs, 2)
+        else
+            for i, input in pairs(inputs) do if input == 2 then table.remove(inputs, i) end end
+        end
+        
+        --Va à gauche
+        if x < -gamepad.offset then
+            currentInput = 1
+            player.moveX( - player.moveSpd * dt)
+        end
+        
+        --Va à droite
+        if x > gamepad.offset then
+            currentInput = 1
+            player.moveX(player.moveSpd * dt)
+        end
     end
 end
 
@@ -154,14 +156,14 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
         id = 0
         
         --Trouve un nom de fichier libre (numerique)
-        for i, v in pairs(love.filesystem.getDirectoryItems("saves")) do
-            if string.sub(v, 1, #v - 4) == tostring(id) then id = id + 1 end
+        for i, item in pairs(love.filesystem.getDirectoryItems("saves")) do
+            if string.sub(item, 1, #item - 4) == tostring(id) then id = id + 1 end
         end
         
         --Génère la table pour les blocs
-        local dump = "blocs.push("
-        for i, v in pairs(room.blocs) do
-            dump = dump .. "bloc["..v.id.."]:new({x = "..v.x..", y = "..v.y.."})"
+        local dump = "blocs.push(false, "
+        for i, b in pairs(room.blocs) do
+            dump = dump .. "bloc["..b.id.."]:new({x = "..b.x..", y = "..b.y.."})"
             if i < #room.blocs then
                 dump = dump..","
             end
@@ -205,17 +207,17 @@ function love.keyreleased(key)--Une touche du clavier viens d'être relachée
   
     --Se baisse
     if key == "s" then 
-        for i, v in pairs(inputs) do if v == 2 then table.remove(inputs, i) end end
+        for i, input in pairs(inputs) do if input == 2 then table.remove(inputs, i) end end
     end
     
     --Va à gauche
     if key == "a" then 
-        for i, v in pairs(inputs) do if v == 3 then table.remove(inputs, i) end end
+        for i, input in pairs(inputs) do if input == 3 then table.remove(inputs, i) end end
     end
     
     --Va à droite
     if key == "d" then 
-        for i, v in pairs(inputs) do if v == 4 then table.remove(inputs, i) end end
+        for i, input in pairs(inputs) do if input == 4 then table.remove(inputs, i) end end
     end
 end
 
@@ -229,7 +231,13 @@ function love.mousepressed(x, y, button)--Un bouton de la souris viens d'être e
     end
 
     --Clic droit (créé un bloc)
-    if button == 2 then blocs.create(x, y, selectedBloc) end
+    if button == 2 then
+        if not blocs.exists(blocs.getCoordPos(x, y)) then
+            blocs.create(x, y, selectedBloc, true)
+        else
+            print("Vous ne pouvez pas poser de bloc ici car il y en a deja un")
+        end
+    end
 end
 
 function love.mousereleased(_, _, button)--Un bouton de la souris viens d'être relaché

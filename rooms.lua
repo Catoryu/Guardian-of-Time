@@ -72,21 +72,27 @@ local moveAllY = function(moveSpeed)--Déplace tous les objets de la salle (vert
     end
 end
 
---Recentre le centre de la fenêtre vers la coordoné donné en paramètre
-rooms.refreshCamera = function(x, y)
-    
+rooms.refreshCamera = function(x, y)--Recentre le centre de la fenêtre vers la coordoné donné en paramètre
     --Calcul la différence entre le point choisi et l'ancien
     local dx = wdow.wth/2 - x
     local dy = wdow.hgt/2 - y
     
     --Vérifie si les coordonés sont dans la salle
     if (x < room.x + wdow.wth/2 or x > room.x + room.wth - wdow.wth/2) then
-        dx = 0
+        if x < wdow.wth/2 then
+            dx = -room.x
+        elseif x > wdow.wth/2 then
+            dx = -(room.x + room.wth - wdow.wth)
+        end
     end
     
     --Vérifie si les coordonés sont dans la salle
     if (y < room.y + wdow.hgt/2 or y > room.y + room.hgt - wdow.hgt/2) then
-        dy = 0
+        if y < wdow.hgt/2 then
+            dy = -room.y
+        elseif y > wdow.hgt/2 then
+            dy = -(room.y + room.hgt - wdow.hgt)
+        end
     end
     
     --Bouge tous les éléments de la salle

@@ -16,7 +16,7 @@ blocs.liquid.water = {frame = 0, refreshRate = 0.01, active = false}
 blocs.liquid.sand = {frame = 0, refreshRate = 0.05, active = false}
 
 blocs.exists = function(x, y)--Test si un bloc existe dans une certaine coordonné
-    for i, b in pairs(room.blocs) do
+    for _, b in pairs(room.blocs) do
         if b.x == x and b.y == y then
             return true
         end
@@ -27,7 +27,7 @@ end
 
 blocs.calculateCardinality = function(bloc, destroy)--Calcul les les cardinalités du bloc choisi (Regarde autour du bloc)
     if destroy then
-        for i, b in pairs(room.blocs) do
+        for _, b in pairs(room.blocs) do
             if b.imgLink then
                 --Bloc en dessous de celui qui est détruit
                 if bloc.x == b.x and bloc.y + 1 == b.y then
@@ -51,7 +51,7 @@ blocs.calculateCardinality = function(bloc, destroy)--Calcul les les cardinalit�
         --Réinitialise la cardinality du bloc
         bloc.imgCardinality = {0, 0, 0, 0}
         
-        for i, b in pairs(room.blocs) do
+        for _, b in pairs(room.blocs) do
             if b.imgLink then
                 --Haut
                 if bloc.x == b.x and bloc.y - 1 == b.y then
@@ -80,24 +80,42 @@ blocs.calculateCardinality = function(bloc, destroy)--Calcul les les cardinalit�
     return bloc
 end
 
-blocs.push = function(...)--Permet de créer un bloc (coordonnés sur la grille)
-    for _, blocValues in pairs({...}) do
+blocs.push = function(isSafe, ...)--Permet de créer un bloc (coordonnés sur la grille)
+    for _, b in pairs({...}) do
         
-        --Si il y a déjà un bloc à cette position, annule l'ajout de ce bloc
-        if not blocs.exists(blocValues.x, blocValues.y) then
-            --Modifie les images si un blocs est a coté
-            if blocValues.imgLink then
-                blocValues.imgCardinality = {0, 0, 0, 0}
-                blocValues = blocs.calculateCardinality(blocValues)
+        local x, y = blocs.getPos(b.x, b.y)
+        
+        --Test de collision avec le joueur lors de la création
+        if isSafe then
+            if not b.isLiquid then
+                if collision_rectToRect(x, y, blocs.size, blocs.size, player:getXYWH()) then
+                    return false
+                end
+            else
+                --Récupère les coordonnés du bloc
+                local x, y = blocs.getPos(b.x, b.y)
+                
+                --Calcul la hauteur du liquide
+                local liquidHeight = b.fillingRate * blocs.size / 100
+                
+                if collision_rectToRect(x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight, player:getXYWH()) then
+                    return false
+                end
             end
-            
-            blocValues.frame = time + blocValues.refreshRate
-            
-            table.insert(room.blocs, blocValues)
-        else
-            print("Vous ne pouvez pas ajouter de bloc, il y en a deja un ici")
         end
+        
+        --Modifie les images si un blocs est a coté
+        if b.imgLink then
+            b.imgCardinality = {0, 0, 0, 0}
+            b = blocs.calculateCardinality(b)
+        end
+        
+        b.frame = time + b.refreshRate
+        
+        table.insert(room.blocs, b)
     end
+    
+    return true
 end
 
 blocs.flush = function()--Permet de supprimer tous les blocs
@@ -105,7 +123,7 @@ blocs.flush = function()--Permet de supprimer tous les blocs
 end
 
 blocs.get = function(x, y)--Permet de récupérer un bloc selon ses coordonnés
-    for i, b in pairs(room.blocs) do
+    for _, b in pairs(room.blocs) do
         if b.x == x and b.y == y then
             return b
         end
@@ -115,18 +133,17 @@ blocs.get = function(x, y)--Permet de récupérer un bloc selon ses coordonnés
 end
 
 blocs.pop = function (x, y)--Permet de supprimer un bloc (coordonnés sur la grille)
-    for i, v in pairs(room.blocs) do
-        if v.x == x and v.y == y then
+    for i, b in pairs(room.blocs) do
+        if b.x == x and b.y == y then
             table.insert(blocs.toDelete, i)
         end
     end
 end
 
-blocs.create = function(x, y, id)--Permet de créer un bloc (coordonnés en pixel)
-    local bx = math.floor((-room.x + x) / blocs.size) + 1
-    local by = math.floor((-room.y + y) / blocs.size) + 1
+blocs.create = function(x, y, id, safe)--Permet de créer un bloc (coordonnés en pixel)
+    local bx, by = blocs.getCoordPos(x, y)
 
-    blocs.push(bloc[id]:new({x = bx, y = by}))
+    blocs.push(safe, bloc[id]:new({x = bx, y = by}))
 end
 
 blocs.getPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
@@ -136,32 +153,36 @@ blocs.getPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
     return x, y
 end
 
+blocs.getCoordPos = function(x, y)--Permet de trouver des coordonnées via un x et un y en pixel
+    local bx = math.floor((-room.x + x) / blocs.size) + 1
+    local by = math.floor((-room.y + y) / blocs.size) + 1
+    
+    return bx, by
+end
+
 blocs.update = function(dt)--Vérification des événements des blocs
     --Gère les frames synchronisé des liquides
-    for i, v in pairs(blocs.liquid) do
-        v.active = false
+    for _, b in pairs(blocs.liquid) do
+        b.active = false
         
-        if time > v.frame then
-            v.frame = v.frame + v.refreshRate
-            v.active = true
+        if time > b.frame then
+            b.frame = b.frame + b.refreshRate
+            b.active = true
         end
     end
     
     --Itère à travers tous les blocs dans l'ordre décroissant de remplissage
-    for i, b in spairs(room.blocs, function(t, a, b) return t[b].fillingRate < t[a].fillingRate end) do
+    for _, b in spairs(room.blocs, function(t, a, b) return t[b].fillingRate < t[a].fillingRate end) do
         
         --Si le bloc est déclenché au bout d'un moment
-        if b.isTimely then
+        if b.timePass then
             
             --Diminue la durée avant que l'événement commence
             b.ttl = b.ttl - 1000*dt
             
             --Test si la durée avant que l'événement commence est inférieur ou égale à 0
             if b.ttl <= 0 then
-                if b.activeEvent.ttlReach then
-                    --Déclenche l'événement
-                    b:onTtlReached()
-                end
+                b:onTtlReach()
             end
         end
         
@@ -173,21 +194,20 @@ blocs.update = function(dt)--Vérification des événements des blocs
         elseif time > b.frame then
             b.frame = b.frame + b.refreshRate
             
+            --Applique la gravité
             if b.isGravityAffected then
                 b:moveY(1)
             end
         end
-        
-        if type(b) == "number" then print("WHAOU") end
     end
     
     --Trie les blocs à supprimer
     table.sort(blocs.toDelete, function(a,b) return b < a end)
     
-    --Itère à travers tous les blocs
-    for i, b in pairs(blocs.toDelete) do
+    --Itère à travers tous les blocs à supprimer
+    for i, index in pairs(blocs.toDelete) do
         --Supprime les blocs qui doivent être supprimé
-        table.remove(room.blocs, b)
+        table.remove(room.blocs, index)
     end
     
     blocs.toDelete = {}
@@ -196,12 +216,11 @@ end
 
 blocs.draw = function()--Dessine les blocs
     for i, b in pairs(room.blocs) do
-        --Récupère les coordonnées du bloc
-        local x, y = blocs.getPos(b.x, b.y)
-        
         --Si le bloc est sur l'écran
-        if (x + blocs.size > 0 and x < wdow.wth) and
-        (y + blocs.size > 0 and y < wdow.hgt) then
+        if b:onScreen() then
+            
+            --Récupère les coordonnées du bloc
+            local x, y = blocs.getPos(b.x, b.y)
             
             --Si le bloc est un liquide
             if b.isLiquid then
@@ -226,7 +245,7 @@ blocs.draw = function()--Dessine les blocs
                 --lg.rectangle("line", x, y, blocs.size, blocs.size)
                 lg.print("x" .. b.x .. " y" .. b.y , x, y)
                 lg.print("id:"..b.id, x, y + 10)
-                if b.isTimely then
+                if b.timePass then
                     lg.print(string.format("%d ms", b.ttl), x, y + 20)
                 end
                 if b.imgLink then

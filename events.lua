@@ -15,7 +15,7 @@ events.update = function(dt)--Vérification du déclenchement des événements
         if v.room == chapter.roomNumber then
             
             --Test si le joueur touche l'événement
-            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) ~= 0 then
+            if collision_rectToRect(player.x, player.y, player.wth, player.hgt, v.x, v.y, v.wth, v.hgt) then
                 
                 if not v.isPlayerIn then
                     --Déclenche l'événement correspondant

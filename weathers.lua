@@ -14,6 +14,16 @@ weathers.frame = 0
 --Définit quel météo est utilisé actuellement
 weathers.id = 0
 
+weathers.windRefreshCooldown = 0
+weathers.maxWindSpeed = 0
+weathers.minThick = 0
+weathers.maxThick = 0
+weathers.minLenght = 0
+weathers.maxLenght = 0
+weathers.dropSpeedRatio = 0
+weathers.density = 0
+weathers.colors = {0, 0, 0}
+
 weathers.load = function()--Initialise la météo
     
     --Enlève la météo
@@ -69,7 +79,7 @@ end
 
 weathers.update = function(dt)--Actualise la météo
     --Actualise le vent
-    if time > weathers.frame then
+    if time > weathers.frame and weathers.id ~= 0 then
         weathers.frame = weathers.frame + weathers.windRefreshCooldown
         
         --Modifie la valeur du vent
