@@ -118,7 +118,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 --Récupère les coordonnés du bloc
                 local x, y = blocs.getPos(b.x, b.y)
@@ -196,7 +196,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 
                 --Récupère les coordonnés du bloc
@@ -292,7 +292,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 
                 --Récupère les coordonnés du bloc
@@ -367,7 +367,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 
                 --Récupère les coordonnés du bloc
@@ -462,7 +462,7 @@ player.canMoveX = function(moveSpeed, isPushed)
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 --Récupère les coordonnés du bloc
                 local x, y = blocs.getPos(b.x, b.y)
@@ -521,7 +521,7 @@ player.canMoveX = function(moveSpeed, isPushed)
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 
                 --Récupère les coordonnés du bloc
@@ -598,7 +598,7 @@ player.canMoveY = function(moveSpeed, isPushed)
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 
                 --Récupère les coordonnés du bloc
@@ -657,7 +657,7 @@ player.canMoveY = function(moveSpeed, isPushed)
         end
         
         --Collision blocs
-        for i, b in pairs(room.blocs) do
+        for i, b in pairs(room.blocs[1]) do
             if b.isSolid and not b.isLiquid then
                 
                 --Récupère les coordonnés du bloc
@@ -764,7 +764,12 @@ end
 
 player.draw = function()--Dessine le joueur
     lg.setColor(255, 255, 255)
-    lg.rectangle("fill", player.x, player.y, player.wth, player.hgt)
+    
+    if wdow.shake.isPlayerShaken then
+        lg.rectangle("fill", player.x + wdow.shake.x, player.y + wdow.shake.y, player.wth, player.hgt)
+    else
+        lg.rectangle("fill", player.x, player.y, player.wth, player.hgt)
+    end
     
     if player.showGrid then
         --Calcul la position de la grille
@@ -772,6 +777,6 @@ player.draw = function()--Dessine le joueur
         _, dump2 = math.modf(room.y/blocs.size)
         
         --Affiche la grille
-        lg.draw(player.grid, dump*blocs.size, dump2*blocs.size)
+        lg.draw(player.grid, dump*blocs.size + wdow.shake.x, dump2*blocs.size + wdow.shake.y)
     end
 end

@@ -25,6 +25,7 @@ mouse.secondY = 0
 mouse.visible = true
 selectedEntity = 3
 selectedBloc = 1
+selectedLayer = 1
 inputs = {}
 
 --Définit quel périphérique est utilisé (clavier/souris[0] ou manette[1])
@@ -193,9 +194,8 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     if key == "delete" then table.remove(room.entities, #room.entities)end
     
     --Supprime le dernier bloc et recalcul les cardinalités
-    if key == "backspace" and #room.blocs > 0 then
-        room.blocs[#room.blocs] = blocs.calculateCardinality(room.blocs[#room.blocs], true)
-        blocs.pop(room.blocs[#room.blocs].x, room.blocs[#room.blocs].y)
+    if key == "backspace" and room.blocs[1] ~= nil and #room.blocs[1] > 0 then
+        blocs.pop(room.blocs[1][#room.blocs[1]].x, room.blocs[1][#room.blocs[1]].y, 1)
     end
 end
 
@@ -232,10 +232,22 @@ function love.mousepressed(x, y, button)--Un bouton de la souris viens d'être e
 
     --Clic droit (créé un bloc)
     if button == 2 then
-        if not blocs.exists(blocs.getCoordPos(x, y)) then
-            blocs.create(x, y, selectedBloc, true)
+        
+        local bx, by = blocs.getCoordPos(x, y)
+        
+        if not blocs.exists(bx, by, selectedLayer) then
+            blocs.create(x, y, selectedBloc, true, selectedLayer)
         else
             print("Vous ne pouvez pas poser de bloc ici car il y en a deja un")
+        end
+    end
+    
+    --Clic molette (change la couche du bloc à poser)
+    if button == 3 then
+        if selectedLayer == 1 then
+            selectedLayer = 2
+        else
+            selectedLayer = 1
         end
     end
 end

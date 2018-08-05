@@ -190,6 +190,11 @@ loadRoom = function(roomNumber)--Charge un salle
         end
     end
     
+    --Vérifie que la table des blocs en premier plan existe
+    if room.blocs[1] == nil then
+        room.blocs[1] = {}
+    end
+    
     print((love.timer.getTime() - start) * 1000 .." ms pour le chargement de la salle")
 end
 
@@ -244,4 +249,19 @@ mergeColors = function(color1, color2)--Combine deux couleurs
     color[4] = (color1[4] + color2[4]) / 2
     
     return color
+end
+
+shakeScreen = function(duration, shakeX, shakeY, spd, isPlayerShaken)--Secoue l'écran
+    --Définit des valeurs de base pour la secousse de l'écran
+    if duration == nil then duration = 500 end
+    if shakeX == nil then shakeX = 8 end
+    if shakeY == nil then shakeY = 10 end
+    if spd == nil then spd = 800 end
+    if isPlayerShaken == nil then isPlayerShaken = true end
+    
+    wdow.shake.duration = duration
+    wdow.shake.maxX = shakeX
+    wdow.shake.maxY = shakeY
+    wdow.shake.spd = spd
+    wdow.shake.isPlayerShaken = isPlayerShaken
 end

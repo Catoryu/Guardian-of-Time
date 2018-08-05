@@ -116,6 +116,6 @@ weathers.draw = function()--Dessine la météo
     lg.setColor(unpack(weathers.colors))
     
     for i, v in pairs (weathers.drops) do
-        lg.rectangle("fill", v.x, v.y, v.thick, v.lenght)
+        lg.rectangle("fill", v.x + wdow.shake.x, v.y + wdow.shake.y, v.thick, v.lenght)
     end
 end

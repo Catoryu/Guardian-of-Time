@@ -10,7 +10,7 @@ end
 
 rooms.draw = function()--Dessine tous les objets de la salle
     --Affiche l'image de fond
-    lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x, room.y)
+    lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x + wdow.shake.x, room.y + wdow.shake.y)
     
     --Affiche les blocs
     blocs.draw()
@@ -20,6 +20,12 @@ rooms.draw = function()--Dessine tous les objets de la salle
     
     --Affiche les événements (Debug)
     events.draw()
+    
+    --Affiche le joueur
+    player.draw()
+    
+    --Affiche la météo
+    weathers.draw()
     
     --Affiche un filtre de couleur à la salle
     lg.setColor(unpack(room.colors))

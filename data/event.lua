@@ -65,5 +65,15 @@ event = {
             print(("Evenement 3 declenche a %.2f s"):format(time))
             effects.trigger(2, 3000)
         end,
+    }),
+    
+    --Secoue l'écran
+    event_class:new({
+        id = 4,
+        enter = true,
+        onEnter = function(self)
+            print(("Evenement 4 declenche a %.2f s"):format(time))
+            shakeScreen(_, _, _, _, true)
+        end,
     })
 }

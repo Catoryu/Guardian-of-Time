@@ -25,10 +25,14 @@ function love.load()--Chargement du jeu
     
     --[[Instructions initiales]]--
     
+    --Modifie la taille de la fenêtre et son titre
+    love.window.setTitle(wdow.title)
+    love.window.setMode(wdow.wth, wdow.hgt)
+    
     --Rend la souris invisible
     love.mouse.setVisible(false)
     
-    --Réactualiser l'aléatoire
+    --Réactualise l'aléatoire
     math.randomseed(os.time())
     
     --Filtre pour rendre le pixelart plus net
@@ -51,6 +55,7 @@ function love.update(dt)--Actualisation du jeu
         rooms.update(dt)
         controls.update(dt)
         effects.update(dt)
+        wdow.update(dt)
     else
         --Permet de ne pas faire avancer le joueur dans le vide après avoir bougé la fenêtre
         inputs = {}
@@ -62,12 +67,6 @@ function love.draw()--Affichage du jeu
     effects.current.raw.draw(function()
         --Dessine la salle
         rooms.draw()
-        
-        --Dessine le joueur
-        player.draw()
-        
-        --Dessine la météo
-        weathers.draw()
     end)
 
     --[[Debug]]--
@@ -83,7 +82,7 @@ function love.draw()--Affichage du jeu
         
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
-        lg.rectangle("fill", 10, 10, 300, 380)
+        lg.rectangle("fill", 10, 10, 300, 400)
         lg.setColor(0, 0, 0)
         lg.print("player.x : "..player.x, 10, 10)
         lg.print("player.y : "..player.y, 10, 30)
@@ -100,13 +99,14 @@ function love.draw()--Affichage du jeu
         lg.print("player.airTime : "..player.airTime, 10, 190)
         lg.print("player.canJumpHigher : "..tostring(player.canJumpHigher), 10, 210)
         lg.print("#room.entities : "..#room.entities, 10, 230)
-        lg.print("#room.blocs : "..#room.blocs, 10, 250)
+        lg.print("#room.blocs : "..blocs.count(), 10, 250)
         lg.print("#chapter.events : "..#chapter.events, 10, 270)
         lg.print("selectedBloc : "..selectedBloc.." ("..bloc[selectedBloc].name..")", 10, 290)
         lg.print("selectedEntity : "..selectedEntity.." ("..entity[selectedEntity].name..")", 10, 310)
-        lg.print(string.format("time : %.2f s", time), 10, 330)
-        lg.print(string.format("weathers.wind : %.2f px/s", weathers.wind), 10, 350)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 370)
+        lg.print("selectedLayer : "..selectedLayer, 10, 330)
+        lg.print(string.format("time : %.2f s", time), 10, 350)
+        lg.print(string.format("weathers.wind : %.2f px/s", weathers.wind), 10, 370)
+        lg.print("FPS : "..love.timer.getFPS(), 10, 390)
     end
     
     --Affichage de la souris

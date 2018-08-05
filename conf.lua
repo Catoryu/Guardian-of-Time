@@ -1,4 +1,4 @@
---Téléchargement de la version 0.10.2
+--Téléchargement de la version 0.10.2 de LÖVE
 --https://bitbucket.org/rude/love/downloads/love-0.10.2-win64.exe
 
 function love.conf(t) 
@@ -50,8 +50,53 @@ wdow.mode = false
 wdow.wth = 1280
 wdow.hgt = 720
 wdow.title = "Guardian of Time"
-love.window.setTitle(wdow.title)
-love.window.setMode(wdow.wth, wdow.hgt)
+wdow.shake = {}
+wdow.shake.x = 0
+wdow.shake.y = 0
+wdow.shake.directionX = false
+wdow.shake.directionY = false
+wdow.shake.maxX = 8
+wdow.shake.maxY = 10
+wdow.shake.spd = 800 --ms, temps pour un tremblement d'aller de maxX à -maxX
+wdow.shake.duration = 0 --ms
+wdow.shake.isPlayerShaken = true
+wdow.update = function(dt)
+    --Gère le tremblement de l'écran
+    if wdow.shake.duration > 0 then
+        wdow.shake.duration = wdow.shake.duration - 1000*dt
+        
+        if wdow.shake.directionX then
+            wdow.shake.x = wdow.shake.x + wdow.shake.spd*dt
+            if wdow.shake.x > wdow.shake.maxX then
+                wdow.shake.x = wdow.shake.maxX
+                wdow.shake.directionX = not wdow.shake.directionX
+            end
+        else
+            wdow.shake.x = wdow.shake.x - wdow.shake.spd*dt
+            if wdow.shake.x < -wdow.shake.maxX then
+                wdow.shake.x = -wdow.shake.maxX
+                wdow.shake.directionX = not wdow.shake.directionX
+            end
+        end
+        
+        if wdow.shake.directionY then
+            wdow.shake.y = wdow.shake.y + wdow.shake.spd*dt
+            if wdow.shake.y > wdow.shake.maxY then
+                wdow.shake.y = wdow.shake.maxY
+                wdow.shake.directionY = not wdow.shake.directionY
+            end
+        else
+            wdow.shake.y = wdow.shake.y - wdow.shake.spd*dt
+            if wdow.shake.y < -wdow.shake.maxY then
+                wdow.shake.y = -wdow.shake.maxY
+                wdow.shake.directionY = not wdow.shake.directionY
+            end
+        end
+    else
+        wdow.shake.x = 0
+        wdow.shake.y = 0
+    end
+end
 
 --Valeur de deboguage
 debug = {}

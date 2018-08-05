@@ -25,14 +25,16 @@ entities.draw = function()--Dessine les entités
     for i, v in pairs(room.entities) do
         lg.setColor(unpack(v.colors))
         
-        lg.rectangle("fill", v.x, v.y, v.wth, v.hgt)
+        lg.rectangle("fill", v.x  + wdow.shake.x, v.y + wdow.shake.x, v.wth, v.hgt)
         
-        lg.setFont(debug.font)
-        lg.setColor(255, 255, 255)
-        lg.rectangle("fill", v.x, v.y, debug.font:getWidth(v.id), debug.font:getHeight(v.id))
-        lg.setColor(0, 0, 0)
-        lg.print(v.id, v.x, v.y)
-        lg.print("y : "..v.y, v.x, v.y + 15)
-        lg.print("wth : "..v.wth, v.x, v.y + 30)
+        if debug.visible then
+            lg.setFont(debug.font)
+            lg.setColor(255, 255, 255)
+            lg.rectangle("fill", v.x, v.y, debug.font:getWidth(v.id), debug.font:getHeight(v.id))
+            lg.setColor(0, 0, 0)
+            lg.print(v.id, v.x, v.y)
+            lg.print("y : "..v.y, v.x, v.y + 15)
+            lg.print("wth : "..v.wth, v.x, v.y + 30)
+        end
     end
 end

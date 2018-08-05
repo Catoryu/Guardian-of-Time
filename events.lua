@@ -58,13 +58,15 @@ events.update = function(dt)--Vérification du déclenchement des événements
 end
 
 events.draw = function()--Debug, ne sera pas la dans la version finale
-    lg.setColor(255, 0, 0)
-    
-    --Dessine tous les événements (debug)
-    for i, v in pairs(chapter.events) do
-        if v.room == chapter.roomNumber then
-            lg.rectangle("line", v.x, v.y, v.wth, v.hgt)
-            lg.print(tostring(v.isPlayerIn), v.x, v.y)
+    if debug.visible then
+        lg.setColor(255, 0, 0)
+        
+        --Dessine tous les événements (debug)
+        for i, v in pairs(chapter.events) do
+            if v.room == chapter.roomNumber then
+                lg.rectangle("line", v.x, v.y, v.wth, v.hgt)
+                lg.print(tostring(v.isPlayerIn), v.x, v.y)
+            end
         end
     end
 end
