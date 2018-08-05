@@ -1,0 +1,8 @@
+Character height (cm)	Height design (px)	Color
+ x < 101		 Special design	
+ 100 < x < 136		 30			Yellow
+ 135 < x < 166		 38			Y+Orange
+ 165 < x < 191		 45			YO+Red
+ 190 < x < 221		 50			YOR+Green
+ Gods (~250)		 63			YORG+Blue
+ Special creature	 Special design
