@@ -26,6 +26,7 @@ mouse.visible = true
 selectedEntity = 3
 selectedBloc = 1
 selectedLayer = 1
+mute = true
 inputs = {}
 
 --Définit quel périphérique est utilisé (clavier/souris[0] ou manette[1])
@@ -192,6 +193,16 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     
     --Supprime la dernière entité
     if key == "delete" then table.remove(room.entities, #room.entities)end
+    
+    --Active/Désactive le son
+    if key == "m" then 
+        mute = not mute
+        if mute == true then
+            src.sound.wind_l:pause(); src.sound.wind_r:pause()
+        else
+            src.sound.wind_l:play(); src.sound.wind_r:play()
+        end
+    end
     
     --Supprime le dernier bloc et recalcul les cardinalités
     if key == "backspace" and room.blocs[1] ~= nil and #room.blocs[1] > 0 then

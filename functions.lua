@@ -79,7 +79,7 @@ toZero = function(value, step)--Permet de rapprocher d'amener une valeur à zero
     return value
 end
 
-loadSrc = function(dir, srcType)--Chargement d'une resource
+loadSrc = function(dir, srcType, option)--Chargement d'une resource
     --Itère à travers tous les fichiers d'un dossier
     --Ajoute dans un tableau une variable associative qui porte le nom du fichier (sans l'extension)
     --Cette variable a comme valeur l'objet love2d souhaité (srcType)
@@ -159,6 +159,20 @@ loadSrc = function(dir, srcType)--Chargement d'une resource
             --Crée une variable qui porte le nom de la police d'écriture
             value[fileName] = lg.newFont(dir.."/"..v)
         end
+    elseif srcType == "sound" then
+        for i, v in pairs(love.filesystem.getDirectoryItems(dir)) do
+            --Récupère le nom du fichier sans l'extension
+            fileName = string.sub(v, 1, #v - 4)
+            
+            --Crée une variable qui porte le nom du fichier audio
+            if option then
+                value[fileName] = love.audio.newSource(dir.."/"..v, "static")
+            else
+                value[fileName] = love.audio.newSource(dir.."/"..v)
+            end
+        end
+    else
+        error("srcType unknown in function : loadSrc")
     end
     
     return value
@@ -264,4 +278,14 @@ shakeScreen = function(duration, shakeX, shakeY, spd, isPlayerShaken)--Secoue l'
     wdow.shake.maxY = shakeY
     wdow.shake.spd = spd
     wdow.shake.isPlayerShaken = isPlayerShaken
+end
+
+chance = function(val)
+    random = math.random(0, 100) + math.random()
+    
+    if random < val then
+        return true
+    else
+        return false
+    end
 end

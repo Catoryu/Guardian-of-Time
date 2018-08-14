@@ -3,7 +3,7 @@ local start = love.timer.getTime()
 
 src = {}
 src.font = loadSrc("resource/fonts", "font")
-src.sound = {}
+src.sound = loadSrc("resource/sound", "sound")
 src.anim = {}
 src.img = {}
 src.img.cursor = lg.newImage("resource/miscellaneous/cursor 32x32.png")

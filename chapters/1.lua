@@ -68,7 +68,8 @@ events.push(
     event[1]:new({x = 600, y = 400, wth = 100, hgt = 100, room = 1}),
     event[2]:new({x = 500, y = 400, wth = 100, hgt = 100, room = 1}),
     event[3]:new({x = 700, y = 400, wth = 100, hgt = 100, room = 1}),
-    event[4]:new({x = 400, y = 400, wth = 100, hgt = 100, room = 1})
+    event[4]:new({x = 400, y = 400, wth = 100, hgt = 100, room = 1}),
+    event[5]:new({x = 800, y = 400, wth = 100, hgt = 100, room = 1})
 )
 
 --[[Room 1]]--
@@ -84,7 +85,7 @@ chapter.rooms[1] = function()
     room.colors = {255, 255, 255, 0}
     room.blocs = {}
     room.entities = {}
-    weathers.id = 0
+    weathers.id = 1
     
     lg.setBackgroundColor(80, 80, 180)
     

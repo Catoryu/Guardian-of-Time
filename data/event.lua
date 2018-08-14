@@ -75,5 +75,15 @@ event = {
             print(("Evenement 4 declenche a %.2f s"):format(time))
             shakeScreen(_, _, _, _, true)
         end,
+    }),
+
+    --Charge la neige de façon "smooth"
+    event_class:new({
+        id = 5,
+        enter = true,
+        onEnter = function(self)
+            print(("Evenement 5 declenche a %.2f s"):format(time))
+            weathers.softChange(3)
+        end,
     })
 }
