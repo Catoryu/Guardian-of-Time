@@ -98,7 +98,6 @@ loadSrc = function(dir, srcType, option)--Chargement d'une resource
     
     if srcType == "image" then
         for i, v in pairs(love.filesystem.getDirectoryItems(dir)) do
-            
             --Récupère le nom du fichier sans l'extension
             fileName = string.sub(v, 1, #v - 4)
             
@@ -169,6 +168,68 @@ loadSrc = function(dir, srcType, option)--Chargement d'une resource
                 value[fileName] = love.audio.newSource(dir.."/"..v, "static")
             else
                 value[fileName] = love.audio.newSource(dir.."/"..v)
+            end
+        end
+    elseif srcType == "animation" then
+        for i, v in pairs(love.filesystem.getDirectoryItems(dir)) do
+            --Récupère le nom du fichier sans l'extension
+            fileName = string.sub(v, 1, #v - 4)
+            
+            --Test si c'est une spritesheet
+            isSpritesheet = string.find(fileName, "_")
+            
+            if isSpritesheet then
+                --Récupère le nom de la texture (par exemple "stone")
+                textureName = string.sub(v, 1, isSpritesheet - 1)
+                
+                --Récupère la partie des valeurs du spritesheet (par exemple "f6w50h50c4r2")
+                spritesheetValues = string.sub(v ,isSpritesheet + 1, #v)
+                
+                --Récupère l'emplacement dans la chaine de caractère du nombre de frames, la taille des images, le nombre de colonnes et le nombre de lignes
+                local frames = string.find(spritesheetValues, "f")
+                local width = string.find(spritesheetValues, "w")
+                local height = string.find(spritesheetValues, "h")
+                local cols = string.find(spritesheetValues, "c")
+                local rows = string.find(spritesheetValues, "r")
+                
+                --Récupère le nombre de frames, la taille des images, le nombre de colonnes et le nombre de lignes
+                frames = string.sub(spritesheetValues, frames + 1, width - 1)
+                width = string.sub(spritesheetValues, width + 1, height - 1)
+                height = string.sub(spritesheetValues, height + 1, cols - 1)
+                cols = string.sub(spritesheetValues, cols + 1, rows - 1)
+                rows = string.sub(spritesheetValues, rows + 1, #spritesheetValues - 4)
+                
+                --Crée l'image qui contient tous les sprites
+                value[textureName] = lg.newImage(dir.."/"..v)
+                
+                --Itère à travers chaque sprite
+                for i = 1, frames do
+                    --Trouve la ligne actuel
+                    local row = math.floor(i / (cols))
+                    
+                    --Détecte si la frame actuel est en bout de ligne
+                    if i % cols == 0 then row = row - 1 end
+                    
+                    if row == -1 then row = 0 end
+                    
+                    --Trouve la colonne actuel
+                    local col = (i-1) % cols
+                    
+                    --Trouve le point x et y de chaque frame par rapport à la colonne et la ligne
+                    local frameX = 1 + col * 2 + col * width
+                    local frameY = 1 + row * 2 + row * height
+                    
+                    value[textureName.."_"..i-1] = lg.newQuad(frameX, frameY, width, height, value[textureName]:getDimensions())
+                end
+                
+                animation[textureName] = animation_class:new({
+                    frames = tonumber(frames),
+                    file = textureName,
+                    wth = width,
+                    hgt = height,
+                    cols = cols,
+                    rows = rows
+                })
             end
         end
     else

@@ -45,13 +45,18 @@ local moveAllX = function(moveSpeed)--Déplace tous les objets de la salle (hori
     end
     
     --Bouge les événements
-    for i, v in pairs(chapter.events) do
-        v.x = v.x + moveSpeed
+    for i, e in pairs(chapter.events) do
+        e.x = e.x + moveSpeed
     end
     
     --Bouge les particules de météo
-    for i, v in pairs(weathers.drops) do
-        v.x = v.x + moveSpeed
+    for i, d in pairs(weathers.drops) do
+        d.x = d.x + moveSpeed
+    end
+    
+    --Bouge les animations
+    for i, a in pairs(animations.container) do
+        a.x = a.x + moveSpeed
     end
 end
 
@@ -68,13 +73,18 @@ local moveAllY = function(moveSpeed)--Déplace tous les objets de la salle (vert
     end
     
     --Bouge les événements
-    for i, v in pairs(chapter.events) do
-        v.y = v.y + moveSpeed
+    for i, e in pairs(chapter.events) do
+        e.y = e.y + moveSpeed
     end
     
     --Bouge les particules de météo
-    for i, v in pairs(weathers.drops) do
-        v.y = v.y + moveSpeed
+    for i, d in pairs(weathers.drops) do
+        d.y = d.y + moveSpeed
+    end
+    
+    --Bouge les animations
+    for i, a in pairs(animations.container) do
+        a.y = a.y + moveSpeed
     end
 end
 

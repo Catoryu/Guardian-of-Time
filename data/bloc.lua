@@ -20,7 +20,7 @@ bloc_class = {
     imgCardinality = {}, --Permet de définir si le bloc a plusieurs images
     imgLink = false,
     timePass = false, --Indique si le bloc est affecté par le temps
-    layer = 1, --Permet de définir si le bloque est devant ou derrière
+    layer = 1, --Permet de définir si le bloc est devant ou derrière
     colors = {255, 255, 255, 255},
     
     --Définit quel fonction sont activé

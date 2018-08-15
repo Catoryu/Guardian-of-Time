@@ -765,10 +765,12 @@ end
 player.draw = function()--Dessine le joueur
     lg.setColor(255, 255, 255)
     
-    if wdow.shake.isPlayerShaken then
-        lg.rectangle("fill", player.x + wdow.shake.x, player.y + wdow.shake.y, player.wth, player.hgt)
-    else
-        lg.rectangle("fill", player.x, player.y, player.wth, player.hgt)
+    if debug.visible then
+        if wdow.shake.isPlayerShaken then
+            lg.rectangle("line", player.x + wdow.shake.x, player.y + wdow.shake.y, player.wth, player.hgt)
+        else
+            lg.rectangle("line", player.x, player.y, player.wth, player.hgt)
+        end
     end
     
     if player.showGrid then

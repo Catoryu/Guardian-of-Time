@@ -5,6 +5,7 @@ function love.load()--Chargement du jeu
     
     --[[Appel des autres fichiers]]--
     dofile("assets/lobj.lua")
+    dofile("animations.lua")
     dofile("functions.lua")
     dofile("load.lua")
     dofile("conf.lua")
@@ -24,6 +25,8 @@ function love.load()--Chargement du jeu
     time = 0
     
     --[[Instructions initiales]]--
+    
+    animations.create(animation["player"]:new({fps = 10, isLooping = true, bind = "player", centerMethod = 7}))
     
     --Modifie la taille de la fenêtre et son titre
     love.window.setTitle(wdow.title)
@@ -56,6 +59,7 @@ function love.update(dt)--Actualisation du jeu
         controls.update(dt)
         effects.update(dt)
         wdow.update(dt)
+        animations.update(dt)
     else
         --Permet de ne pas faire avancer le joueur dans le vide après avoir bougé la fenêtre
         inputs = {}
@@ -115,4 +119,6 @@ function love.draw()--Affichage du jeu
         lg.setColor(255, 255, 255)
         lg.draw(src.img.cursor, mouse.x, mouse.y)
     end
+    
+    animations.draw()
 end

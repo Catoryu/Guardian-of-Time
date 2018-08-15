@@ -207,6 +207,10 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     --Supprime le dernier bloc et recalcul les cardinalités
     if key == "backspace" and room.blocs[1] ~= nil and #room.blocs[1] > 0 then
         blocs.pop(room.blocs[1][#room.blocs[1]].x, room.blocs[1][#room.blocs[1]].y, 1)
+        
+        local x, y = blocs.getPos(room.blocs[1][#room.blocs[1]].x, room.blocs[1][#room.blocs[1]].y)
+        
+        animations.create(animation["explosion"]:new({x = x + blocs.size/2 - animation["explosion"].wth/2, y = y + blocs.size/2 - animation["explosion"].hgt/2, fps = 30}))
     end
 end
 
