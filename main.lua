@@ -5,6 +5,7 @@ function love.load()--Chargement du jeu
     
     --[[Appel des autres fichiers]]--
     dofile("assets/lobj.lua")
+    dofile("assets/deepcopy.lua")
     dofile("animations.lua")
     dofile("functions.lua")
     dofile("load.lua")
@@ -17,6 +18,7 @@ function love.load()--Chargement du jeu
     dofile("events.lua")
     dofile("weathers.lua")
     dofile("effects.lua")
+    dofile("bgrounds.lua")
     
     --[[Variable global]]--
     gravity = 4000

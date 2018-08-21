@@ -246,7 +246,7 @@ loadChapter = function(chapterNumber)--Charge un chapitre
     loadRoom(1)
 end
 
-loadRoom = function(roomNumber)--Charge un salle
+loadRoom = function(roomNumber, roomX, roomY)--Charge un salle
     local start = love.timer.getTime()
     
     --Actualise la variable qui définit la salle actuelle
@@ -255,8 +255,15 @@ loadRoom = function(roomNumber)--Charge un salle
     --Chargement de la salle
     chapter.rooms[roomNumber]()
     
+    --Redéfinit la position de la salle
+    if roomX then room.x = roomX end
+    if roomY then room.y = roomY end
+    
     --Chargement de la météo
     weathers.load()
+    
+    --Chargement de l'image de fond
+    bgrounds.load()
     
     --Réinitialisation des événements
     for i, v in pairs(chapter.events) do
@@ -275,6 +282,7 @@ end
 
 spairs = function(t, order)--Permet de trier les valeurs d'une table
     --https://stackoverflow.com/questions/15706270/sort-a-table-in-lua
+    
     -- collect the keys
     local keys = {}
     for k in pairs(t) do keys[#keys+1] = k end
@@ -297,7 +305,9 @@ spairs = function(t, order)--Permet de trier les valeurs d'une table
     end
 end
 
-function toBits(num,bits)--Convertit un nombre en binaire
+toBits = function(num, bits)--Convertit un nombre en binaire
+    --https://stackoverflow.com/a/9080080
+    
   -- returns a table of bits, most significant first.
   bits = bits or math.max(1, select(2, math.frexp(num)))
   local t = {} -- will contain the bits        
