@@ -26,8 +26,6 @@ function love.load()--Chargement du jeu
     
     --[[Instructions initiales]]--
     
-    animations.create(animation["player"]:new({fps = 10, isLooping = true, bind = "player", centerMethod = 7}))
-    
     --Modifie la taille de la fenêtre et son titre
     love.window.setTitle(wdow.title)
     love.window.setMode(wdow.wth, wdow.hgt)
@@ -119,6 +117,4 @@ function love.draw()--Affichage du jeu
         lg.setColor(255, 255, 255)
         lg.draw(src.img.cursor, mouse.x, mouse.y)
     end
-    
-    animations.draw()
 end

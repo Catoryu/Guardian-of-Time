@@ -326,19 +326,17 @@ mergeColors = function(color1, color2)--Combine deux couleurs
     return color
 end
 
-shakeScreen = function(duration, shakeX, shakeY, spd, isPlayerShaken)--Secoue l'écran
+shakeScreen = function(duration, shakeX, shakeY, spd)--Secoue l'écran
     --Définit des valeurs de base pour la secousse de l'écran
     if duration == nil then duration = 500 end
     if shakeX == nil then shakeX = 8 end
     if shakeY == nil then shakeY = 10 end
     if spd == nil then spd = 800 end
-    if isPlayerShaken == nil then isPlayerShaken = true end
     
     wdow.shake.duration = duration
     wdow.shake.maxX = shakeX
     wdow.shake.maxY = shakeY
     wdow.shake.spd = spd
-    wdow.shake.isPlayerShaken = isPlayerShaken
 end
 
 chance = function(val)

@@ -59,7 +59,6 @@ wdow.shake.maxX = 8
 wdow.shake.maxY = 10
 wdow.shake.spd = 800 --ms, temps pour un tremblement d'aller de maxX à -maxX
 wdow.shake.duration = 0 --ms
-wdow.shake.isPlayerShaken = true
 wdow.update = function(dt)
     --Gère le tremblement de l'écran
     if wdow.shake.duration > 0 then

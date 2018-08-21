@@ -21,6 +21,9 @@ rooms.draw = function()--Dessine tous les objets de la salle
     --Affiche les événements (Debug)
     events.draw()
     
+    --Affiche les animations immigrées
+    animations.draw()
+    
     --Affiche le joueur
     player.draw()
     

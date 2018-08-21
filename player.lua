@@ -17,8 +17,8 @@ lg.setCanvas(player.grid)
 lg.setCanvas()
 
 player.showGrid = false
-player.wth = 45
-player.hgt = 95
+player.wth = 42
+player.hgt = 86
 player.x = wdow.wth/2 - player.wth/2
 player.y = wdow.hgt - player.hgt
 player.moveSpd = 200
@@ -34,6 +34,38 @@ player.jumpLevel = 1
 player.jumpLevels = {100, 200, 250, 300}
 player.jumpSlow = 500
 player.canJumpHigher = false
+player.direction = true --false = left, true = right
+
+player.animationStage = 1
+
+--[[
+1 = Immobile
+2 = Marche
+3 = Début de saut
+4 = Change de coté
+5 = En l'air (en allant en haut)
+6 = En l'air (en allant en bas)
+7 = En l'air (en allant en haut à droite)
+8 = En l'air (en allant en bas à droite)
+9 = Aterrissage
+]]--
+
+player.drawings = {}
+for i = 1, 9 do
+    player.drawings[i] = animation["player"..i]:new({fps = 10, bind = "player"})
+    
+    --Défini des animations qui doivent être complétées avant de passer à la suivante
+    if i == 3 or i == 4 or i == 9 then
+        player.drawings[i].mandatory = true
+    else
+        player.drawings[i].mandatory = false
+        player.drawings[i].isLooping = true
+    end
+    
+    --Alligne l'animation au pieds du joueur
+    player.drawings[i].ox = -(player.wth - player.drawings[i].wth)/2
+    player.drawings[i].oy = -(player.hgt - player.drawings[i].hgt)
+end
 
 player.attacks = {--cc Rui
     jump = 0,
@@ -53,13 +85,19 @@ end
 
 player.jump = function()--Fait sauter du joueur
     if not player.isJumping then
+        
+        print("animation : Le joueur saute")
+        player.changeAnimation(3)
+        
         player.isJumping = true
         player.ySpd = -player.jumpSpd
         player.jumpKeyDown = true
         
-        --Affiche une petite animation de levé de particules
+        --Affiche effet de poussière
         
         --Joue le son de saut
+        
+        --Joue l'animation de saut du joueur
     end
 end
 
@@ -67,7 +105,7 @@ player.touchGround = function()--Instructions lorsque le joueur touche le sol
     player.ySpd = 0
     player.isJumping = false
     
-    --Affiche une petite animation de levé de particules
+    --Affiche effet de poussière
     
     --Joue le son d'atterissage
 end
@@ -87,6 +125,16 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     end
     
     if moveSpeed < 0 then
+        if player.direction then
+            print("animation : Le joueur change de cote (droite a gauche)")
+            player.changeAnimation(4)
+        end
+        
+        player.direction = false
+        for i, d in pairs(player.drawings) do
+            d.isInvertedX = true
+        end
+        
         local dx = math.huge
         
         --Collision bords de la salle
@@ -153,17 +201,23 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
             player.xSpd = 0
             player.x = player.x - dx
             
-            rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
-            
             return false
         end
         
         player.x = player.x + moveSpeed
         
-        rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
-        
         return true
     elseif moveSpeed > 0 then
+        if not player.direction then
+            print("animation : Le joueur change de cote (gauche a droite)")
+            player.changeAnimation(4)
+        end
+        
+        player.direction = true
+        for i, d in pairs(player.drawings) do
+            d.isInvertedX = false
+        end
+        
         local dx = math.huge
         
         --Collision bords de la salle
@@ -234,13 +288,11 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
             player.xSpd = 0
             
             player.x = player.x + dx
-            rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
             
             return false
         end
         
         player.x = player.x + moveSpeed
-        rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
         
         return true
     end
@@ -330,13 +382,11 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             player.ySpd = 0
             
             player.y = player.y - dy
-            rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
             
             return false
         end
         
         player.y = player.y + moveSpeed
-        rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
         
         return true
     elseif moveSpeed > 0 then
@@ -404,14 +454,18 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         if dy ~= math.huge then
             player.touchGround()
             
+            if dy ~= 0 then
+                print("animation : le joueur touche le lol")
+                
+                player.changeAnimation(9)
+            end
+            
             player.y = player.y + dy
-            rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
             
             return false
         end
         
         player.y = player.y + moveSpeed
-        rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
         
         if moveSpeed > 0 then
             --Réinitialise le saut (vu que le joueur est en train de tomber)
@@ -697,7 +751,94 @@ player.canMoveY = function(moveSpeed, isPushed)
     end
 end
 
+player.changeAnimation = function(animationStage)
+--    print(player.drawings[player.animationStage].frame.."\\"..player.drawings[player.animationStage].frames)
+    
+    --Vérifie que la nouvelle animation est différente et qu'elle est complétée (si c'est nécessaire)
+    if player.animationStage ~= animationStage and
+    (not player.drawings[player.animationStage].mandatory or (player.drawings[player.animationStage].mandatory and player.drawings[player.animationStage].frame == player.drawings[player.animationStage].frames - 1)) then
+        
+        --Reset la nouvelle animation
+        player.drawings[animationStage].frame = 0
+        player.drawings[animationStage].isPlaying = true
+        player.drawings[animationStage].isVisible = true
+        
+        --Arrête l'actualisation de l'ancienne animation
+        player.drawings[player.animationStage].isPlaying = true
+        
+        --Change l'animation
+        player.animationStage = animationStage
+        return true
+    end
+    
+    return false
+end
+
+player.getDirection = function(oldPlayerX, oldPlayerY)--Test ou le joueur s'est déplacé
+    
+    if oldPlayerY == player.y then
+        if inputs[#inputs] == 3 then
+            
+            player.changeAnimation(2)
+            print("animation : Le joueur va vers la gauche en etant sur le lol")
+            
+        elseif inputs[#inputs] == 4 then
+            
+            player.changeAnimation(2)
+            print("animation : Le joueur va vers la droite en etant sur le lol")
+            
+        else
+            
+            player.changeAnimation(1)
+            print("animation : Le joueur est immobile")
+            
+        end
+    elseif player.airTime ~= 0 then
+        if oldPlayerX == player.x then
+            if oldPlayerY < player.y then
+                
+                player.changeAnimation(6)
+                print("animation : Le joueur descend sans bouger de x")
+                
+            elseif oldPlayerY > player.y then
+                
+                player.changeAnimation(5)
+                print("animation : Le joueur monte sans bouger de x")
+                
+            end
+        elseif oldPlayerX < player.x then
+            if oldPlayerY < player.y then
+                
+                player.changeAnimation(8)
+                print("animation : Le joueur descend en allant a droite")
+                
+            elseif oldPlayerY > player.y then
+                
+                player.changeAnimation(7)
+                print("animation : Le joueur monte en allant a droite")
+                
+            end
+        elseif oldPlayerX > player.x then
+            if oldPlayerY < player.y then
+                
+                player.changeAnimation(8)
+                print("animation : Le joueur descend en allant a gauche")
+                
+            elseif oldPlayerY > player.y then
+                
+                player.changeAnimation(7)
+                print("animation : Le joueur monte en allant a gauche")
+                
+            end
+        end
+    end
+end
+
 player.update = function(dt)--Gère les mouvements joueur
+    
+    --Récupère la position du joueur
+    local oldPlayerX, oldPlayerY = player.x, player.y
+    
     --Direction du joueur
     if inputs[#inputs] == 2 then
         --Appuie sur "s"
@@ -753,24 +894,28 @@ player.update = function(dt)--Gère les mouvements joueur
 --            player.isJumping = false
 --        end
 --    end
-
+    
     if player.isJumping then
         player.airTime = player.airTime + 1000 * dt
     else
         player.airTime = 0
         player.jumpLevel = 1
     end
+    
+    player.drawings[player.animationStage]:update(dt)
+    
+    player.getDirection(oldPlayerX, oldPlayerY)
+    
+    rooms.refreshCamera(player.x + player.wth/2, player.y + player.hgt/2)
 end
 
 player.draw = function()--Dessine le joueur
+    player.drawings[player.animationStage]:draw()
+    
     lg.setColor(255, 255, 255)
     
     if debug.visible then
-        if wdow.shake.isPlayerShaken then
-            lg.rectangle("line", player.x + wdow.shake.x, player.y + wdow.shake.y, player.wth, player.hgt)
-        else
-            lg.rectangle("line", player.x, player.y, player.wth, player.hgt)
-        end
+        lg.rectangle("line", player.x, player.y, player.wth, player.hgt)
     end
     
     if player.showGrid then
