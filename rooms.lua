@@ -10,7 +10,7 @@ end
 
 rooms.draw = function()--Dessine tous les objets de la salle
     --Affiche l'image de fond
-    lg.draw(src.img.bground["c"..chapterNumber.."r"..chapter.roomNumber], room.x + wdow.shake.x, room.y + wdow.shake.y)
+    bgrounds.draw(false)
     
     --Affiche les blocs
     blocs.draw()
@@ -27,6 +27,9 @@ rooms.draw = function()--Dessine tous les objets de la salle
     --Affiche le joueur
     player.draw()
     
+    --Affiche les parties de l'image de fond qui se retrouve devant
+    bgrounds.draw(true)
+    
     --Affiche la météo
     weathers.draw()
     
@@ -38,6 +41,9 @@ end
 local moveAllX = function(moveSpeed)--Déplace tous les objets de la salle (horizontalement)
     --Bouge la salle (donc les blocs avec)
     room.x = room.x + moveSpeed
+    
+    --Bouge le fond
+    bgrounds.moveX(moveSpeed)
     
     --Bouge le joueur
     player.x = player.x + moveSpeed
@@ -66,6 +72,9 @@ end
 local moveAllY = function(moveSpeed)--Déplace tous les objets de la salle (verticalement)
     --Bouge la salle (donc les blocs avec)
     room.y = room.y + moveSpeed
+    
+    --Bouge le fond
+    bgrounds.moveY(moveSpeed)
     
     --Bouge le joueur
     player.y = player.y + moveSpeed

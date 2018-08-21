@@ -146,9 +146,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
                 end
             else
                 --Change de salle
-                chapter.roomNumber = room.cardinality[3]
-                loadRoom(chapter.roomNumber)
-                room.x = - room.wth + wdow.wth
+                loadRoom(room.cardinality[3], - room.wth + wdow.wth, room.y)
                 player.x = room.x + room.wth - player.wth
                 return true
             end
@@ -229,10 +227,8 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
                 end
             else
                 --Change de salle
-                chapter.roomNumber = room.cardinality[4]
-                loadRoom(chapter.roomNumber)
-                room.x = 0
-                player.x = room.x
+                loadRoom(room.cardinality[4], 0, room.y)
+                player.x = 0
                 return true
             end
         end
@@ -324,10 +320,8 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
                 end
             else
                 --Change de salle
-                chapter.roomNumber = room.cardinality[1]
-                loadRoom(chapter.roomNumber)
+                loadRoom(room.cardinality[1], room.x, - room.hgt + wdow.hgt)
                 player.y = wdow.hgt - player.hgt
-                room.y = - room.hgt + wdow.hgt
                 return true
             end
         end
@@ -399,9 +393,8 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
                 end
             else
                 --Change de salle
-                loadRoom(room.cardinality[2])
+                loadRoom(room.cardinality[2], room.x, 0)
                 player.y = 0
-                room.y = 0
             end
         end
         

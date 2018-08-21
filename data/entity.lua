@@ -39,7 +39,7 @@ entity_class = {
                 end
                 
                 --Collision bloc
-                for _, b in pairs(room.blocs) do
+                for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
                             --Récupère les coordonnés du bloc
@@ -119,7 +119,7 @@ entity_class = {
                 end
                 
                 --Collision bloc
-                for _, b in pairs(room.blocs) do
+                for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
                             --Récupère les coordonnés du bloc
@@ -217,7 +217,7 @@ entity_class = {
                 end
                 
                 --Collision bloc
-                for _, b in pairs(room.blocs) do
+                for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
                             --Récupère les coordonnés du bloc
@@ -297,7 +297,7 @@ entity_class = {
                 end
                 
                 --Collision bloc
-                for _, b in pairs(room.blocs) do
+                for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
                             --Récupère les coordonnés du bloc

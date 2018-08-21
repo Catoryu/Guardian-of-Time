@@ -178,8 +178,6 @@ animation_class = {
                 self.oy = -self.oy
             end
             
-            print(type(src.anim["player4_2"]))
-            
             lg.draw(src.anim[self.file], src.anim[self.file.."_"..self.frame], x + wdow.shake.x, y + wdow.shake.y, self.rotation, self.sx, self.sy, self.ox, self.oy, self.kx, self.ky)
             
             if debug.visible then
