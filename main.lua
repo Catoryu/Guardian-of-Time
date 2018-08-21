@@ -4,21 +4,21 @@ function love.load()--Chargement du jeu
     keyDown = love.keyboard.isDown
     
     --[[Appel des autres fichiers]]--
-    dofile("assets/lobj.lua")
-    dofile("assets/deepcopy.lua")
-    dofile("animations.lua")
-    dofile("functions.lua")
-    dofile("load.lua")
+    require "assets/lobj"
+    require "assets/deepcopy"
+    require "animations"
+    require "functions"
+    require "load"
     dofile("conf.lua")
-    dofile("controls.lua")
-    dofile("rooms.lua")
-    dofile("blocs.lua")
-    dofile("player.lua")
-    dofile("entities.lua")
-    dofile("events.lua")
-    dofile("weathers.lua")
-    dofile("effects.lua")
-    dofile("bgrounds.lua")
+    require "controls"
+    require "rooms"
+    require "blocs"
+    require "player"
+    require "entities"
+    require "events"
+    require "weathers"
+    require "effects"
+    require "bgrounds"
     
     --[[Variable global]]--
     gravity = 4000
