@@ -336,8 +336,10 @@ bloc_class = {
                                 b.x = -1
                                 b.y = -1
                                 
+                                blocs.checkIfLayerExists(self.layer)
+                                
                                 --Ajoute la position -1 -1 dans la table des blocs à supprimer
-                                table.insert(blocs.toDelete, i)
+                                table.insert(blocs.toDelete[self.layer], i)
                                 
                                 --Déplace le bloc liquide
                                 self.y = self.y + 1
@@ -372,8 +374,10 @@ bloc_class = {
                                 b.x = -1
                                 b.y = -1
                                 
+                                blocs.checkIfLayerExists(self.layer)
+                                
                                 --Ajoute la position -1 -1 dans la table des blocs à supprimer
-                                table.insert(blocs.toDelete, i)
+                                table.insert(blocs.toDelete[self.layer], i)
                                 
                                 --Crée un bloc liquide à la nouvelle position
                                 blocs.push(self.isSolid, bloc[self.id]:new({x = self.x - 1, y = self.y, fillingRate = quantity, layer = self.layer}))
@@ -408,8 +412,10 @@ bloc_class = {
                                 b.x = -1
                                 b.y = -1
                                 
+                                blocs.checkIfLayerExists(self.layer)
+                                
                                 --Ajoute la position -1 -1 dans la table des blocs à supprimer
-                                table.insert(blocs.toDelete, i)
+                                table.insert(blocs.toDelete[self.layer], i)
                                 
                                 --Crée un bloc liquide à la nouvelle position
                                 blocs.push(self.isSolid, bloc[self.id]:new({x = self.x + 1, y = self.y, fillingRate = quantity, layer = self.layer}))
@@ -585,16 +591,7 @@ bloc_class = {
     end
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(bloc_class, {__index = bloc_class})
-
---Permet de créer un objet en utilisant une classe
-function bloc_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
+newClass(bloc_class)
 
 bloc = {
     --Bloc solide classique

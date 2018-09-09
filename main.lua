@@ -6,8 +6,8 @@ function love.load()--Chargement du jeu
     --[[Appel des autres fichiers]]--
     require "assets/lobj"
     require "assets/deepcopy"
-    require "animations"
     require "functions"
+    require "animations"
     require "load"
     dofile("conf.lua")
     require "controls"
@@ -67,7 +67,6 @@ function love.update(dt)--Actualisation du jeu
 end
 
 function love.draw()--Affichage du jeu
-    
     effects.current.raw.draw(function()
         --Dessine la salle
         rooms.draw()
@@ -86,7 +85,7 @@ function love.draw()--Affichage du jeu
         
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
-        lg.rectangle("fill", 10, 10, 300, 420)
+        lg.rectangle("fill", 10, 10, 300, 440)
         lg.setColor(0, 0, 0)
         lg.print("player.x : "..player.x, 10, 10)
         lg.print("player.y : "..player.y, 10, 30)
@@ -110,13 +109,14 @@ function love.draw()--Affichage du jeu
         lg.print("selectedLayer : "..selectedLayer, 10, 330)
         lg.print(string.format("time : %.2f s", time), 10, 350)
         lg.print(string.format("weathers.wind : %.2f px/s", weathers.wind), 10, 370)
-        lg.print("#weathers.drops : "..#weathers.drops, 10, 390)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 410)
+        lg.print("weathers.id : "..weathers.id, 10, 390)
+        lg.print("weathers.softDuration : "..weathers.softDuration, 10, 410)
+        lg.print("FPS : "..love.timer.getFPS(), 10, 430)
     end
     
     --Affichage de la souris
     if mouse.visible then
         lg.setColor(255, 255, 255)
-        lg.draw(src.img.cursor, mouse.x, mouse.y)
+        lg.draw(src.img.misc.cursor, mouse.x, mouse.y)
     end
 end

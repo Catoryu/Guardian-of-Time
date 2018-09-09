@@ -22,17 +22,7 @@ bgroundLayer_class = {
     isOnFront = false
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(bgroundLayer_class, {__index = bgroundLayer_class})
-
---Permet de créer un objet en utilisant une classe
-function bgroundLayer_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
-
+newClass(bgroundLayer_class)
 
 bground_class = {
     id = 0,
@@ -42,16 +32,7 @@ bground_class = {
     isVisible = true,
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(bground_class, {__index = bground_class})
-
---Permet de créer un objet en utilisant une classe
-function bground_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
+newClass(bground_class)
 
 bground = {
     bground_class:new({
@@ -63,7 +44,18 @@ bground = {
             bgroundLayer_class:new({image = "collines3", distanceX = 25, distanceY = 10}),
             bgroundLayer_class:new({image = "collines4", distanceX = 30, distanceY = 15}),
             bgroundLayer_class:new({image = "collines5", distanceX = 40, distanceY = 20}),
-            bgroundLayer_class:new({image = "collines6", isOnFront = true, distanceX = 50, distanceY = 30})
+            bgroundLayer_class:new({image = "collines6", isOnFront = true, distanceX = 120, distanceY = 30})
+        }
+    }),
+    
+    bground_class:new({
+        id = 2,
+        name = "midnight",
+        layers = {
+            bgroundLayer_class:new({image = "midnight1", distanceX = 0, distanceY = 0}),
+            bgroundLayer_class:new({image = "midnight2", distanceX = 15, distanceY = 5}),
+            bgroundLayer_class:new({image = "midnight3", distanceX = 30, distanceY = 10}),
+            bgroundLayer_class:new({image = "midnight4", distanceX = 40, distanceY = 15})
         }
     }),
 }

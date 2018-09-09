@@ -90,12 +90,19 @@ blocs.calculateCardinality = function(bloc, destroy)--Calcul les les cardinalit√
     return bloc
 end
 
-
 blocs.checkIfLayerExists = function(layer)--Cr√©e la couche du bloc si elle n'existe pas
     if room.blocs[layer] == nil then
         for i = 1, layer do
             if room.blocs[i] == nil then
                 room.blocs[i] = {}
+            end
+        end
+    end
+    
+    if blocs.toDelete[layer] == nil then
+        for i = 1, layer do
+            if blocs.toDelete[i] == nil then
+                blocs.toDelete[i] = {}
             end
         end
     end

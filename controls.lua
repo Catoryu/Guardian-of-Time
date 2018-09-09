@@ -164,10 +164,12 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
         
         --Génère la table pour les blocs
         local dump = "blocs.push(false, "
-        for i, b in pairs(room.blocs) do
-            dump = dump .. "bloc["..b.id.."]:new({x = "..b.x..", y = "..b.y.."})"
-            if i < #room.blocs then
-                dump = dump..","
+        for j = 1, #room.blocs do
+            for i, b in pairs(room.blocs[j]) do
+                dump = dump .. "bloc["..b.id.."]:new({x = "..b.x..", y = "..b.y..", layer = "..b.layer.."})"
+                if i < #room.blocs[j] then
+                    dump = dump..","
+                end
             end
         end
         dump = dump..")"

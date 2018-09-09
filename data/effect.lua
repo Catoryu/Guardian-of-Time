@@ -9,16 +9,7 @@ effect_class = {
     parameterBase = nil
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(effect_class, {__index = effect_class})
-
---Permet de créer un objet en utilisant une classe
-function effect_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
+newClass(effect_class)
 
 effect = {
     --Temps idéale min : 1300 max : 3000

@@ -59,8 +59,12 @@ local moveAllX = function(moveSpeed)--Déplace tous les objets de la salle (hori
     end
     
     --Bouge les particules de météo
-    for i, d in pairs(weathers.drops) do
-        d.x = d.x + moveSpeed
+    for i, w in pairs(room.weather.list) do
+        if w.container then
+            for j, p in pairs(w.container) do
+                p.x = p.x + moveSpeed
+            end
+        end
     end
     
     --Bouge les animations
@@ -90,8 +94,12 @@ local moveAllY = function(moveSpeed)--Déplace tous les objets de la salle (vert
     end
     
     --Bouge les particules de météo
-    for i, d in pairs(weathers.drops) do
-        d.y = d.y + moveSpeed
+    for i, w in pairs(room.weather.list) do
+        if w.container then
+            for j, p in pairs(w.container) do
+                p.y = p.y + moveSpeed
+            end
+        end
     end
     
     --Bouge les animations
@@ -124,6 +132,6 @@ rooms.refreshCamera = function(x, y)--Recentre le centre de la fenêtre vers la 
     end
     
     --Bouge tous les éléments de la salle
-    moveAllX(dx)
-    moveAllY(dy)
+    if dx ~= 0 then moveAllX(dx) end
+    if dy ~= 0 then moveAllY(dy) end
 end

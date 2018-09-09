@@ -358,3 +358,16 @@ chance = function(val)
         return false
     end
 end
+
+newClass = function(table)
+    --Un peu de magie dans ce monde de brutes
+    setmetatable(table, {__index = table})
+
+    --Permet de créer un objet en utilisant une classe
+    function table:new (t)
+        t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
+        setmetatable(t, self)
+        self.__index = self
+        return t
+    end
+end

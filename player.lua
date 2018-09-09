@@ -86,7 +86,7 @@ end
 player.jump = function()--Fait sauter du joueur
     if not player.isJumping then
         
-        print("animation : Le joueur saute")
+--        print("animation : Le joueur saute")
         player.changeAnimation(3)
         
         player.isJumping = true
@@ -126,7 +126,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     
     if moveSpeed < 0 then
         if player.direction then
-            print("animation : Le joueur change de cote (droite a gauche)")
+--            print("animation : Le joueur change de cote (droite a gauche)")
             player.changeAnimation(4)
         end
         
@@ -207,7 +207,7 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         return true
     elseif moveSpeed > 0 then
         if not player.direction then
-            print("animation : Le joueur change de cote (gauche a droite)")
+--            print("animation : Le joueur change de cote (gauche a droite)")
             player.changeAnimation(4)
         end
         
@@ -448,7 +448,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
             player.touchGround()
             
             if dy ~= 0 then
-                print("animation : le joueur touche le lol")
+--                print("animation : le joueur touche le lol")
                 
                 player.changeAnimation(9)
             end
@@ -773,17 +773,17 @@ player.getDirection = function(oldPlayerX, oldPlayerY)--Test ou le joueur s'est 
         if inputs[#inputs] == 3 then
             
             player.changeAnimation(2)
-            print("animation : Le joueur va vers la gauche en etant sur le lol")
+--            print("animation : Le joueur va vers la gauche en etant sur le lol")
             
         elseif inputs[#inputs] == 4 then
             
             player.changeAnimation(2)
-            print("animation : Le joueur va vers la droite en etant sur le lol")
+--            print("animation : Le joueur va vers la droite en etant sur le lol")
             
         else
             
             player.changeAnimation(1)
-            print("animation : Le joueur est immobile")
+--            print("animation : Le joueur est immobile")
             
         end
     elseif player.airTime ~= 0 then
@@ -791,36 +791,36 @@ player.getDirection = function(oldPlayerX, oldPlayerY)--Test ou le joueur s'est 
             if oldPlayerY < player.y then
                 
                 player.changeAnimation(6)
-                print("animation : Le joueur descend sans bouger de x")
+--                print("animation : Le joueur descend sans bouger de x")
                 
             elseif oldPlayerY > player.y then
                 
                 player.changeAnimation(5)
-                print("animation : Le joueur monte sans bouger de x")
+--                print("animation : Le joueur monte sans bouger de x")
                 
             end
         elseif oldPlayerX < player.x then
             if oldPlayerY < player.y then
                 
                 player.changeAnimation(8)
-                print("animation : Le joueur descend en allant a droite")
+--                print("animation : Le joueur descend en allant a droite")
                 
             elseif oldPlayerY > player.y then
                 
                 player.changeAnimation(7)
-                print("animation : Le joueur monte en allant a droite")
+--                print("animation : Le joueur monte en allant a droite")
                 
             end
         elseif oldPlayerX > player.x then
             if oldPlayerY < player.y then
                 
                 player.changeAnimation(8)
-                print("animation : Le joueur descend en allant a gauche")
+--                print("animation : Le joueur descend en allant a gauche")
                 
             elseif oldPlayerY > player.y then
                 
                 player.changeAnimation(7)
-                print("animation : Le joueur monte en allant a gauche")
+--                print("animation : Le joueur monte en allant a gauche")
                 
             end
         end

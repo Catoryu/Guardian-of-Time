@@ -22,16 +22,7 @@ event_class = {
     onLeave = false --Définit les instructions si l'événement est déclenché par la sortie du contact avec le joueur
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(event_class, {__index = event_class})
-
---Permet de créer un objet en utilisant une classe
-function event_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
+newClass(event_class)
 
 event = {
     --Inverse la pluie (normal <---> forte)
@@ -73,17 +64,19 @@ event = {
         enter = true,
         onEnter = function(self)
             print(("Evenement 4 declenche a %.2f s"):format(time))
-            shakeScreen(_, _, _, _, true)
+            shakeScreen()
         end,
     }),
 
-    --Charge la neige de façon "smooth"
+    --Alterne toutes les météos en les chargeant de façon "smooth"
     event_class:new({
         id = 5,
         enter = true,
         onEnter = function(self)
             print(("Evenement 5 declenche a %.2f s"):format(time))
-            weathers.softChange(3)
+            local id = weathers.id + 1
+            if id > #weather - 1 then id = 1 end
+            weathers.softChange(id)
         end,
     })
 }

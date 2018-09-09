@@ -64,19 +64,13 @@ animations.draw = function()
             if debug.visible then
                 lg.setColor(0, 255, 0)
                 
-                if a.isInvertedX then
-                    if a.isInvertedY then
-                        lg.rectangle("line", x - a.wth + a.ox, y - a.hgt + a.oy, a.wth, a.hgt)
-                    else
-                        lg.rectangle("line", x - a.wth + a.ox, y - a.oy, a.wth, a.hgt)
-                    end
-                else
-                    if a.isInvertedY then
-                        lg.rectangle("line", x - a.ox, y - a.hgt + a.oy, a.wth, a.hgt)
-                    else
-                        lg.rectangle("line", x - a.ox, y - a.oy, a.wth, a.hgt)
-                    end
-                end
+                x = x - a.ox*a.sx
+                y = y - a.oy*a.sy
+                
+                local wth = a.wth*a.sx
+                local hgt = a.hgt*a.sy
+                
+                lg.line(x, y, x + wth, y, x + wth, y + hgt, x, y + hgt, x, y)
             end
             
             if a.isInvertedX then
@@ -183,29 +177,21 @@ animation_class = {
             if debug.visible then
                 lg.setColor(0, 255, 0)
                 
-                if self.isInvertedX then
-                    if self.isInvertedY then
-                        lg.rectangle("line", x - self.wth + self.ox, y - self.hgt + self.oy, self.wth, self.hgt)
-                    else
-                        lg.rectangle("line", x - self.wth + self.ox, y - self.oy, self.wth, self.hgt)
-                    end
-                else
-                    if self.isInvertedY then
-                        lg.rectangle("line", x - self.ox, y - self.hgt + self.oy, self.wth, self.hgt)
-                    else
-                        lg.rectangle("line", x - self.ox, y - self.oy, self.wth, self.hgt)
-                    end
-                end
+                x = x - self.ox*self.sx
+                y = y - self.oy*self.sy
+                
+                local wth = self.wth*self.sx
+                local hgt = self.hgt*self.sy
+                
+                lg.line(x, y, x + wth, y, x + wth, y + hgt, x, y + hgt, x, y)
             end
-            
+        
             if self.isInvertedX then
-                x = x - self.wth
                 self.sx = -self.sx
                 self.ox = -self.ox
             end
             
             if self.isInvertedY then
-                y = y - self.hgt
                 self.sy = -self.sy
                 self.oy = -self.oy
             end
@@ -213,16 +199,8 @@ animation_class = {
     end
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(animation_class, {__index = animation_class})
 
---Permet de créer un objet en utilisant une classe
-function animation_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
+newClass(animation_class)
 
 --Cette table contiendra toutes les animations lors du chargement de celles-ci
 animation = {}

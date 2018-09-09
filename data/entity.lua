@@ -372,16 +372,7 @@ entity_class = {
     end
 }
 
---Un peu de magie dans ce monde de brutes
-setmetatable(entity_class, {__index = entity_class})
-
---Permet de créer un objet en utilisant une classe
-function entity_class:new (t)
-    t = t or {} --Crée une table si l'utilisateur n'en passe pas dans la fonction
-    setmetatable(t, self)
-    self.__index = self
-    return t
-end
+newClass(entity_class)
 
 entity = {
     --Je liste déjà tous là, je supprimerais ce qui n'ai pas une entité après

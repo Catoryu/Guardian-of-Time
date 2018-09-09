@@ -6,7 +6,7 @@ src.font = loadSrc("resource/fonts", "font")
 src.sound = loadSrc("resource/sounds", "sound")
 src.anim = loadSrc("resource/animations", "animation")
 src.img = {}
-src.img.cursor = lg.newImage("resource/images/miscellaneous/cursor32x32.png")
+src.img.misc = loadSrc("resource/images/miscellaneous", "image")
 src.img.bloc = loadSrc("resource/images/bloc", "image")
 src.img.bground = loadSrc("resource/images/backgrounds", "image")
 

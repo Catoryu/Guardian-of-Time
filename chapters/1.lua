@@ -82,13 +82,13 @@ chapter.rooms[1] = function()
     room.x = 0
     room.y = -room.hgt + wdow.hgt
     room.cardinality = {3, 0, 0, 2}
-    room.colors = {255, 255, 255, 0}
+    room.colors = {255, 255, 255, 20}
     room.blocs = {}
     room.entities = {}
-    weathers.id = 1
-    bgrounds.id = 1
+    weathers.id = 3
+    bgrounds.id = 2
     
-    lg.setBackgroundColor(241, 242, 215)
+    lg.setBackgroundColor(0, 60, 123)
     
     --Blocs
     blocs.push(false, bloc[1]:new({x = 21, y = 18}),bloc[1]:new({x = 22, y = 17}),bloc[1]:new({x = 21, y = 16}),bloc[1]:new({x = 23, y = 16}),bloc[1]:new({x = 23, y = 18}),bloc[1]:new({x = 25, y = 17}),bloc[1]:new({x = 26, y = 17}),bloc[1]:new({x = 27, y = 17}),bloc[1]:new({x = 26, y = 16}),bloc[1]:new({x = 26, y = 18}),bloc[1]:new({x = 29, y = 18}),bloc[1]:new({x = 29, y = 17}),bloc[1]:new({x = 29, y = 16}),bloc[1]:new({x = 30, y = 16}),bloc[1]:new({x = 31, y = 16}),bloc[1]:new({x = 31, y = 17}),bloc[1]:new({x = 31, y = 18}),bloc[1]:new({x = 30, y = 18}),bloc[1]:new({x = 33, y = 17}),bloc[1]:new({x = 35, y = 18}),bloc[1]:new({x = 35, y = 17}),bloc[1]:new({x = 35, y = 16}),bloc[1]:new({x = 36, y = 16}),bloc[1]:new({x = 37, y = 16}),bloc[1]:new({x = 37, y = 17}),bloc[1]:new({x = 37, y = 18}),bloc[1]:new({x = 36, y = 18}),bloc[1]:new({x = 36, y = 17}))
@@ -107,7 +107,7 @@ chapter.rooms[2] = function()
     room.colors = {50, 20, 20, 100}
     room.blocs = {}
     room.entities = {}
-    weathers.id = 2
+    weathers.id = 5
     bgrounds.id = 1
     
     lg.setBackgroundColor(241, 242, 215)
@@ -127,7 +127,7 @@ chapter.rooms[3] = function()
     room.blocs = {}
     room.entities = {}
     room.events = {}
-    weathers.id = 0
+    weathers.id = 1
     bgrounds.id = 1
     
     lg.setBackgroundColor(241, 242, 215)
@@ -147,7 +147,7 @@ chapter.rooms[4] = function()
     room.blocs = {}
     room.entities = {}
     room.events = {}
-    weathers.id = 0
+    weathers.id = 1
     bgrounds.id = 1
     
     lg.setBackgroundColor(241, 242, 215)
