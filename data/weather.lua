@@ -552,7 +552,113 @@ weather = {
             end
         end,
         draw = function(self) end
-    }
+    },
+    {--Blizzard
+        id = 8,
+        container = {},
+        minThick = 4,
+        maxThick = 6,
+        minLenght = 4,
+        maxLenght = 6,
+        dropSpeedRatio = 50,
+        dropNumber = 5000,
+        direction = true,
+        colors = {220, 242, 255, 190},
+        --colors = { 220, 192, 0, 190},
+        disappearChance = 0,
+        maxFallTime = 0,
+        disappearChance = 0,
+        resetOffsetX = 100,
+        resetOffsetY = 4000,
+        
+        drop_class = {
+            x = 0,
+            y = 0,
+            thick = 0,
+            lenght = 0,
+            speed = 0,
+            
+            reset = function(self, firstInitialization)
+                local this = room.weather.list[8]
+                
+                if weathers.soft and not firstInitialization then
+                    if weathers.softDuration < this.maxFallTime then return end
+                end
+                
+                self.thick = math.random(this.minThick, this.maxThick)
+                self.lenght = math.random(this.minLenght, this.maxLenght)
+                self.speed = self.lenght * this.dropSpeedRatio
+                
+                if firstInitialization then
+                    self.x = math.random(- this.resetOffsetX, wdow.wth + this.resetOffsetX)
+                    
+                    --Si le chargement de la météo est doux, les gouttes apparaissent en haut de l'écran
+                    if weathers.soft then
+                        self.y = math.random(- this.resetOffsetY, -self.lenght)
+                    else
+                        self.y = math.random(0, wdow.hgt - self.lenght)
+                    end
+                else
+                    self.x = math.random(- this.resetOffsetX, wdow.wth + this.resetOffsetX)
+                    self.y = math.random(- self.lenght, wdow.hgt)
+                end
+            end
+        },
+        
+        initialization = function(self)
+            newClass(self.drop_class)
+            
+            --Calcul l'endroit de la salle ou il faut rajouter des gouttes
+            --(Sinon il se peut que des zones de la salle n'est pas de gouttes à cause du vent)
+            --self.resetOffsetX = wdow.hgt / (self.maxLenght * self.dropSpeedRatio) * room.weather.maxWindSpeed
+            
+            --self.maxFallTime = (self.resetOffsetX + wdow.hgt) / (self.minLenght * self.dropSpeedRatio) * 1000
+            
+            --Crée toutes les particules
+            for i = 1, self.dropNumber do
+                local drop = self.drop_class:new()
+                
+                drop:reset(true)
+                
+                table.insert(self.container, drop)
+            end
+        end,
+        
+        update = function(self, dt)
+            for i, d in pairs(self.container) do
+                
+                --Fait avancer les gouttes d'eau
+                d.y = d.y + d.speed*dt
+                
+                --Applique le vent (artificiel) à la goutte
+                if direction then
+                    d.x = d.x + 1500*dt
+                else
+                    d.x = d.x - 1500*dt
+                end
+                
+                --Test si la goutte d'eau sort de la fenêtre
+                if d.y > wdow.hgt then
+                    if weathers.soft and chance(self.disappearChance) then
+                        table.remove(self.container, i)
+                    else
+                        d:reset()
+                    end
+                end
+            end
+            
+            --Calcul le pourcentage de chance qu'un goutte disparaisse (avec le changement de météo "smooth")
+            self.disappearChance = 100 - (weathers.softDuration * 100 / weathers.softDurationBase)
+        end,
+        
+        draw = function(self)
+            lg.setColor(unpack(self.colors))
+            
+            for i, d in pairs (self.container) do
+                lg.rectangle("fill", d.x + wdow.shake.x, d.y + wdow.shake.y, d.thick, d.lenght)
+            end
+        end
+    },
 }
 
 --Table contenant toutes les météos
