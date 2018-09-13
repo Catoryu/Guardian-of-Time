@@ -703,4 +703,9 @@ weatherSet = {
         windChangeForce = 15,
         weathers = {6}
     }
+    {--Blizzard
+        windRefreshCooldown = 1000,
+        maxWindSpeed = 0,
+        windChangeForce = 0,
+        weathers = {8}
 }
