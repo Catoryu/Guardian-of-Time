@@ -57,5 +57,5 @@ bground = {
             bgroundLayer_class:new({image = "midnight3", distanceX = 30, distanceY = 10}),
             bgroundLayer_class:new({image = "midnight4", distanceX = 40, distanceY = 15})
         }
-    }),
+    })
 }

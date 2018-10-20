@@ -25,7 +25,7 @@ blocs.exists = function(x, y, layer)--Test si un bloc existe dans une certaine c
     blocs.checkIfLayerExists(layer)
     
     for _, b in pairs(room.blocs[layer]) do
-        if b.x == x and b.y == y then
+        if b.coordX == x and b.coordY == y then
             return true
         end
     end
@@ -33,56 +33,90 @@ blocs.exists = function(x, y, layer)--Test si un bloc existe dans une certaine c
     return false
 end
 
+blocs.calculateDimensions = function()
+    for i, l in pairs(room.blocs) do
+        for j, b in pairs(l) do
+            b:calculateDimension()
+        end
+    end
+end
+
 blocs.calculateCardinality = function(bloc, destroy)--Calcul les les cardinalités du bloc choisi (Regarde autour du bloc)
     blocs.checkIfLayerExists(bloc.layer)
     
     if destroy then
         for _, b in pairs(room.blocs[bloc.layer]) do
-            if b.imgLink then
-                --Bloc en dessous de celui qui est détruit
-                if bloc.x == b.x and bloc.y + 1 == b.y then
-                    b.imgCardinality[1] = 0
-                end
-                --Bloc en dessus de celui qui est détruit
-                if bloc.x == b.x and bloc.y - 1 == b.y then
-                    b.imgCardinality[2] = 0
-                end
-                --Bloc à droite de celui qui est détruit
-                if bloc.x + 1 == b.x and bloc.y == b.y then
-                    b.imgCardinality[3] = 0
-                end
-                --Bloc à gauche de celui qui est détruit
-                if bloc.x - 1 == b.x and bloc.y == b.y then
-                    b.imgCardinality[4] = 0
-                end
+            --Bloc en dessous de celui qui est détruit
+            if bloc.coordX == b.coordX and bloc.coordY + 1 == b.coordY then
+                b.cardinality[1] = 0
+                if bloc.imgLink then b.imgCardinality[1] = 0 end
+                b:wakeUp()
+            end
+            --Bloc en dessus de celui qui est détruit
+            if bloc.coordX == b.coordX and bloc.coordY - 1 == b.coordY then
+                b.cardinality[2] = 0
+                if bloc.imgLink then b.imgCardinality[2] = 0 end
+                b:wakeUp()
+            end
+            --Bloc à droite de celui qui est détruit
+            if bloc.coordX + 1 == b.coordX and bloc.coordY == b.coordY then
+                b.cardinality[3] = 0
+                if bloc.imgLink then b.imgCardinality[3] = 0 end
+                b:wakeUp()
+            end
+            --Bloc à gauche de celui qui est détruit
+            if bloc.coordX - 1 == b.coordX and bloc.coordY == b.coordY then
+                b.cardinality[4] = 0
+                if bloc.imgLink then b.imgCardinality[4] = 0 end
+                b:wakeUp()
             end
         end
     else
         --Réinitialise la cardinality du bloc
-        bloc.imgCardinality = {0, 0, 0, 0}
+        bloc.cardinality = {0, 0, 0, 0}
+        
+        if bloc.imgLink then bloc.imgCardinality = {0, 0, 0, 0} end
         
         for _, b in pairs(room.blocs[bloc.layer]) do
-            if b.imgLink then
-                --Haut
-                if bloc.x == b.x and bloc.y - 1 == b.y then
-                    bloc.imgCardinality[1] = 1
-                    b.imgCardinality[2] = 1
-                end
-                --Bas
-                if bloc.x == b.x and bloc.y + 1 == b.y then
-                    bloc.imgCardinality[2] = 1
-                    b.imgCardinality[1] = 1
-                end
-                --Gauche
-                if bloc.x - 1 == b.x and bloc.y == b.y then
-                    bloc.imgCardinality[3] = 1
-                    b.imgCardinality[4] = 1
-                end
-                --Droite
-                if bloc.x + 1 == b.x and bloc.y == b.y then
-                    bloc.imgCardinality[4] = 1
-                    b.imgCardinality[3] = 1
-                end
+            --Haut
+            if bloc.coordX == b.coordX and bloc.coordY - 1 == b.coordY then
+                bloc.cardinality[1] = b.id
+                b.cardinality[2] = bloc.id
+                
+                if b.imgLink then bloc.imgCardinality[1] = 1 end
+                if bloc.imgLink then b.imgCardinality[2] = 1 end
+                
+                b:wakeUp()
+            end
+            --Bas
+            if bloc.coordX == b.coordX and bloc.coordY + 1 == b.coordY then
+                bloc.cardinality[2] = b.id
+                b.cardinality[1] = bloc.id
+                
+                if b.imgLink then bloc.imgCardinality[2] = 1 end
+                if bloc.imgLink then b.imgCardinality[1] = 1 end
+                
+                b:wakeUp()
+            end
+            --Gauche
+            if bloc.coordX - 1 == b.coordX and bloc.coordY == b.coordY then
+                bloc.cardinality[3] = b.id
+                b.cardinality[4] = bloc.id
+                
+                if b.imgLink then bloc.imgCardinality[3] = 1 end
+                if bloc.imgLink then b.imgCardinality[4] = 1 end
+                
+                b:wakeUp()
+            end
+            --Droite
+            if bloc.coordX + 1 == b.coordX and bloc.coordY == b.coordY then
+                bloc.cardinality[4] = b.id
+                b.cardinality[3] = bloc.id
+                
+                if b.imgLink then bloc.imgCardinality[4] = 1 end
+                if bloc.imgLink then b.imgCardinality[3] = 1 end
+                
+                b:wakeUp()
             end
         end
     end
@@ -115,39 +149,35 @@ blocs.push = function(isSafe, ...)--Permet de créer un bloc (coordonnés sur la
         
         --Crée la couleur des blocs par couche si elle n'existe pas
         if blocs.layerColor[b.layer] == nil then
-            for i = 1, b.layer do
-                if blocs.layerColor[i] == nil then
-                    blocs.layerColor[i] = {0, 0, 0, 255}
-                end
+            if blocs.layerColor[i] == nil then
+                blocs.layerColor[i] = {0, 0, 0, 255}
             end
         end
         
-        local x, y = blocs.getPos(b.x, b.y)
+        b:calculateDimension()
         
-        --Test de collision avec le joueur lors de la création
-        if isSafe and b.layer == 1 then
-            if not b.isLiquid then
-                if collision_rectToRect(x, y, blocs.size, blocs.size, player:getXYWH()) then
+        if isSafe then
+            --Test si il y a déjà un bloc à l'endroit du nouveau bloc
+            for i, bb in pairs(room.blocs[b.layer]) do
+                if bb.coordX == b.coordX and bb.coordY == b.coordY then
+                    print("Le bloc ne peut pas etre place car il y a deja un bloc à cette endroit")
                     return false
                 end
-            else
-                --Récupère les coordonnés du bloc
-                local x, y = blocs.getPos(b.x, b.y)
-                
-                --Calcul la hauteur du liquide
-                local liquidHeight = b.fillingRate * blocs.size / 100
-                
-                if collision_rectToRect(x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight, player:getXYWH()) then
+            end
+            
+            --Test de collision avec le joueur lors de la création
+            if b.layer == 1 then
+                if collision_rectToRect(b.x, b.y, b.wth, b.hgt, player:getXYWH()) then
+                    print("Le bloc ne peut pas etre place car il touche le joueur")
                     return false
                 end
             end
         end
         
         --Modifie les images si un blocs est a coté
-        if b.imgLink then
-            b.imgCardinality = {0, 0, 0, 0}
-            b = blocs.calculateCardinality(b)
-        end
+        b.imgCardinality = {0, 0, 0, 0}
+        b.cardinality = {0, 0, 0, 0}
+        b = blocs.calculateCardinality(b)
         
         b.frame = time + b.refreshRate
         
@@ -165,7 +195,7 @@ blocs.get = function(x, y, layer)--Permet de récupérer un bloc selon ses coord
     blocs.checkIfLayerExists(layer)
     
     for _, b in pairs(room.blocs[layer]) do
-        if b.x == x and b.y == y then
+        if b.coordX == x and b.coordY == y then
             return b
         end
     end
@@ -184,7 +214,12 @@ blocs.pop = function (x, y, layer)--Permet de supprimer un bloc (coordonnés sur
     end
     
     for i, b in pairs(room.blocs[layer]) do
-        if b.x == x and b.y == y then
+        if b.coordX == x and b.coordY == y then
+            --Test si le bloc choisi pour être supprimé existe déjà dans les blocs qui vont être supprimés
+            for j, index in pairs(blocs.toDelete[layer]) do
+                if index == i then return end
+            end
+            
             table.insert(blocs.toDelete[layer], i)
         end
     end
@@ -203,7 +238,7 @@ end
 blocs.create = function(x, y, id, safe, layer)--Permet de créer un bloc (coordonnés en pixel)
     local bx, by = blocs.getCoordPos(x, y)
 
-    blocs.push(safe, bloc[id]:new({x = bx, y = by, layer = layer}))
+    blocs.push(safe, bloc[id]:new({coordX = bx, coordY = by, layer = layer}))
 end
 
 blocs.getPos = function(x, y)--Permet de trouver les coordonnés x et y en pixel
@@ -222,18 +257,34 @@ end
 
 blocs.update = function(dt)--Vérification des événements des blocs
     --Gère les frames synchronisé des liquides
-    for _, b in pairs(blocs.liquid) do
-        b.active = false
+    for _, f in pairs(blocs.liquid) do
+        f.active = false
         
-        if time > b.frame then
-            b.frame = b.frame + b.refreshRate
-            b.active = true
+        if time > f.frame then
+            f.frame = f.frame + f.refreshRate
+            f.active = true
         end
     end
     
+    local temp = {}
+    
+    --Trie les blocs dans l'ordre décroissant de remplissage
     for j = 1, #room.blocs do
-        --Itère à travers tous les blocs dans l'ordre décroissant de remplissage
+        table.insert(temp, {})
         for _, b in spairs(room.blocs[j], function(t, a, b) return t[b].fillingRate < t[a].fillingRate end) do
+            table.insert(temp[j], b)
+        end
+    end
+    
+    room.blocs = temp
+    
+    --Itère tous les blocs
+    for j = 1, #room.blocs do
+        for i, b in pairs(room.blocs[j]) do
+            
+            if b.update then
+                b:onUpdate()
+            end
             
             --Si le bloc est déclenché au bout d'un moment
             if b.timePass then
@@ -248,16 +299,26 @@ blocs.update = function(dt)--Vérification des événements des blocs
             end
             
             if b.isLiquid then
-                --Si le lquide en question peut couler
-                if blocs.liquid[b.name].active then
+                --Si le liquide en question peut couler
+                if blocs.liquid[b.name].active and b.isAwake then
                     b:flow()
                 end
             elseif time > b.frame then
+                if b.newFrame then
+                    b:onNewFrame()
+                end
+                
                 b.frame = b.frame + b.refreshRate
                 
                 --Applique la gravité
                 if b.isGravityAffected then
-                    b:moveY(1)
+                    if b.isAwake then
+                        b:moveY(1)
+                    else
+                        b:sleep()
+                    end
+                else
+                    b:sleep()
                 end
             end
         end
@@ -269,58 +330,86 @@ blocs.update = function(dt)--Vérification des événements des blocs
         
         --Itère à travers tous les blocs à supprimer
         for i, index in pairs(blocs.toDelete[j]) do
-            blocs.calculateCardinality(room.blocs[j][index], true)
+            --print("#blocs.toDelete[1]"..#blocs.toDelete[1])
+            --print("index"..index)
             
-            --Supprime les blocs qui doivent être supprimé
-            table.remove(room.blocs[j], index)
+            if room.blocs[j][index] ~= nil then
+                blocs.calculateCardinality(room.blocs[j][index], true)
+                
+                --Supprime les blocs qui doivent être supprimé
+                table.remove(room.blocs[j], index)
+            else
+--                print("tu sens des pieds")
+            end
         end
     end
     
     blocs.toDelete = {}
 end
 
-
 blocs.draw = function()--Dessine les blocs
     for j = #room.blocs, 1, -1 do
         for i, b in pairs(room.blocs[j]) do
-            --Si le bloc est sur l'écran
             if b:onScreen() then
                 
-                --Récupère les coordonnées du bloc
-                local x, y = blocs.getPos(b.x, b.y)
-                
+                --Change de couleur selon la couche
                 if j == 1 then
                     lg.setColor(unpack(b.colors))
                 else
                     lg.setColor(unpack(mergeColors(b.colors, blocs.layerColor[j])))
                 end
                 
-                --Si le bloc est un liquide
+                --Affichage du bloc
                 if b.isLiquid then
                     
-                    lg.rectangle("fill", x + wdow.shake.x, y + (100-(b.fillingRate*blocs.size/100) - blocs.size) + wdow.shake.y, blocs.size, (b.fillingRate*blocs.size/100))
-                    
-                --Si le bloc n'est pas liquide
+                    if b.cardinality[1] ~= 0 then
+                        if b.cardinality[1] == b.id then
+                            local x, y = blocs.getPos(b.coordX, b.coordY)
+                            lg.rectangle("fill", x + wdow.shake.x, y + wdow.shake.y, b.wth, blocs.size)
+                        elseif bloc[b.cardinality[1]].isLiquid then
+                            
+                            lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y, b.wth, b.hgt)
+                            
+                            if j == 1 then
+                                lg.setColor(unpack(bloc[b.cardinality[1]].colors))
+                            else
+                                lg.setColor(unpack(mergeColors(bloc[b.cardinality[1]].colors, blocs.layerColor[j])))
+                            end
+                            
+                            lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y - (blocs.size - b.hgt), b.wth, blocs.size - b.hgt)
+                        else
+                            lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y, b.wth, b.hgt)
+                        end
+                    else
+                        lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y, b.wth, b.hgt)
+                    end
                 else
                     if b.imgLink then
-                        lg.draw(src.img.bloc[b.img], src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], x + wdow.shake.x, y + wdow.shake.y)
+                        lg.draw(src.img.bloc[b.img], src.img.bloc[b.img.."_"..table.concat(b.imgCardinality)], b.x + wdow.shake.x, b.y + wdow.shake.y)
                     else
-                        lg.draw(src.img.bloc[b.img], x + wdow.shake.x, y + wdow.shake.y)
+                        lg.draw(src.img.bloc[b.img], b.x + wdow.shake.x, b.y + wdow.shake.y)
                     end
                 end
                 
                 --[[Debug]]--
                 if debug.visible then
+                    local x, y = blocs.getPos(b.coordX, b.coordY)
+                    
+                    if b.isAwake then
+                        lg.setColor(255, 0, 0, 80)
+                        lg.rectangle("fill", x, y, blocs.size, blocs.size)
+                    else
+                        lg.setColor(0, 255, 0, 80)
+                        lg.rectangle("fill", x, y, blocs.size, blocs.size)
+                    end
+                    
                     lg.setColor(unpack(debug.color))
-                    --lg.rectangle("line", x, y, blocs.size, blocs.size)
-                    lg.print("x" .. b.x .. " y" .. b.y , x, y)
+                    lg.print("x" .. b.coordX .. " y" .. b.coordY , x, y)
                     lg.print("id:"..b.id, x, y + 10)
                     if b.timePass then
                         lg.print(string.format("%d ms", b.ttl), x, y + 20)
                     end
-                    if b.imgLink then
-                        lg.print(table.concat(b.imgCardinality), x, y + 30)
-                    end
+                    lg.print(table.concat(b.cardinality), x, y + 30)
                     if b.isLiquid then
                         lg.print(string.format("%.2f", b.fillingRate), x, y + 40)
                     end

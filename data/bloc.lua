@@ -1,9 +1,16 @@
 --Class des blocs
 bloc_class = {
     id = 1,
+    coordX = 0,
+    coordY = 0,
+    
     x = 0,
     y = 0,
+    wth = 0,
+    hgt = 0,
+    
     ttl = 0, --Durée de vie du bloc (valeur en ms)
+    isAwake = true,
     isVisible = true,
     isSolid = false,
     isLiquid = false,
@@ -18,6 +25,7 @@ bloc_class = {
     hp = 0,
     img = "",
     imgCardinality = {}, --Permet de définir si le bloc a plusieurs images
+    cardinality = {},
     imgLink = false,
     timePass = false, --Indique si le bloc est affecté par le temps
     layer = 1, --Permet de définir si le bloc est devant ou derrière
@@ -26,18 +34,50 @@ bloc_class = {
     --Définit quel fonction sont activé
     ttlReach = false,
     touch = false,
+    update = false,
+    newFrame = false,
     
     onTtlReach = function(self) end, --Définit les instructions si l'événement est déclenché par le temps
     onTouch = function(self, direction) end, --Définit les instructions si l'événement est déclenché par un contact avec le joueur
+    onUpdate = function(self) end,
+    onNewFrame = function(self) end,
 
     setOnTtlReached = function(self, func)--Défini la fonction utilisé lorsque le temps du bloc est plus petit que 0
         self.rawOnTtlReached = func
         self.activeEvent.ttlReach = true
     end,
 
-    setOnTouch = function(self, func)    --Défini la fonction utilisé lorsque le bloc est touché (par le joueur)
+    setOnTouch = function(self, func)--Défini la fonction utilisé lorsque le bloc est touché (par le joueur)
         self.rawOnTouch = func
         self.activeEvent.touch = true
+    end,
+
+    ping = function(self)
+        for i, b in pairs(room.blocs[self.layer]) do
+            if self.coordX == b.coordX and self.coordY + 1 == b.coordY then
+                b:wakeUp()
+            end
+            --Bloc en dessus de celui qui est détruit
+            if self.coordX == b.coordX and self.coordY - 1 == b.coordY then
+                b:wakeUp()
+            end
+            --Bloc à droite de celui qui est détruit
+            if self.coordX + 1 == b.coordX and self.coordY == b.coordY then
+                b:wakeUp()
+            end
+            --Bloc à gauche de celui qui est détruit
+            if self.coordX - 1 == b.coordX and self.coordY == b.coordY then
+                b:wakeUp()
+            end
+        end
+    end,
+
+    wakeUp = function(self)
+        self.isAwake = true
+    end,
+    
+    sleep = function(self)
+        self.isAwake = false
     end,
 
     reset = function(self)--Reset les valeurs du bloc
@@ -55,6 +95,15 @@ bloc_class = {
         rawOnTouch = function(self, direction) end
     end,
 
+    onScreen = function(self)--Test si le bloc est visible a l'écran
+        if (self.x + self.wth > 0 and self.x < wdow.wth) and
+        (self.y + self.hgt > 0 and self.y < wdow.hgt) then
+            return true
+        else
+            return false
+        end
+    end,
+    
     setBaseValues = function(self)--Reset le bloc avec ses valeurs de base (Utile lorsqu'on change d'écran)
         for k, _ in pairs(self) do self[k] = nil end
     end,
@@ -62,19 +111,19 @@ bloc_class = {
     moveX = function(self, moveSpeed)--Bouge le bloc horizontalement
         local canMove = true
         
-        local x, y = blocs.getPos(self.x + moveSpeed, self.y)
+        local x, y = blocs.getPos(self.coordX + moveSpeed, self.coordY)
         
         --Colision bords de la fenêtre
         if moveSpeed < 0 then
             --Collision haut de la fenêtre
-            if self.x + moveSpeed < 1 then
-                self.x = 1
+            if self.coordX + moveSpeed < 1 then
+                self.coordX = 1
                 canMove = false
             end
         elseif moveSpeed > 0 then
             --Collision bas de la fenêtre
-            if self.x + moveSpeed > room.cols then
-                self.x = room.cols
+            if self.coordX + moveSpeed > room.cols then
+                self.coordX = room.cols
                 canMove = false
             end
         end
@@ -107,9 +156,9 @@ bloc_class = {
         
         --Collision blocs
         for i, b in pairs(room.blocs[self.layer]) do
-            if b ~= self and self.x + moveSpeed == b.x and self.y == b.y then
+            if b ~= self and self.coordX + moveSpeed == b.coordX and self.coordY == b.coordY then
                 if self.density > b.density then
-                    b.y = b.y - moveSpeed
+                    b.coordY = b.coordY - moveSpeed
                 else
                     canMove = false
                 end
@@ -119,8 +168,9 @@ bloc_class = {
         --Déplacement du bloc
         if canMove then
             blocs.calculateCardinality(self, true)
-            self.x = self.x + moveSpeed
-            blocs.calculateCardinality(self)
+            self.coordX = self.coordX + moveSpeed
+            self = blocs.calculateCardinality(self)
+            self:calculateDimension()
             return true
         else
             return false
@@ -130,20 +180,22 @@ bloc_class = {
     moveY = function(self, moveSpeed)--Bouge le bloc verticalement
         local canMove = true
         
-        local x, y = blocs.getPos(self.x, self.y + moveSpeed)
+        local x, y = blocs.getPos(self.coordX, self.coordY + moveSpeed)
         
         --Colision bords de la fenêtre
         if moveSpeed < 0 then
             --Collision haut de la fenêtre
-            if self.y + moveSpeed < 1 then
-                self.y = 1
+            if self.coordY + moveSpeed < 1 then
+                self.coordY = 1
                 canMove = false
+                self:sleep()
             end
         elseif moveSpeed > 0 then
             --Collision bas de la fenêtre
-            if self.y + moveSpeed > room.rows then
-                self.y = room.rows
+            if self.coordY + moveSpeed > room.rows then
+                self.coordY = room.rows
                 canMove = false
+                self:sleep()
             end
         end
         
@@ -159,6 +211,7 @@ bloc_class = {
                 if collision_rectToRect(x, y, blocs.size, blocs.size, e.x, e.y, e.wth, e.hgt) then
                     if e.solidResistance == 100 then
                         canMove = false
+                        self:sleep()
                     end
                 end
             end
@@ -166,11 +219,12 @@ bloc_class = {
         
         --Collision blocs
         for _, b in pairs(room.blocs[self.layer]) do
-            if b ~= self and self.x == b.x and self.y + moveSpeed == b.y then
+            if b ~= self and self.coordX == b.coordX and self.coordY + moveSpeed == b.coordY then
                 if self.density > b.density then
-                    b.y = b.y - moveSpeed
+                    b.coordY = b.coordY - moveSpeed
                 else
                     canMove = false
+                    self:sleep()
                 end
             end
         end
@@ -178,16 +232,40 @@ bloc_class = {
         --Déplacement du bloc
         if canMove then
             blocs.calculateCardinality(self, true)
-            self.y = self.y + moveSpeed
-            blocs.calculateCardinality(self)
+            self.coordY = self.coordY + moveSpeed
+            self = blocs.calculateCardinality(self)
+            self:calculateDimension()
             return true
         else
             return false
         end
     end,
     
+    calculateDimension = function(self)
+        self.hgt = self.isLiquid and self.fillingRate * blocs.size / 100 or blocs.size
+        self.wth = blocs.size
+        self.x = room.x + self.coordX * blocs.size - self.wth
+        self.y = room.y + self.coordY * blocs.size - self.hgt
+    end,
+    
+    getXYWH = function(self)
+        return self.x, self.y, self.wth, self.hgt
+    end,
+    
     changeFillingRate = function(self, newFillingRate)--Modifie la contenance d'un liquide (en vérifiant les collisions avec le joueur)
         
+        self:ping()
+        self:wakeUp()
+        
+        --Si le bloc a plus que 100% de remplissage, il repasse à 100%
+        if newFillingRate > 100 then newFillingRate = 100 end
+        
+        --Actualise la contenance du liquide
+        self.fillingRate = newFillingRate
+        
+        self:calculateDimension()
+        
+        --[[
         --Si le bloc a plus que 100% de remplissage, il repasse à 100%
         if newFillingRate > 100 then newFillingRate = 100 end
         
@@ -195,7 +273,7 @@ bloc_class = {
         if not self.isLiquid then print("On ne peut pas changer la quantité de liquide d'un bloc qui n'est pas liquide"); return end
         
         --Récupère les coordonées du bloc
-        local x, y = blocs.getPos(self.x, self.y)
+        local x, y = blocs.getPos(self.coordX, self.coordY)
         
         --Calcul la hauteur du liquide
         local liquidHeight = self.fillingRate * blocs.size / 100
@@ -228,6 +306,7 @@ bloc_class = {
             --Actualise la contenance du liquide
             self.fillingRate = newFillingRate
         end
+        ]]--
     end,
     
     forceflow = function(self)--Fait couler entièrement le liquide du bloc
@@ -240,9 +319,9 @@ bloc_class = {
         --Test où est-ce que le liquide peut couler--
         for i, b in pairs(room.blocs[self.layer]) do
             --Test si le bloc peut couler en bas
-            if self.x == b.x and self.y + 1 == b.y then
+            if self.coordX == b.coordX and self.coordY + 1 == b.coordY then
                 --Si c'est un liquide
-                if b.isLiquid and b.fillingRate ~= 100 and b.density <= self.density then
+                if b.isLiquid and (b.fillingRate ~= 100 or b.id == self.id) and b.density <= self.density then
                     canFlow[2] = 2
                 else
                     canFlow[2] = 0
@@ -250,9 +329,9 @@ bloc_class = {
             end
             
             --Test si le bloc peut couler à gauche
-            if self.x - 1 == b.x and self.y == b.y then
+            if self.coordX - 1 == b.coordX and self.coordY == b.coordY then
                 --Si c'est un liquide
-                if b.isLiquid and b.fillingRate ~= 100 and b.density <= self.density then
+                if b.isLiquid and (b.fillingRate ~= 100 or b.id == self.id) and b.density <= self.density then
                     canFlow[3] = 2
                 else
                     canFlow[3] = 0
@@ -260,9 +339,9 @@ bloc_class = {
             end
             
             --Test si le bloc peut couler à droite
-            if self.x + 1 == b.x and self.y == b.y then
+            if self.coordX + 1 == b.coordX and self.coordY == b.coordY then
                 --Si c'est un liquide
-                if b.isLiquid and b.fillingRate ~= 100 and b.density <= self.density then
+                if b.isLiquid and (b.fillingRate ~= 100 or b.id == self.id) and b.density <= self.density then
                     canFlow[4] = 2
                 else
                     canFlow[4] = 0
@@ -270,12 +349,10 @@ bloc_class = {
             end
         end
         
-        --Vérifie que le liquide ne coule pas dans les bord de la salle
-        if self.y + 1 > room.rows then canFlow[2] = 0 end--En bas
-        
-        if self.x - 1 < 1 then canFlow[3] = 0 end--A gauche
-        
-        if self.x + 1 > room.cols then canFlow[4] = 0 end--A droite
+        --Collision bord de salle
+        if self.coordY + 1 > room.rows then canFlow[2] = 0 end--En bas
+        if self.coordX - 1 < 1 then canFlow[3] = 0 end--A gauche
+        if self.coordX + 1 > room.cols then canFlow[4] = 0 end--A droite
         
         --Fait couler le liquide--
         
@@ -299,6 +376,8 @@ bloc_class = {
         elseif canFlow[4] ~= 0 then
             --Donne du liquide à droite
             self:spread(4, canFlow[4] - 1, self.fillingRate, true)
+        else
+            blocs.pop(self.coordX, self.coordY, self.layer)
         end
     end,
     
@@ -307,12 +386,14 @@ bloc_class = {
         --0 : no
         --1 : yes
         
+        self:wakeUp()
+        
         if hasAlreadyBloc == 1 then
             for i, b in pairs(room.blocs[self.layer]) do
                 if direction == 1 then--Haut
                     
                 elseif direction == 2 then--Bas
-                    if b.x == self.x and b.y == self.y + 1 then
+                    if b.coordX == self.coordX and b.coordY == self.coordY + 1 then
                         --Si c'est le même liquide
                         if self.id == b.id then
                             
@@ -333,8 +414,10 @@ bloc_class = {
                                 b:forceflow()
                                 
                                 --Déplace le bloc à supprimer dans un endroit invisible
-                                b.x = -1
-                                b.y = -1
+                                b.coordX = -1
+                                b.coordY = -1
+                                
+                                b:sleep()
                                 
                                 blocs.checkIfLayerExists(self.layer)
                                 
@@ -342,12 +425,12 @@ bloc_class = {
                                 table.insert(blocs.toDelete[self.layer], i)
                                 
                                 --Déplace le bloc liquide
-                                self.y = self.y + 1
+                                self.coordY = self.coordY + 1
                             end
                         end
                     end
                 elseif direction == 3 then--Gauche
-                    if b.x == self.x - 1 and b.y == self.y then
+                    if b.coordX == self.coordX - 1 and b.coordY == self.coordY then
                         --Si c'est le même liquide
                         if self.id == b.id then
                             
@@ -371,8 +454,8 @@ bloc_class = {
                                 b:forceflow()
                                 
                                 --Déplace le bloc à supprimer dans un endroit invisible
-                                b.x = -1
-                                b.y = -1
+                                b.coordX = -1
+                                b.coordY = -1
                                 
                                 blocs.checkIfLayerExists(self.layer)
                                 
@@ -380,12 +463,12 @@ bloc_class = {
                                 table.insert(blocs.toDelete[self.layer], i)
                                 
                                 --Crée un bloc liquide à la nouvelle position
-                                blocs.push(self.isSolid, bloc[self.id]:new({x = self.x - 1, y = self.y, fillingRate = quantity, layer = self.layer}))
+                                blocs.push(self.isSolid, bloc[self.id]:new({coordX = self.coordX - 1, coordY = self.coordY, fillingRate = quantity, layer = self.layer}))
                             end
                         end
                     end
                 elseif direction == 4 then--Droit
-                    if b.x == self.x + 1 and b.y == self.y then
+                    if b.coordX == self.coordX + 1 and b.coordY == self.coordY then
                         --Si c'est le même liquide
                         if self.id == b.id then
                             
@@ -409,8 +492,8 @@ bloc_class = {
                                 b:forceflow()
                                 
                                 --Déplace le bloc à supprimer dans un endroit invisible
-                                b.x = -1
-                                b.y = -1
+                                b.coordX = -1
+                                b.coordY = -1
                                 
                                 blocs.checkIfLayerExists(self.layer)
                                 
@@ -418,7 +501,7 @@ bloc_class = {
                                 table.insert(blocs.toDelete[self.layer], i)
                                 
                                 --Crée un bloc liquide à la nouvelle position
-                                blocs.push(self.isSolid, bloc[self.id]:new({x = self.x + 1, y = self.y, fillingRate = quantity, layer = self.layer}))
+                                blocs.push(self.isSolid, bloc[self.id]:new({coordX = self.coordX + 1, coordY = self.coordY, fillingRate = quantity, layer = self.layer}))
                             end
                         end
                     end
@@ -428,13 +511,14 @@ bloc_class = {
             if direction == 1 then--Haut
                 
             elseif direction == 2 then--Bas
-                self.y = self.y + 1
+                self.coordY = self.coordY + 1
+                self = blocs.calculateCardinality(self)
             elseif direction == 3 then--Gauche
-                if blocs.push(self.isSolid, bloc[self.id]:new({x = self.x - 1, y = self.y, fillingRate = quantity, layer = self.layer})) then
+                if blocs.push(self.isSolid, bloc[self.id]:new({coordX = self.coordX - 1, coordY = self.coordY, fillingRate = quantity, layer = self.layer})) then
                     quantity = 0
                 end
             elseif direction == 4 then--Droit
-                if blocs.push(self.isSolid, bloc[self.id]:new({x = self.x + 1, y = self.y, fillingRate = quantity, layer = self.layer})) then
+                if blocs.push(self.isSolid, bloc[self.id]:new({coordX = self.coordX + 1, coordY = self.coordY, fillingRate = quantity, layer = self.layer})) then
                     quantity = 0
                 end
             end
@@ -451,18 +535,13 @@ bloc_class = {
         --2 : Liquide
         local canFlow = {0, 1, 1, 1}
         
-        --Collision bord de salle
-        if self.y + 1 > room.rows then canFlow[2] = 0 end--En bas
-        if self.x - 1 < 1 then canFlow[3] = 0 end--A gauche
-        if self.x + 1 > room.cols then canFlow[4] = 0 end--A droite
-        
         --Collision blocs
         for i, b in pairs(room.blocs[self.layer]) do
             
             --Test si le bloc peut couler en bas
-            if self.x == b.x and self.y + 1 == b.y then
+            if self.coordX == b.coordX and self.coordY + 1 == b.coordY then
                 
-                if b.isLiquid and b.fillingRate ~= 100 and b.density <= self.density then
+                if b.isLiquid and (b.fillingRate ~= 100 or b.id ~= self.id) and b.density <= self.density then
                     canFlow[2] = 2
                 else
                     canFlow[2] = 0
@@ -470,9 +549,9 @@ bloc_class = {
             end
             
             --Test si le bloc peut couler à gauche
-            if self.x - 1 == b.x and self.y == b.y then
+            if self.coordX - 1 == b.coordX and self.coordY == b.coordY then
                 
-                if b.isLiquid and b.fillingRate ~= 100 and b.density <= self.density then
+                if b.isLiquid and (b.fillingRate ~= 100 or b.id ~= self.id) and b.density <= self.density then
                     canFlow[3] = 2
                 else
                     canFlow[3] = 0
@@ -480,9 +559,9 @@ bloc_class = {
             end
             
             --Test si le bloc peut couler à droite
-            if self.x + 1 == b.x and self.y == b.y then
+            if self.coordX + 1 == b.coordX and self.coordY == b.coordY then
                 
-                if b.isLiquid and b.fillingRate ~= 100 and b.density <= self.density then
+                if b.isLiquid and (b.fillingRate ~= 100 or b.id ~= self.id) and b.density <= self.density then
                     canFlow[4] = 2
                 else
                     canFlow[4] = 0
@@ -490,10 +569,15 @@ bloc_class = {
             end
         end
         
+        --Collision bord de salle
+        if self.coordY + 1 > room.rows then canFlow[2] = 0 end--En bas
+        if self.coordX - 1 < 1 then canFlow[3] = 0 end--A gauche
+        if self.coordX + 1 > room.cols then canFlow[4] = 0 end--A droite
+        
         if self.isSolid and self.layer == 1 then
             
             --Récupère la position du la nouvelle bloc
-            local x, y = blocs.getPos(self.x, self.y + 1)
+            local x, y = blocs.getPos(self.coordX, self.coordY + 1)
             
             --Collision joueur
             if collision_rectToRect(player.x + 1, player.y, player.wth - 2, player.hgt, x, y, blocs.size, blocs.size) then
@@ -539,6 +623,8 @@ bloc_class = {
                 
                 --Vide son liquide
                 self:changeFillingRate(self.fillingRate - fillLoss + liquidNotspread)
+            else
+                self:sleep()
             end
             
         --Coule à gauche
@@ -554,6 +640,8 @@ bloc_class = {
                 
                 --Vide son liquide
                 self:changeFillingRate(self.fillingRate - fillLoss + liquidNotspread)
+            else
+                self:sleep()
             end
             
         --Coule à droite
@@ -567,35 +655,28 @@ bloc_class = {
                 --Donne du liquide à droite
                 liquidNotspread = liquidNotspread + self:spread(4, canFlow[4] - 1, fillLoss)
                 
+                if liquidNotspread < 0 then self:sleep(); return end
+                
                 --Vide son liquide
                 self:changeFillingRate(self.fillingRate - fillLoss + liquidNotspread)
+            else
+                self:sleep()
             end
+        --Coule nul part
+        else
+            self:sleep()
         end
-        
-        --Si le bloc a plus que 100% de remplissage, il repasse à 100%
-        if self.fillingRate > 100 then self.changeFillingRate(100) end
         
         --Si le bloc n'a plus de liquide, il disparaît
-        if self.fillingRate <= 0 then blocs.pop(self.x, self.y, self.layer) end
+        if self.fillingRate <= 0 then blocs.pop(self.coordX, self.coordY, self.layer); blocs.calculateCardinality(self, true); self.coordX = 1; self.coordY = 1 end
     end,
     
-    onScreen = function(self)--Test si le bloc est visible a l'écran
-        local x, y = blocs.getPos(self.x, self.y)
-        
-        if (x + blocs.size > 0 and x - blocs.size < wdow.wth) and
-        (y + blocs.size > 0 and y - blocs.size < wdow.hgt) then
-            return true
-        else
-            return false
-        end
-    end
 }
 
 newClass(bloc_class)
 
 bloc = {
-    --Bloc solide classique
-    bloc_class:new({
+    bloc_class:new({--Bloc solide classique
         id = 1,
         name = "solid",
         img = "stone",
@@ -604,8 +685,7 @@ bloc = {
         density = 100
     }),
 
-    --Bloc qui se détruit au toucher (dessus)
-    bloc_class:new({
+    bloc_class:new({--Bloc qui se détruit au toucher (dessus)
         id = 2,
         name = "disappears when touched",
         img = "instable",
@@ -615,16 +695,15 @@ bloc = {
         touch = true,
         ttl = 1000,
         onTtlReach = function(self)
-            print("\nRemplacement x :"..self.x.." y :"..self.y)
-            blocs.pop(self.x, self.y, self.layer)
-            blocs.push(false, bloc[3]:new({x = self.x, y = self.y}))
+            print("\nRemplacement coordX :"..self.coordX.." coordY :"..self.coordY)
+            blocs.pop(self.coordX, self.coordY, self.layer)
+            blocs.push(false, bloc[3]:new({coordX = self.coordX, coordY = self.coordY}))
         end,
         onTouch = function(self, direction) if direction == 1 then self.timePass = true end end,
         density = 100
     }),
 
-    --Bloc qui apparait au bout d'un certain temps
-    bloc_class:new({
+    bloc_class:new({--Bloc qui apparait au bout d'un certain temps
         id = 3,
         name = "appears with time",
         img = "instable2",
@@ -633,25 +712,22 @@ bloc = {
         ttlReach = true,
         onTtlReach = function(self)
             --Test si le bloc n'est pas en collision avec le joueur
-            x, y = blocs.getPos(self.x, self.y)
-            if not collision_rectToRect(player.x, player.y, player.wth, player.hgt, x, y, blocs.size, blocs.size) then
-                blocs.pop(self.x, self.y, self.layer)
-                blocs.push(false, bloc[2]:new({x = self.x, y = self.y}))
+            if not collision_rectToRect(player.x, player.y, player.wth, player.hgt, self.x, self.y, blocs.size, blocs.size) then
+                blocs.pop(self.coordX, self.coordY, self.layer)
+                blocs.push(false, bloc[2]:new({coordX = self.coordX, coordY = self.coordY}))
             end
         end,
         density = 100
     }),
 
-    --WIP
-    --Plateforme à sens unique (Uniquement collision du dessus)
-    bloc_class:new({
+    bloc_class:new({--WIP Plateforme à sens unique (Uniquement collision du dessus)
         id = 4,
         name = "platform",
         img = "woodPlatform",
         density = 100
     }),
 
-    bloc_class:new({
+    bloc_class:new({--Bloc liquide d'eau
         id = 5,
         name = "water",
         viscousRate = 10,
@@ -660,10 +736,9 @@ bloc = {
         isLiquid = true,
         fillingRate = 100,
         density = 10,
-        layer = 3
     }),
 
-    bloc_class:new({
+    bloc_class:new({--Bloc liquide de sable
         id = 6,
         name = "sand",
         viscousRate = 10,
@@ -672,10 +747,11 @@ bloc = {
         isLiquid = true,
         isSolid = true,
         fillingRate = 100,
-        density = 20
+        density = 20,
+        isGravityAffected = false
     }),
 
-    bloc_class:new({
+    bloc_class:new({--Bloc solide de sable
         id = 7,
         name = "sandBloc",
         img = "sand",
@@ -683,5 +759,22 @@ bloc = {
         imgLink = true,
         isSolid = true,
         density = 30
-    })
+    }),
+
+    bloc_class:new({--Source d'eau
+        id = 8,
+        name = "Water source",
+        img = "waterSource",
+        isGravityAffected = false,
+        refreshRate = 1,
+        isSolid = false,
+        density = 100,
+        update = true,
+        spawnLayer = 1,
+        layer = 2,
+        newFrame = true,
+        onNewFrame = function(self)
+            blocs.push(true, bloc[5]:new({coordX = self.coordX, coordY = self.coordY, layer = self.spawnLayer}))
+        end
+    }),
 }

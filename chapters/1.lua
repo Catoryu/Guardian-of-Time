@@ -65,11 +65,11 @@ chapter.events = {}
 
 --Events
 events.push(
-    event[1]:new({x = 600, y = 400, wth = 100, hgt = 100, room = 1}),
-    event[2]:new({x = 500, y = 400, wth = 100, hgt = 100, room = 1}),
-    event[3]:new({x = 700, y = 400, wth = 100, hgt = 100, room = 1}),
-    event[4]:new({x = 400, y = 400, wth = 100, hgt = 100, room = 1}),
-    event[5]:new({x = 800, y = 400, wth = 100, hgt = 100, room = 1})
+    event[1]:new({x = 600, y = 200, wth = 100, hgt = 100, room = 1}),
+    event[2]:new({x = 500, y = 200, wth = 100, hgt = 100, room = 1}),
+    event[3]:new({x = 700, y = 200, wth = 100, hgt = 100, room = 1}),
+    event[4]:new({x = 400, y = 200, wth = 100, hgt = 100, room = 1}),
+    event[5]:new({x = 800, y = 200, wth = 100, hgt = 100, room = 1})
 )
 
 --[[Room 1]]--
@@ -85,13 +85,10 @@ chapter.rooms[1] = function()
     room.colors = {255, 255, 255, 20}
     room.blocs = {}
     room.entities = {}
-    weathers.id = 3
+    weathers.id = 1
     bgrounds.id = 2
     
-    lg.setBackgroundColor(0, 60, 123)
-    
-    --Blocs
-    blocs.push(false, bloc[1]:new({x = 21, y = 18}),bloc[1]:new({x = 22, y = 17}),bloc[1]:new({x = 21, y = 16}),bloc[1]:new({x = 23, y = 16}),bloc[1]:new({x = 23, y = 18}),bloc[1]:new({x = 25, y = 17}),bloc[1]:new({x = 26, y = 17}),bloc[1]:new({x = 27, y = 17}),bloc[1]:new({x = 26, y = 16}),bloc[1]:new({x = 26, y = 18}),bloc[1]:new({x = 29, y = 18}),bloc[1]:new({x = 29, y = 17}),bloc[1]:new({x = 29, y = 16}),bloc[1]:new({x = 30, y = 16}),bloc[1]:new({x = 31, y = 16}),bloc[1]:new({x = 31, y = 17}),bloc[1]:new({x = 31, y = 18}),bloc[1]:new({x = 30, y = 18}),bloc[1]:new({x = 33, y = 17}),bloc[1]:new({x = 35, y = 18}),bloc[1]:new({x = 35, y = 17}),bloc[1]:new({x = 35, y = 16}),bloc[1]:new({x = 36, y = 16}),bloc[1]:new({x = 37, y = 16}),bloc[1]:new({x = 37, y = 17}),bloc[1]:new({x = 37, y = 18}),bloc[1]:new({x = 36, y = 18}),bloc[1]:new({x = 36, y = 17}))
+    lg.setBackgroundColor(50, 50, 50)
 end
 
 --[[Room 2]]--
@@ -111,6 +108,9 @@ chapter.rooms[2] = function()
     bgrounds.id = 1
     
     lg.setBackgroundColor(241, 242, 215)
+    
+    --Blocs
+    blocs.push(false, bloc[1]:new({x = 21, y = 18}),bloc[1]:new({x = 22, y = 17}),bloc[1]:new({x = 21, y = 16}),bloc[1]:new({x = 23, y = 16}),bloc[1]:new({x = 23, y = 18}),bloc[1]:new({x = 25, y = 17}),bloc[1]:new({x = 26, y = 17}),bloc[1]:new({x = 27, y = 17}),bloc[1]:new({x = 26, y = 16}),bloc[1]:new({x = 26, y = 18}),bloc[1]:new({x = 29, y = 18}),bloc[1]:new({x = 29, y = 17}),bloc[1]:new({x = 29, y = 16}),bloc[1]:new({x = 30, y = 16}),bloc[1]:new({x = 31, y = 16}),bloc[1]:new({x = 31, y = 17}),bloc[1]:new({x = 31, y = 18}),bloc[1]:new({x = 30, y = 18}),bloc[1]:new({x = 33, y = 17}),bloc[1]:new({x = 35, y = 18}),bloc[1]:new({x = 35, y = 17}),bloc[1]:new({x = 35, y = 16}),bloc[1]:new({x = 36, y = 16}),bloc[1]:new({x = 37, y = 16}),bloc[1]:new({x = 37, y = 17}),bloc[1]:new({x = 37, y = 18}),bloc[1]:new({x = 36, y = 18}),bloc[1]:new({x = 36, y = 17}))
 end
 
 --[[Room 3]]--
@@ -128,9 +128,9 @@ chapter.rooms[3] = function()
     room.entities = {}
     room.events = {}
     weathers.id = 1
-    bgrounds.id = 1
+    bgrounds.id = 2
     
-    lg.setBackgroundColor(241, 242, 215)
+    lg.setBackgroundColor(0, 60, 123)
 end
 
 --[[Room 4]]--

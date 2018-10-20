@@ -42,26 +42,18 @@ entity_class = {
                 for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
                             
-                            --Calcul la hauteur du liquide
-                            local liquidHeight = b.fillingRate * blocs.size / 100
-                            
-                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(4)
-                                if self.x - (x + blocs.size) < dx then
-                                    dx = self.x - (x + blocs.size)
+                                if self.x - (b.x + b.wth) < dx then
+                                    dx = self.x - (b.x + b.wth)
                                 end
                             end
                         else
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, x, y, blocs.size, blocs.size) then
+                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(4)
-                                if self.x - (x + blocs.size) < dx then
-                                    dx = self.x - (x + blocs.size)
+                                if self.x - (b.x + b.wth) < dx then
+                                    dx = self.x - (b.x + b.wth)
                                 end
                             end
                         end
@@ -122,28 +114,19 @@ entity_class = {
                 for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            --Calcul la hauteur du liquide
-                            local liquidHeight = b.fillingRate * blocs.size / 100
-                            
-                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(3)
                                 if b.isSolid then
-                                    if x - (self.x + self.wth) < dx then
-                                        dx = x - (self.x + self.wth)
+                                    if b.x - (self.x + self.wth) < dx then
+                                        dx = b.x - (self.x + self.wth)
                                     end
                                 end
                             end
                         else
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, x, y, blocs.size, blocs.size) then
+                            if collision_rectToRect(self.x + moveSpeed, self.y, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(3)
-                                if x - (self.x + self.wth) < dx then
-                                    dx = x - (self.x + self.wth)
+                                if b.x - (self.x + self.wth) < dx then
+                                    dx = b.x - (self.x + self.wth)
                                 end
                             end
                         end
@@ -220,26 +203,17 @@ entity_class = {
                 for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            --Calcul la hauteur du liquide
-                            local liquidHeight = b.fillingRate * blocs.size / 100
-                            
-                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(4)
-                                if self.y - (y + blocs.size) < dy then
-                                    dy = self.y - (y + blocs.size)
+                                if self.y - (b.y + b.hgt) < dy then
+                                    dy = self.y - (b.y + b.hgt)
                                 end
                             end
                         else
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, x, y, blocs.size, blocs.size) then
+                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(4)
-                                if self.y - (y + blocs.size) < dy then
-                                    dy = self.y - (y + blocs.size)
+                                if self.y - (b.y + b.hgt) < dy then
+                                    dy = self.y - (b.y + b.hgt)
                                 end
                             end
                         end
@@ -300,30 +274,19 @@ entity_class = {
                 for _, b in pairs(room.blocs[1]) do
                     if b.isSolid then
                         if b.isLiquid then
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            --Calcul la hauteur du liquide
-                            local liquidHeight = b.fillingRate * blocs.size / 100
-                            
-                            --Collisions coté gauche des liquides
-                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, x, y + (blocs.size - liquidHeight), blocs.size, liquidHeight) then
+                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(3)
                                 if b.isSolid then
-                                    if y + (blocs.size - liquidHeight) - (self.y + self.hgt) < dy then
-                                        dy = y + (blocs.size - liquidHeight) - (self.y + self.hgt)
+                                    if b.y - (self.y + self.hgt) < dy then
+                                        dy = b.y - (self.y + self.hgt)
                                     end
                                 end
                             end
                         else
-                            --Récupère les coordonnés du bloc
-                            local x, y = blocs.getPos(b.x, b.y)
-                            
-                            --Collisions coté gauche des blocs
-                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, x, y, blocs.size, blocs.size) then
+                            if collision_rectToRect(self.x, self.y + moveSpeed, self.wth, self.hgt, b:getXYWH()) then
                                 b:onTouch(3)
-                                if y - (self.y + self.hgt) < dy then
-                                    dy = y - (self.y + self.hgt)
+                                if b.y - (self.y + self.hgt) < dy then
+                                    dy = b.y - (self.y + self.hgt)
                                 end
                             end
                         end

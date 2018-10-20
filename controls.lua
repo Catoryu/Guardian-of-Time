@@ -144,6 +144,32 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
         player.jump()
     end
     
+    --Cree un sandwich
+    if key == "1" then
+        blocs.push(
+            false, bloc[6]:new({x = 1, y = 1}), bloc[6]:new({x = 2, y = 1}), bloc[6]:new({x = 3, y = 1}),
+            bloc[5]:new({x = 1, y = 2}), bloc[5]:new({x = 2, y = 2}), bloc[5]:new({x = 3, y = 2}),
+            bloc[6]:new({x = 1, y = 3}), bloc[6]:new({x = 2, y = 3}), bloc[6]:new({x = 3, y = 3}),
+            bloc[5]:new({x = 1, y = 4}), bloc[5]:new({x = 2, y = 4}), bloc[5]:new({x = 3, y = 4}),
+            bloc[6]:new({x = 1, y = 5}), bloc[6]:new({x = 2, y = 5}), bloc[6]:new({x = 3, y = 5}),
+            bloc[5]:new({x = 1, y = 6}), bloc[5]:new({x = 2, y = 6}), bloc[5]:new({x = 3, y = 6}),
+            bloc[6]:new({x = 1, y = 7}), bloc[6]:new({x = 2, y = 7}), bloc[6]:new({x = 3, y = 7}),
+            bloc[5]:new({x = 1, y = 8}), bloc[5]:new({x = 2, y = 8}), bloc[5]:new({x = 3, y = 8})
+        )
+    end
+    
+    --Détruit tous les blocs
+    if key == "2" then
+        for j = 1, #room.blocs do
+            for i, b in pairs(room.blocs[j]) do
+                local x, y = blocs.getPos(b.coordX, b.coordY)
+                
+                animations.create(animation["explosion"]:new({x = x + blocs.size/2 - animation["explosion"].wth/2, y = y + blocs.size/2 - animation["explosion"].hgt/2, fps = 30}))
+                blocs.pop(b.coordX, b.coordY, j)
+            end
+        end
+    end
+    
     --Se baisse
     if key == "s" then table.insert(inputs, 2) end
     
@@ -208,9 +234,9 @@ function love.keypressed(key)--Une touche du clavier viens d'être enfoncée
     
     --Supprime le dernier bloc et recalcul les cardinalités
     if key == "backspace" and room.blocs[1] ~= nil and #room.blocs[1] > 0 then
-        blocs.pop(room.blocs[1][#room.blocs[1]].x, room.blocs[1][#room.blocs[1]].y, 1)
+        blocs.pop(room.blocs[1][#room.blocs[1]].coordX, room.blocs[1][#room.blocs[1]].coordY, 1)
         
-        local x, y = blocs.getPos(room.blocs[1][#room.blocs[1]].x, room.blocs[1][#room.blocs[1]].y)
+        local x, y = blocs.getPos(room.blocs[1][#room.blocs[1]].coordX, room.blocs[1][#room.blocs[1]].coordY)
         
         animations.create(animation["explosion"]:new({x = x + blocs.size/2 - animation["explosion"].wth/2, y = y + blocs.size/2 - animation["explosion"].hgt/2, fps = 30}))
     end

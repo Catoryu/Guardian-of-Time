@@ -132,6 +132,6 @@ rooms.refreshCamera = function(x, y)--Recentre le centre de la fenêtre vers la 
     end
     
     --Bouge tous les éléments de la salle
-    if dx ~= 0 then moveAllX(dx) end
-    if dy ~= 0 then moveAllY(dy) end
+    if dx ~= 0 then moveAllX(dx); blocs.calculateDimensions() end
+    if dy ~= 0 then moveAllY(dy); blocs.calculateDimensions() end
 end

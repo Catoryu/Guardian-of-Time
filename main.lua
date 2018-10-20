@@ -73,6 +73,11 @@ function love.draw()--Affichage du jeu
     end)
 
     --[[Debug]]--
+    lg.setColor(180, 180, 180, 200)
+    lg.rectangle("fill", 1200, 10, 70, 15)
+    lg.setColor(0, 0, 0)
+    lg.print("FPS : "..love.timer.getFPS(), 1200, 10)
+    
     if debug.visible then
         love.graphics.setBlendMode("alpha", "premultiplied")
         lg.setColor(255, 255, 255, 255)
@@ -85,7 +90,7 @@ function love.draw()--Affichage du jeu
         
         lg.setFont(debug.font)
         lg.setColor(180, 180, 180, 200)
-        lg.rectangle("fill", 10, 10, 300, 440)
+        lg.rectangle("fill", 10, 10, 300, 420)
         lg.setColor(0, 0, 0)
         lg.print("player.x : "..player.x, 10, 10)
         lg.print("player.y : "..player.y, 10, 30)
@@ -111,7 +116,6 @@ function love.draw()--Affichage du jeu
         lg.print(string.format("weathers.wind : %.2f px/s", weathers.wind), 10, 370)
         lg.print("weathers.id : "..weathers.id, 10, 390)
         lg.print("weathers.softDuration : "..weathers.softDuration, 10, 410)
-        lg.print("FPS : "..love.timer.getFPS(), 10, 430)
     end
     
     --Affichage de la souris
