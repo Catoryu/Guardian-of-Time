@@ -36,7 +36,6 @@ player.jumpSlow = 500
 player.canJumpHigher = false
 player.direction = true --false = left, true = right
 player.offsetStairEffect = 4 --Nombre de pixel de marge pour que le joueur puisse marcher dans des terrains irréguliers
-
 player.animationStage = 1
 
 --[[
@@ -80,6 +79,41 @@ player.attacks = {--cc Rui
     special_attack = 0
 }
 
+player.movingRectCollison = function(self, x, y, wth, hgt, collision, moveSpeed)
+    
+    if collision == 1 then
+        if (self.x + self.wth > x and self.x < x + wth) and
+        (self.y + self.hgt <= y and self.y + self.hgt + moveSpeed > y) then
+            return true
+        end
+    elseif collision == 2 then
+        if (self.x + self.wth > x and self.x < x + wth) and
+        (self.y > y + hgt and self.y + moveSpeed <= y + hgt) then
+            return true
+        end
+    elseif collision == 3 then
+        if (self.x + self.wth <= x and self.x + self.wth + moveSpeed > x) then
+            if (self.y + self.hgt - player.offsetStairEffect >= y and self.y < y + hgt) then
+                return true
+            elseif (self.y + self.hgt >= y and self.y < y + hgt) then
+                local delta = self.y + self.hgt - y
+                if not player.moveY(-delta) then return true end
+            end
+        end
+    elseif collision == 4 then
+        if (self.x >= x + wth and self.x + moveSpeed < x + wth) then
+            if (self.y + self.hgt - player.offsetStairEffect >= y and self.y < y + hgt) then
+                return true
+            elseif (self.y + self.hgt >= y and self.y < y + hgt) then
+                local delta = self.y + self.hgt - y
+                if not player.moveY(-delta) then return true end
+            end
+        end
+    end
+    
+    return false
+end
+
 player.getXYWH = function(self)--Récupère la position du joueur et sa taille (raccourci)
     return self.x, self.y, self.wth, self.hgt
 end
@@ -87,7 +121,6 @@ end
 player.jump = function()--Fait sauter du joueur
     if not player.isJumping then
         
---        print("animation : Le joueur saute")
         player.changeAnimation(3)
         
         player.isJumping = true
@@ -97,14 +130,12 @@ player.jump = function()--Fait sauter du joueur
         --Affiche effet de poussière
         
         --Joue le son de saut
-        
-        --Joue l'animation de saut du joueur
     end
 end
 
 player.touchGround = function()--Instructions lorsque le joueur touche le sol
-    player.ySpd = 0
-    player.isJumping = false
+    
+    if player.airTime > 200 then player.changeAnimation(9) end
     
     --Affiche effet de poussière
     
@@ -127,7 +158,6 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
     
     if moveSpeed < 0 then
         if player.direction then
---            print("animation : Le joueur change de cote (droite a gauche)")
             player.changeAnimation(4)
         end
         
@@ -166,23 +196,11 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                --Récupère les coordonnés du bloc
-                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, b:getXYWH()) then
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 4, moveSpeed) then
+                if b.collision[4] then
                     b:onTouch(4)
-                    if player.x - (b.x + blocs.size) < dx then
-                        dx = player.x - (b.x + blocs.size)
-                    end
-                end
-            end
-            
-            if b.isLiquid then
-                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, b:getXYWH()) then
-                    b:onTouch(4)
-                    if b.isSolid then
-                        if player.x - (b.x + blocs.size) < dx then
-                            dx = player.x - (b.x + blocs.size)
-                        end
+                    if player.x - (b.x + b.wth) < dx then
+                        dx = player.x - (b.x + b.wth)
                     end
                 end
             end
@@ -198,9 +216,9 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         player.x = player.x + moveSpeed
         
         return true
+        
     elseif moveSpeed > 0 then
         if not player.direction then
---            print("animation : Le joueur change de cote (gauche a droite)")
             player.changeAnimation(4)
         end
         
@@ -228,7 +246,6 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         
         --Collision entités
         for _, e in pairs(room.entities) do
-            --Collisions coté gauche des entités
             if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, e:getXYWH()) then
                 if e.solidResistance == 100 then
                     if e.x - (player.x + player.wth) < dx then
@@ -240,24 +257,11 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                
-                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, b:getXYWH()) then
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 3, moveSpeed) then
+                if b.collision[3] then
                     b:onTouch(3)
                     if b.x - (player.x + player.wth) < dx then
                         dx = b.x - (player.x + player.wth)
-                    end
-                end
-            end
-            
-            if b.isLiquid then
-                
-                if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, b:getXYWH()) then
-                    b:onTouch(3)
-                    if b.isSolid then
-                        if b.x - (player.x + player.wth) < dx then
-                            dx = b.x - (player.x + player.wth)
-                        end
                     end
                 end
             end
@@ -279,7 +283,6 @@ player.moveX = function(moveSpeed, isPushed)--Déplacement horizontal du joueur
 end
 
 player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
-    
     if not isPushed then
         --Test si il joueur dans une matière qui le ralenti
         for _, e in pairs(room.entities) do
@@ -295,6 +298,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
     local dy = math.huge
     
     if moveSpeed < 0 then
+        
         --Collision bords de la salle
         if player.y + moveSpeed < 0 then
             if room.cardinality[1] == 0 then
@@ -323,24 +327,11 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, b:getXYWH()) then
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 2, moveSpeed) then
+                if b.collision[2] then
                     b:onTouch(2)
-                    if player.y - (b.y + blocs.size) < dy then
-                        dy = player.y - (b.y + blocs.size)
-                    end
-                end
-            end
-            
-            if b.isLiquid then
-                
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, b:getXYWH()) then
-                    b:onTouch(2)
-                    if b.isSolid then
-                        if player.y - (b.y + blocs.size) < dy then
-                            dy = player.y - (b.y + blocs.size)
-                        end
+                    if player.y - (b.y + b.hgt) < dy then
+                        dy = player.y - (b.y + b.hgt)
                     end
                 end
             end
@@ -358,7 +349,9 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         player.y = player.y + moveSpeed
         
         return true
+        
     elseif moveSpeed > 0 then
+        
         --Collision bords de la salle
         if player.y + moveSpeed + player.hgt > room.y + room.hgt then
             if room.cardinality[2] == 0 then
@@ -386,23 +379,11 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, b:getXYWH()) then
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 1, moveSpeed) then
+                if b.collision[1] then
                     b:onTouch(1)
                     if b.y - (player.y + player.hgt) < dy then
                         dy = b.y - (player.y + player.hgt)
-                    end
-                end
-            end
-            
-            if b.isLiquid then
-                if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, b:getXYWH()) then
-                    b:onTouch(1)
-                    if b.isSolid then
-                        if b.y - (player.y + player.hgt) < dy then
-                            dy = b.y - (player.y + player.hgt)
-                        end
                     end
                 end
             end
@@ -410,12 +391,11 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         
         --Déplacement du joueur
         if dy ~= math.huge then
-            player.touchGround()
+            player.ySpd = 0
+            player.isJumping = false
             
             if dy ~= 0 then
---                print("animation : le joueur touche le lol")
-                
-                player.changeAnimation(9)
+                player.touchGround()
             end
             
             player.y = player.y + dy
@@ -426,6 +406,7 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
         player.y = player.y + moveSpeed
         
         if moveSpeed > 0 then
+            
             --Réinitialise le saut (vu que le joueur est en train de tomber)
             player.isJumping = true
             player.canJumpHigher = false
@@ -438,64 +419,33 @@ player.moveY = function(moveSpeed, isPushed)--Déplacement vertical du joueur
 end
 
 player.canMoveX = function(moveSpeed, isPushed)
-    if not isPushed then
-        --Test si il joueur dans une matière qui le ralenti
-        for i, e in pairs(room.entities) do
-            if e.solidResistance ~= 100 then
-                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, e:getXYWH()) then
-                    moveSpeed = moveSpeed * (100 -e.solidResistance) / 100
-                end
-            end
-        end
-    end
-    
-    local dx = math.huge
     
     if moveSpeed < 0 then
         --Collision bords de la salle
         if player.x + moveSpeed < room.x then
             if room.cardinality[3] == 0 then
-                --Se bloque contre le bord
-                if player.x - room.x < dx then
-                    dx = player.x - room.x
-                end
+                return false
+            else
+                return true
             end
         end
         
         --Collision entités
         for i, e in pairs(room.entities) do
-            if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, e:getXYWH()) then
+            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, e:getXYWH()) then
                 if e.solidResistance == 100 then
-                    if player.x - (e.x + e.wth) < dx then
-                        dx = player.x - (e.x + e.wth)
-                    end
+                    return false
                 end
             end
         end
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, b:getXYWH()) then
-                    if player.x - (b.x + blocs.size) < dx then
-                        dx = player.x - (b.x + blocs.size)
-                    end
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 4, moveSpeed) then
+                if b.collision[4] then
+                    return false
                 end
             end
-            
-            if b.isLiquid then
-                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, b:getXYWH()) then
-                    if b.isSolid then
-                        if player.x - (b.x + blocs.size) < dx then
-                            dx = player.x - (b.x + blocs.size)
-                        end
-                    end
-                end
-            end
-        end
-        
-        if dx ~= math.huge then
-            return false
         end
         
         return true
@@ -504,50 +454,28 @@ player.canMoveX = function(moveSpeed, isPushed)
         --Collision bords de la salle
         if player.x + moveSpeed + player.wth > room.x + room.wth then
             if room.cardinality[4] == 0 then
-                --Se bloque contre le bord
-                if (room.x + room.wth) - (player.x + player.wth) < dx then
-                    dx = (room.x + room.wth) - (player.x + player.wth)
-                end
+                return false
+            else
+                return true
             end
         end
         
         --Collision entités
         for _, e in pairs(room.entities) do
-            --Collisions coté gauche des entités
-            if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, e:getXYWH()) then
+            if collision_rectToRect(player.x + moveSpeed, player.y, player.wth, player.hgt - player.offsetStairEffect, e:getXYWH()) then
                 if e.solidResistance == 100 then
-                    if e.x - (player.x + player.wth) < dx then
-                        dx = e.x - (player.x + player.wth)
-                    end
+                    return false
                 end
             end
         end
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                
-                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, b:getXYWH()) then
-                    if b.x - (player.x + player.wth) < dx then
-                        dx = b.x - (player.x + player.wth)
-                    end
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 3, moveSpeed) then
+                if b.collision[3] then
+                    return false
                 end
             end
-            
-            if b.isLiquid then
-                
-                if collision_rectToRect(player.x + moveSpeed, player.y + 1, player.wth, player.hgt - 2, b:getXYWH()) then
-                    if b.isSolid then
-                        if x - (player.x + player.wth) < dx then
-                            dx = x - (player.x + player.wth)
-                        end
-                    end
-                end
-            end
-        end
-        
-        if dx ~= math.huge then
-            return false
         end
         
         return true
@@ -555,118 +483,64 @@ player.canMoveX = function(moveSpeed, isPushed)
 end
 
 player.canMoveY = function(moveSpeed, isPushed)
-    
-    if not isPushed then
-        --Test si il joueur dans une matière qui le ralenti
-        for _, e in pairs(room.entities) do
-            if e.solidResistance ~= 100 then
-                if collision_rectToRect(player.x, player.y, player.wth, player.hgt, e:getXYWH()) then
-                    moveSpeed = moveSpeed * (100 -e.solidResistance) / 100
-                end
-            end
-        end
-    end
-    
-    local dy = math.huge
-    
     if moveSpeed < 0 then
+        
         --Collision bords de la salle
         if player.y + moveSpeed < 0 then
             if room.cardinality[1] == 0 then
-                --Se bloque au bord
-                if player.y < dy then
-                    dy = player.y
-                end
+                return false
+            else
+                return true
             end
         end
         
         --Collision entités
         for _, e in pairs(room.entities) do
-            if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, e:getXYWH()) then
+            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, e:getXYWH()) then
                 if e.solidResistance == 100 then
-                    if player.y - (e.y + e.hgt) < dy then
-                        dy = player.y - (e.y + e.hgt)
-                    end
+                    return false
                 end
             end
         end
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                
-                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, b:getXYWH()) then
-                    if player.y - (b.y + blocs.size) < dy then
-                        dy = player.y - (b.y + blocs.size)
-                    end
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 2, moveSpeed) then
+                if b.collision[2] then
+                    return false
                 end
             end
-            
-            if b.isLiquid then
-                
-                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, b:getXYWH()) then
-                    if b.isSolid then
-                        if player.y - (b.y + blocs.size) < dy then
-                            dy = player.y - (b.y + blocs.size)
-                        end
-                    end
-                end
-            end
-        end
-        
-        if dy ~= math.huge then
-            return false
         end
         
         return true
+        
     elseif moveSpeed > 0 then
+        
         --Collision bords de la salle
         if player.y + moveSpeed + player.hgt > room.y + room.hgt then
             if room.cardinality[2] == 0 then
-                --Se bloque au bord
-                if room.y + room.hgt - (player.y + player.hgt) < dy then
-                    dy = room.y + room.hgt - (player.y + player.hgt)
-                end
+                return false
+            else
+                return true
             end
         end
         
         --Collision entités
         for _, e in pairs(room.entities) do
-            if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, e:getXYWH()) then
+            if collision_rectToRect(player.x, player.y + moveSpeed, player.wth, player.hgt, e:getXYWH()) then
                 if e.solidResistance == 100 then
-                    if e.y - (player.y + player.hgt) < dy then
-                        dy = e.y - (player.y + player.hgt)
-                    end
+                    return false
                 end
             end
         end
         
         --Collision blocs
         for i, b in pairs(room.blocs[1]) do
-            if b.isSolid and not b.isLiquid then
-                
-                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, b:getXYWH()) then
-                    if b.y - (player.y + player.hgt) < dy then
-                        dy = b.y - (player.y + player.hgt)
-                    end
+            if player:movingRectCollison(b.x, b.y, b.wth, b.hgt, 1, moveSpeed) then
+                if b.collision[1] then
+                    return false
                 end
             end
-            
-            if b.isLiquid then
-                
-                if collision_rectToRect(player.x + 1, player.y + moveSpeed, player.wth - 2, player.hgt, b:getXYWH()) then
-                    if b.isSolid then
-                        if b.y - (player.y + player.hgt) < dy then
-                            dy = b.y - (player.y + player.hgt)
-                        end
-                    end
-                end
-            end
-        end
-        
-        --Déplacement du joueur
-        if dy ~= math.huge then
-            return false
         end
         
         return true
@@ -715,7 +589,7 @@ player.getDirection = function(oldPlayerX, oldPlayerY)--Test ou le joueur s'est 
 --            print("animation : Le joueur est immobile")
             
         end
-    elseif player.airTime ~= 0 then
+    elseif player.airTime > 200 then
         if oldPlayerX == player.x then
             if oldPlayerY < player.y then
                 

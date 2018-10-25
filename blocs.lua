@@ -339,7 +339,7 @@ blocs.update = function(dt)--Vérification des événements des blocs
                 --Supprime les blocs qui doivent être supprimé
                 table.remove(room.blocs[j], index)
             else
---                print("tu sens des pieds")
+--                print("Bloc mal supprimé")
             end
         end
     end
@@ -362,26 +362,65 @@ blocs.draw = function()--Dessine les blocs
                 --Affichage du bloc
                 if b.isLiquid then
                     
-                    if b.cardinality[1] ~= 0 then
-                        if b.cardinality[1] == b.id then
-                            local x, y = blocs.getPos(b.coordX, b.coordY)
-                            lg.rectangle("fill", x + wdow.shake.x, y + wdow.shake.y, b.wth, blocs.size)
-                        elseif bloc[b.cardinality[1]].isLiquid then
-                            
-                            lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y, b.wth, b.hgt)
-                            
-                            if j == 1 then
-                                lg.setColor(unpack(bloc[b.cardinality[1]].colors))
+                    --Expérimentale--
+                    
+                    if b.cardinality[1] ~= b.id and (b.cardinality[2] ~= 0 or b.coordY == room.rows) then
+                        
+                        local left = blocs.get(b.coordX - 1, b.coordY, b.layer)
+                        local right = blocs.get(b.coordX + 1, b.coordY, b.layer)
+                        
+                        local leftUp = blocs.get(b.coordX - 1, b.coordY - 1, b.layer)
+                        local rightUp = blocs.get(b.coordX + 1, b.coordY - 1, b.layer)
+                        
+                        local leftDown = blocs.get(b.coordX - 1, b.coordY + 1, b.layer)
+                        local rightDown = blocs.get(b.coordX + 1, b.coordY + 1, b.layer)
+                        
+                        if not left then left = {isLiquid = false} end
+                        if not right then right = {isLiquid = false} end
+                        
+                        if not leftUp then leftUp = {isLiquid = false} end
+                        if not rightUp then rightUp = {isLiquid = false} end
+                        
+                        if not leftDown then leftDown = {isLiquid = false} end
+                        if not rightDown then rightDown = {isLiquid = false} end
+                        
+                        pointLeft = 0
+                        pointRight = 0
+                        
+                        --Coté gauche
+                        if left.isLiquid then
+                            if leftUp.isLiquid then
+                                pointLeft = b.y - (blocs.size - b.hgt)
                             else
-                                lg.setColor(unpack(mergeColors(bloc[b.cardinality[1]].colors, blocs.layerColor[j])))
+                                pointLeft = (b.y + left.y)/2
                             end
-                            
-                            lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y - (blocs.size - b.hgt), b.wth, blocs.size - b.hgt)
+                        elseif leftDown.isLiquid then
+                            pointLeft = b.y + b.hgt
+                        elseif leftUp.isLiquid then
+                            pointLeft = b.y - (blocs.size - b.hgt)
                         else
-                            lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y, b.wth, b.hgt)
+                            pointLeft = b.y
                         end
+                        
+                        --Coté droite
+                        if right.isLiquid then
+                            if rightUp.isLiquid then
+                                pointRight = b.y - (blocs.size - b.hgt)
+                            else
+                                pointRight = (b.y + right.y)/2
+                            end
+                        elseif rightDown.isLiquid then
+                            pointRight = b.y + b.hgt
+                        elseif rightUp.isLiquid then
+                            pointRight = b.y - (blocs.size - b.hgt)
+                        else
+                            pointRight = b.y
+                        end
+                        
+                        lg.polygon("fill", b.x, pointLeft, b.x + blocs.size/2, b.y, b.x + blocs.size, pointRight, b.x + blocs.size, b.y + b.hgt, b.x, b.y + b.hgt)
+                        
                     else
-                        lg.rectangle("fill", b.x + wdow.shake.x, b.y + wdow.shake.y, b.wth, b.hgt)
+                        lg.rectangle("fill", b.x, b.y - (blocs.size - b.hgt), b.wth, blocs.size)
                     end
                 else
                     if b.imgLink then

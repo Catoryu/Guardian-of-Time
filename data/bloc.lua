@@ -20,7 +20,7 @@ bloc_class = {
     fillingRateMin = 0, --Minimum de % de remplissage pour pouvoir déverser
     refreshRate = 0.05,
     viscousRate = 25,
-    density = 0,
+    density = 100,
     frame = 0,
     hp = 0,
     img = "",
@@ -30,6 +30,7 @@ bloc_class = {
     timePass = false, --Indique si le bloc est affecté par le temps
     layer = 1, --Permet de définir si le bloc est devant ou derrière
     colors = {255, 255, 255, 255},
+    collision = {true, true, true, true}, --Définit quels sont les cotés
     
     --Définit quel fonction sont activé
     ttlReach = false,
@@ -254,59 +255,56 @@ bloc_class = {
     
     changeFillingRate = function(self, newFillingRate)--Modifie la contenance d'un liquide (en vérifiant les collisions avec le joueur)
         
+        --Test si le bloc est bien solide
+        if not self.isLiquid then print("On ne peut pas changer la quantité de liquide d'un bloc qui n'est pas liquide"); return end
+        
         self:ping()
         self:wakeUp()
         
         --Si le bloc a plus que 100% de remplissage, il repasse à 100%
         if newFillingRate > 100 then newFillingRate = 100 end
         
-        --Actualise la contenance du liquide
-        self.fillingRate = newFillingRate
+        dump = self.fillingRate
         
-        self:calculateDimension()
-        
-        --[[
-        --Si le bloc a plus que 100% de remplissage, il repasse à 100%
-        if newFillingRate > 100 then newFillingRate = 100 end
-        
-        --Test si le bloc est bien solide
-        if not self.isLiquid then print("On ne peut pas changer la quantité de liquide d'un bloc qui n'est pas liquide"); return end
-        
-        --Récupère les coordonées du bloc
-        local x, y = blocs.getPos(self.coordX, self.coordY)
-        
-        --Calcul la hauteur du liquide
-        local liquidHeight = self.fillingRate * blocs.size / 100
-        local newLiquidHeight = newFillingRate * blocs.size / 100
-        
-        --Test si le changement de quantité de liquide va toucher le joueur ou que le joueur est sur le liquide/solide
-        if (collision_rectToRect(x, y + (blocs.size - newLiquidHeight), blocs.size, newLiquidHeight, player:getXYWH())
-        or ((player.x + player.wth > x and player.x < x + blocs.size) and (player.y + player.hgt == y + (blocs.size - liquidHeight)))) and self.isSolid and self.layer == 1 then
+        if self.layer == 1 and self.isSolid then
             
-            print(self.name)
+            --Le liquide diminue
+            if newFillingRate < dump and (player.x + player.wth > self.x and player.x < self.x + self.wth) and (player.y + player.hgt == self.y) then
+                
+                self.fillingRate = newFillingRate
+                
+                self:calculateDimension()
+                
+                local delta = player.y + player.hgt - self.y
+                
+                player.moveY(-delta)
+            end
             
-            print("\n\n\nEtat initial :")
-            print("player.y + player.hgt : "..player.y + player.hgt)
-            print("y + (blocs.size - liquidHeight) : "..y + (blocs.size - liquidHeight))
-            
-            delta = liquidHeight - newLiquidHeight
-            
-            if not player.canMoveY(delta) then return end
-            
-            player.moveY(delta)
-            
-            print("\nEtat final : ")
-            print("player.y + player.hgt : "..player.y + player.hgt)
-            print("y + (blocs.size - newLiquidHeight) : "..y + (blocs.size - newLiquidHeight))
-            
-            --Actualise la contenance du liquide
             self.fillingRate = newFillingRate
+            
+            self:calculateDimension()
+            
+            --Le liquide augmente
+            if newFillingRate > dump and collision_rectToRect(self.x, self.y, self.wth, self.hgt, player:getXYWH()) then
+                
+                local delta = player.y + player.hgt - self.y
+                
+                if player.canMoveY(-delta) then
+                    player.moveY(-delta)
+                else
+                    --Ne change pas de quantité de liquide
+                    self.fillingRate = dump
+                    
+                    self:calculateDimension()
+                    
+                    return
+                end
+            end
         else
-            
-            --Actualise la contenance du liquide
             self.fillingRate = newFillingRate
+            
+            self:calculateDimension()
         end
-        ]]--
     end,
     
     forceflow = function(self)--Fait couler entièrement le liquide du bloc
@@ -675,14 +673,26 @@ bloc_class = {
 
 newClass(bloc_class)
 
+--Metamethode pour savoir si tous les cotés sont solide
+setmetatable(
+    bloc_class.collision,
+    {
+        __index = function (t, k)
+            for i, v in pairs(t) do
+                if not v then return false end
+            end
+            return true
+        end
+    }
+)
+
 bloc = {
     bloc_class:new({--Bloc solide classique
         id = 1,
         name = "solid",
         img = "stone",
         imgLink = true,
-        isSolid = true,
-        density = 100
+        isSolid = true
     }),
 
     bloc_class:new({--Bloc qui se détruit au toucher (dessus)
@@ -699,8 +709,7 @@ bloc = {
             blocs.pop(self.coordX, self.coordY, self.layer)
             blocs.push(false, bloc[3]:new({coordX = self.coordX, coordY = self.coordY}))
         end,
-        onTouch = function(self, direction) if direction == 1 then self.timePass = true end end,
-        density = 100
+        onTouch = function(self, direction) if direction == 1 then self.timePass = true end end
     }),
 
     bloc_class:new({--Bloc qui apparait au bout d'un certain temps
@@ -716,15 +725,14 @@ bloc = {
                 blocs.pop(self.coordX, self.coordY, self.layer)
                 blocs.push(false, bloc[2]:new({coordX = self.coordX, coordY = self.coordY}))
             end
-        end,
-        density = 100
+        end
     }),
 
-    bloc_class:new({--WIP Plateforme à sens unique (Uniquement collision du dessus)
+    bloc_class:new({--Plateforme à sens unique (Uniquement collision du dessus)
         id = 4,
         name = "platform",
         img = "woodPlatform",
-        density = 100
+        collision = {true, false, false, false}
     }),
 
     bloc_class:new({--Bloc liquide d'eau
@@ -736,6 +744,7 @@ bloc = {
         isLiquid = true,
         fillingRate = 100,
         density = 10,
+        collision = {false, false, false, false}
     }),
 
     bloc_class:new({--Bloc liquide de sable
@@ -768,7 +777,6 @@ bloc = {
         isGravityAffected = false,
         refreshRate = 1,
         isSolid = false,
-        density = 100,
         update = true,
         spawnLayer = 1,
         layer = 2,
@@ -777,4 +785,13 @@ bloc = {
             blocs.push(true, bloc[5]:new({coordX = self.coordX, coordY = self.coordY, layer = self.spawnLayer}))
         end
     }),
+    --[[
+    A faire : 
+    -Bloc glissant
+    -Bloc rebondissant
+    -Bloc visqueux
+    -Escalier
+    -Echelle
+    -Pente
+    ]]--
 }
