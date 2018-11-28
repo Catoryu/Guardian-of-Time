@@ -1,0 +1,15 @@
+Boutons :
+
+-Validate Char. :
+(FOR ALTERNATIVE CHARACTER)
+	Check if all is ok.
+	Add Character to CharaList.
+	Reset App.
+-Characters List :
+	Shows a list of CharaList in another form.
+	Form need to have possibility to update Character.updated prop.
+	Allows to modificate Character (Later).
+-Save as... :
+	Save CharaList as ".bin".  (or ".xml" if problems)
+-Load :
+	Get CharaList from ".bin" file. (or ".xml" if problems)

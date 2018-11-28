@@ -1,0 +1,88 @@
+DEBUG_2018-11-28_16-42-56 : Initializing MainForm...
+DEBUG_2018-11-28_16-42-56 : MainForm : OK.
+DEBUG_2018-11-28_16-42-56 : Initializing World Lists...
+DEBUG_2018-11-28_16-42-56 : World Lists : OK.
+DEBUG_2018-11-28_16-42-56 : Loading Boxes...
+DEBUG_2018-11-28_16-42-56 : Loading timelines.
+DEBUG_2018-11-28_16-42-56 : Refreshing Timelines.
+DEBUG_2018-11-28_16-42-56 : Timelines : OK.
+DEBUG_2018-11-28_16-42-56 : Loading races.
+DEBUG_2018-11-28_16-42-56 : Refreshing Races.
+DEBUG_2018-11-28_16-42-56 : Races : OK.
+DEBUG_2018-11-28_16-42-56 : Loading names.
+DEBUG_2018-11-28_16-42-57 : Refreshing Last Names.
+DEBUG_2018-11-28_16-42-57 : Last Names : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing First Names.
+DEBUG_2018-11-28_16-42-57 : First Names : OK.
+DEBUG_2018-11-28_16-42-57 : Loading elements.
+DEBUG_2018-11-28_16-42-57 : Refreshing Elements.
+DEBUG_2018-11-28_16-42-57 : Refreshing Element 1.
+DEBUG_2018-11-28_16-42-57 : Element 1 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Element 2.
+DEBUG_2018-11-28_16-42-57 : Element 2 : OK.
+DEBUG_2018-11-28_16-42-57 : Elements : OK.
+DEBUG_2018-11-28_16-42-57 : Loading powers.
+DEBUG_2018-11-28_16-42-57 : Refreshing Powers.
+DEBUG_2018-11-28_16-42-57 : Refreshing Power 1.
+DEBUG_2018-11-28_16-42-57 : Power 1 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Power 2.
+DEBUG_2018-11-28_16-42-57 : Power 2 : OK.
+DEBUG_2018-11-28_16-42-57 : Powers : OK.
+DEBUG_2018-11-28_16-42-57 : Loading hairs.
+DEBUG_2018-11-28_16-42-57 : Refreshing Hair Colors.
+DEBUG_2018-11-28_16-42-57 : Hair Colors : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Hair Lengths.
+DEBUG_2018-11-28_16-42-57 : Hair Length : OK.
+DEBUG_2018-11-28_16-42-57 : Loading eyes.
+DEBUG_2018-11-28_16-42-57 : Refreshing Eye Colors.
+DEBUG_2018-11-28_16-42-57 : Eye Colors : OK.
+DEBUG_2018-11-28_16-42-57 : Loading stuff.
+DEBUG_2018-11-28_16-42-57 : Refreshing Likes.
+DEBUG_2018-11-28_16-42-57 : Refreshing Likes 1.
+DEBUG_2018-11-28_16-42-57 : Likes 1 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Likes 2.
+DEBUG_2018-11-28_16-42-57 : Likes 2 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Likes 3.
+DEBUG_2018-11-28_16-42-57 : Likes 3 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Likes 4.
+DEBUG_2018-11-28_16-42-57 : Likes 4 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Likes 5.
+DEBUG_2018-11-28_16-42-57 : Likes 5 : OK.
+DEBUG_2018-11-28_16-42-57 : Likes : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Unlikes.
+DEBUG_2018-11-28_16-42-57 : Refreshing Unlikes 1.
+DEBUG_2018-11-28_16-42-57 : Unlikes 1 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Unlikes 2.
+DEBUG_2018-11-28_16-42-57 : Unlikes 2 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Unlikes 3.
+DEBUG_2018-11-28_16-42-57 : Unlikes 3 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Unlikes 4.
+DEBUG_2018-11-28_16-42-57 : Unlikes 4 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Unlikes 5.
+DEBUG_2018-11-28_16-42-57 : Unlikes 5 : OK.
+DEBUG_2018-11-28_16-42-57 : Unlikes : OK.
+DEBUG_2018-11-28_16-42-57 : Loading activities.
+DEBUG_2018-11-28_16-42-57 : Refreshing Activities.
+DEBUG_2018-11-28_16-42-57 : Refreshing Activity 1.
+DEBUG_2018-11-28_16-42-57 : Activity 1 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Activity 2.
+DEBUG_2018-11-28_16-42-57 : Activity 2 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Activity 3.
+DEBUG_2018-11-28_16-42-57 : Activity 3 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Activity 4.
+DEBUG_2018-11-28_16-42-57 : Activity 4 : OK.
+DEBUG_2018-11-28_16-42-57 : Activities : OK.
+DEBUG_2018-11-28_16-42-57 : Loading weapons.
+DEBUG_2018-11-28_16-42-57 : Refreshing Weapons.
+DEBUG_2018-11-28_16-42-57 : Refreshing Weapon 1.
+DEBUG_2018-11-28_16-42-57 : Weapon 1 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Weapon 2.
+DEBUG_2018-11-28_16-42-57 : Weapon 2 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Weapon 3.
+DEBUG_2018-11-28_16-42-57 : Weapon 3 : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Weapon 4.
+DEBUG_2018-11-28_16-42-57 : Weapon 4 : OK.
+DEBUG_2018-11-28_16-42-57 : Weapons : OK.
+DEBUG_2018-11-28_16-42-57 : Refreshing Dates.
+DEBUG_2018-11-28_16-42-57 : Refreshing Date Limits.
+DEBUG_2018-11-28_16-42-57 : Date Limits : OK.

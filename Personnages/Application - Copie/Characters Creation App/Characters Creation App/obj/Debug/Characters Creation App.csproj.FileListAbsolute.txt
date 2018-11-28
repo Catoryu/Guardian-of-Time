@@ -1,0 +1,30 @@
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters Creation App.csprojAssemblyReference.cache
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\GuardianOfTime.ListForm.resources
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\GuardianOfTime.MainForm.resources
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters_Creation_App.Properties.Resources.resources
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters Creation App.csproj.GenerateResource.cache
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters Creation App.csproj.CoreCompileInputs.cache
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\Characters Creation App.exe.config
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\Characters Creation App.exe
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\Characters Creation App.pdb
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\Catoryu's Library.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\MonoGame.Framework.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.MediaFoundation.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.XAudio2.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.DXGI.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.Direct3D11.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.Direct2D1.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.XInput.dll
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\Catoryu's Library.pdb
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\MonoGame.Framework.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.MediaFoundation.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.XAudio2.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.DXGI.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.Direct3D11.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.Direct2D1.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\bin\Debug\SharpDX.XInput.xml
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters Creation App.csproj.CopyComplete
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters Creation App.exe
+F:\Guardian of Time Project\Personnages\Application\Characters Creation App\Characters Creation App\obj\Debug\Characters Creation App.pdb
